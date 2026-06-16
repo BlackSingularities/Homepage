@@ -14,6 +14,16 @@ const ExtIcon = () => (
 
 const PROJECTS = [
   {
+    title: 'Galeria Fotograficzna',
+    type: 'Portfolio + Galeria klientów',
+    desc: 'Aplikacja fotograficzna z publicznym portfolio, prywatnymi galeriami chronionymi hasłem, panelem admina i lightboxem z zoomem 1:1.',
+    tags: ['Node.js', 'React', 'Sharp', 'Docker'],
+    img: 'https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=900&q=80&auto=format&fit=crop',
+    href: '/galeria',
+    badge: 'Własny projekt',
+    size: 'featured',
+  },
+  {
     title: 'Kompendium Podróżnicze',
     type: 'Aplikacja webowa',
     desc: 'Rozbudowana encyklopedia podróżnicza — kraje, miasta, atrakcje, blog. FastAPI + React, 21 tabel bazy danych, panel admina.',
@@ -21,7 +31,7 @@ const PROJECTS = [
     img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80&auto=format&fit=crop',
     href: '/kompendium-podroznicze',
     badge: 'Własny projekt',
-    size: 'featured',
+    size: 'regular',
   },
   {
     title: 'Navigator',
