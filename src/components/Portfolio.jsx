@@ -5,7 +5,6 @@ const ArrowIcon = () => (
     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
 )
-
 const ExtIcon = () => (
   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -17,10 +16,9 @@ const PROJECTS = [
   {
     title: 'Kompendium Podróżnicze',
     type: 'Aplikacja webowa',
-    desc: 'Rozbudowana encyklopedia podróżnicza — kraje, miasta, atrakcje, blog. FastAPI + React, 21 tabel bazy danych, panel admina, bogata baza wiedzy o świecie.',
+    desc: 'Rozbudowana encyklopedia podróżnicza — kraje, miasta, atrakcje, blog. FastAPI + React, 21 tabel bazy danych, panel admina.',
     tags: ['FastAPI', 'React', 'SQLite', 'Docker'],
-    gradient: 'linear-gradient(135deg, #1a2744 0%, #0d1a38 40%, #091428 100%)',
-    label: 'Kompendium',
+    img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80&auto=format&fit=crop',
     href: '/kompendium-podroznicze',
     badge: 'Własny projekt',
     size: 'featured',
@@ -28,10 +26,9 @@ const PROJECTS = [
   {
     title: 'Navigator',
     type: 'Eksplorator tras GPX',
-    desc: 'Aplikacja do zarządzania i analizy tras GPX. Mapa Leaflet, wykresy wysokości, heatmapa, duplikaty, statystyki archiwum 300+ tras.',
+    desc: 'Aplikacja do zarządzania i analizy tras GPX. Mapa Leaflet, wykresy wysokości, heatmapa, 300+ tras.',
     tags: ['Node.js', 'Leaflet', 'Docker'],
-    gradient: 'linear-gradient(135deg, #1a2a1a 0%, #0d200d 40%, #081408 100%)',
-    label: 'Navigator',
+    img: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=700&q=80&auto=format&fit=crop',
     href: '/navigator',
     badge: 'Własny projekt',
     size: 'regular',
@@ -41,8 +38,7 @@ const PROJECTS = [
     type: 'Dziennik podróży',
     desc: 'Aplikacja do dokumentowania podróży z galerią zdjęć, mapami i wpisami. FastAPI + React + Tailwind.',
     tags: ['FastAPI', 'React', 'Tailwind', 'Docker'],
-    gradient: 'linear-gradient(135deg, #2a1a10 0%, #1a0d06 40%, #0d0804 100%)',
-    label: 'Travels',
+    img: 'https://images.unsplash.com/photo-1476900164809-ff19b8ae5968?w=700&q=80&auto=format&fit=crop',
     href: '/travels',
     badge: 'Własny projekt',
     size: 'half',
@@ -50,10 +46,9 @@ const PROJECTS = [
   {
     title: 'ProjectTravel.pl',
     type: 'Strona dla klienta',
-    desc: 'Profesjonalna strona internetowa wykonana na zlecenie. Projekt, kodowanie i wdrożenie.',
+    desc: 'Profesjonalna strona internetowa wykonana na zlecenie klienta. Projekt, kodowanie i pełne wdrożenie.',
     tags: ['Web Design', 'Frontend', 'Wdrożenie'],
-    gradient: 'linear-gradient(135deg, #2a2a1a 0%, #1a1a0d 40%, #0e0e08 100%)',
-    label: 'ProjectTravel',
+    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80&auto=format&fit=crop',
     href: 'https://www.projecttravel.pl/',
     badge: 'Klient',
     external: true,
@@ -71,15 +66,18 @@ function ProjectCard({ project }) {
   return (
     <article className={`project-card ${sizeClass} reveal`}>
       <div className="project-visual">
-        <div className="project-visual-inner">
-          <div className="project-visual-grad" style={{ background: project.gradient }} />
-          <span className="project-visual-label">{project.label}</span>
-        </div>
+        <img
+          src={project.img}
+          alt={project.title}
+          loading="lazy"
+          className="project-visual-photo"
+        />
+        <div className="project-visual-overlay" />
         <span className="project-visual-badge">{project.badge}</span>
+        <span className="project-visual-type">{project.type}</span>
       </div>
 
       <div className="project-body">
-        <p className="project-type">{project.type}</p>
         <h3 className="project-title">{project.title}</h3>
         <p className="project-desc">{project.desc}</p>
 
@@ -110,7 +108,7 @@ export default function Portfolio() {
     if (!els) return
     const obs = new IntersectionObserver(
       (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
-      { threshold: 0.08 }
+      { threshold: 0.07 }
     )
     els.forEach(el => obs.observe(el))
     return () => obs.disconnect()
