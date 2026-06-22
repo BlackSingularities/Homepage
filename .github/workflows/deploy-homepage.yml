@@ -1,0 +1,43 @@
+name: Deploy Homepage
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: homepage-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to production server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOMEPAGE_SSH_HOST }}
+          username: ${{ secrets.HOMEPAGE_SSH_USER }}
+          password: ${{ secrets.HOMEPAGE_SSH_PASSWORD }}
+          port: ${{ secrets.HOMEPAGE_SSH_PORT }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /opt/apps/homepage
+
+            if [ ! -d .git ]; then
+              git init
+              git remote add origin https://github.com/BlackSingularities/Homepage.git
+            else
+              git remote set-url origin https://github.com/BlackSingularities/Homepage.git
+            fi
+
+            git fetch origin main
+            git checkout -B main origin/main
+            git reset --hard origin/main
+            git clean -fd
+
+            docker compose up -d --build
