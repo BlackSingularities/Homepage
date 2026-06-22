@@ -16,6 +16,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOMEPAGE_SSH_HOST }}
+          username: ${{ secrets.HOMEPAGE_SSH_USER }}
+          password: ${{ secrets.HOMEPAGE_SSH_PASSWORD }}
+          port: ${{ secrets.HOMEPAGE_SSH_PORT }}
+          source: "."
+          target: "/opt/apps/homepage"
+          rm: true
+          overwrite: true
+          tar_dereference: true
+
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -27,17 +43,5 @@ jobs:
           script: |
             set -euo pipefail
             cd /opt/apps/homepage
-
-            if [ ! -d .git ]; then
-              git init
-              git remote add origin https://github.com/BlackSingularities/Homepage.git
-            else
-              git remote set-url origin https://github.com/BlackSingularities/Homepage.git
-            fi
-
-            git fetch origin main
-            git checkout -B main origin/main
-            git reset --hard origin/main
-            git clean -fd
-
+            rm -rf .git node_modules dist
             docker compose up -d --build
