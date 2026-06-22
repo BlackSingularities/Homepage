@@ -1,20 +1,18 @@
 import { motion } from 'framer-motion'
 import {
   ArrowUpRight,
-  BarChart3,
-  BrainCircuit,
   Camera,
   Code2,
+  Container,
   DatabaseZap,
-  Gauge,
-  Globe2,
   Layers3,
+  LineChart,
   Map,
   Plane,
-  Route,
+  Sparkle,
   Sparkles,
-  Table2,
-  Workflow,
+  TerminalSquare,
+  Wand2,
 } from 'lucide-react'
 
 const fade = {
@@ -28,122 +26,131 @@ const stagger = {
 }
 
 const tools = [
+  'HTML / CSS',
+  'Vibecoding',
+  'AI workflow',
+  'Docker',
+  'SSH',
+  'Linux',
+  'Reverse proxy',
+  'Git',
   'Power BI',
-  'Google Looker Studio',
+  'Looker Studio',
   'Excel / Power Query',
   'Google Sheets',
   'Apps Script',
-  'SQL',
-  'Python',
-  'React',
-  'FastAPI',
-  'Docker',
-  'Automatyzacje',
-  'AI workflow',
 ]
 
-const capabilities = [
+const skills = [
   {
-    icon: BarChart3,
-    title: 'Business intelligence',
-    text: 'Dashboardy, modele danych, KPI, raporty zarządcze i analityka, która zamienia chaos operacyjny w decyzje.',
+    icon: Wand2,
+    title: 'Vibecoding stron i aplikacji',
+    text: 'Nie piszę klasycznie w żadnym języku poza HTML i CSS — ale z pomocą AI buduję realnie działające strony i narzędzia. Rozumiem, jak to wszystko działa, i doprowadzam projekt do końca.',
   },
   {
-    icon: Table2,
-    title: 'Excel, Sheets i Apps Script',
-    text: 'Zaawansowane arkusze, automatyzacje, importy danych, walidacje, raporty cykliczne i narzędzia dla zespołów.',
+    icon: Container,
+    title: 'Serwery i wdrożenia',
+    text: 'Docker, SSH, Linux, reverse proxy, domeny i certyfikaty. Potrafię postawić aplikację na własnym serwerze i utrzymać ją obok innych usług.',
+  },
+  {
+    icon: LineChart,
+    title: 'Analityka danych',
+    text: 'Power BI, Looker Studio, Excel i Power Query. Zamieniam rozsypane arkusze w dashboardy, KPI i raporty, na których da się oprzeć decyzje.',
   },
   {
     icon: DatabaseZap,
-    title: 'Aplikacje do analizy danych',
-    text: 'Własne panele, wyszukiwarki, ekosystemy wiedzy, narzędzia admina i aplikacje skrojone pod proces.',
+    title: 'Arkusze i automatyzacje',
+    text: 'Google Sheets, Apps Script, formuły, importy i automatyzacje. Wyręczam ludzi w nudnej, powtarzalnej robocie i pilnuję, żeby dane się zgadzały.',
+  },
+  {
+    icon: Sparkle,
+    title: 'AI jako codzienne narzędzie',
+    text: 'Modele AI traktuję jak współpracownika — do prototypów, researchu, treści i przyspieszania każdego etapu pracy, nie jako ciekawostkę.',
   },
   {
     icon: Layers3,
-    title: 'Pełne web ecosystemy',
-    text: 'Strony, backendy, bazy, panele zarządzania, Docker, reverse proxy i wdrożenia obok istniejących usług.',
-  },
-  {
-    icon: Camera,
-    title: 'Fotografia i opowieść wizualna',
-    text: 'Kadry podróżnicze, produktowe i wizerunkowe, które nadają projektom charakter zamiast stockowego szumu.',
-  },
-  {
-    icon: Plane,
-    title: 'Podróże i lotnictwo',
-    text: 'Mapy, trasy, przewodniki, encyklopedie miejsc i narzędzia inspirowane ruchem, geografią i eksploracją.',
+    title: 'Estetyka i detal',
+    text: 'Dbam, żeby to, co robię, dobrze wyglądało: typografia, kompozycja, spójność. Oko fotografa przydaje się też przy interfejsach.',
   },
 ]
 
 const liveApps = [
   {
+    name: 'Open Notebook',
+    href: '/open-notebook',
+    kind: 'AI research workspace',
+    text: 'Prywatny asystent do źródeł, notatek i pracy z wiedzą przy wsparciu modeli AI.',
+    tags: ['AI', 'Research', 'Docker'],
+    status: 'Nowe',
+  },
+  {
     name: 'Galeria',
     href: '/galeria',
-    kind: 'Photography system',
-    text: 'Portfolio fotograficzne i galerie z naciskiem na estetykę, selekcję i prezentację kadrów.',
+    kind: 'Portfolio fotograficzne',
+    text: 'Moje zdjęcia z podróży i nie tylko — galeria z naciskiem na selekcję i sposób prezentacji kadrów.',
     tags: ['Photo', 'Portfolio', 'UX'],
   },
   {
     name: 'Travels',
     href: '/travels',
-    kind: 'Travel journal',
-    text: 'Dziennik podróży, mapy, zdjęcia i struktura do opowiadania historii z drogi.',
+    kind: 'Dziennik podróży',
+    text: 'Mapy, zdjęcia i historie z drogi spięte w jedno miejsce. Tu spotykają się moje dwie pasje.',
     tags: ['Travel', 'Maps', 'Content'],
   },
   {
     name: 'Kompendium Podróżnicze',
     href: '/kompendium-podroznicze',
-    kind: 'Travel knowledge base',
-    text: 'Rozbudowana baza miejsc, atrakcji i treści podróżniczych z architekturą pod zarządzanie.',
-    tags: ['FastAPI', 'React', 'Admin'],
+    kind: 'Baza wiedzy o miejscach',
+    text: 'Rozbudowana baza miejsc i atrakcji z panelem do zarządzania treścią.',
+    tags: ['Web app', 'Admin', 'Data'],
   },
   {
     name: 'Navigator',
     href: '/navigator',
-    kind: 'Route intelligence',
-    text: 'Eksplorator tras GPX, mapy, analiza przebiegów i narzędzia dla aktywności terenowych.',
+    kind: 'Eksplorator tras',
+    text: 'Przeglądanie tras GPX, mapy i analiza przebiegów — narzędzie dla ruchu w terenie.',
     tags: ['GPX', 'Maps', 'Analytics'],
   },
   {
     name: 'Kompendium IT',
     href: '/kompendium-it',
-    kind: 'Knowledge system',
-    text: 'Baza wiedzy IT, która porządkuje materiały i skraca drogę od pytania do rozwiązania.',
+    kind: 'Baza wiedzy IT',
+    text: 'Uporządkowane materiały i notatki techniczne, które skracają drogę od pytania do rozwiązania.',
     tags: ['Knowledge', 'Docs', 'Search'],
   },
   {
     name: 'Języki AI',
     href: '/jezyki-ai',
-    kind: 'Learning app',
-    text: 'Aplikacja edukacyjna łącząca naukę języków z technologią i szybkim prototypowaniem.',
+    kind: 'Aplikacja do nauki',
+    text: 'Nauka języków połączona z AI i szybkim prototypowaniem nowych pomysłów.',
     tags: ['Learning', 'AI', 'Product'],
   },
 ]
 
-const cases = [
+const passions = [
   {
-    label: 'BI cockpit',
-    title: 'Od danych rozrzuconych po arkuszach do jednego widoku zarządczego.',
-    text: 'Łączę Power BI, Looker Studio, Sheets, Excel i automatyzacje, żeby firmy widziały sprzedaż, koszty, działania i anomalie bez ręcznego przeklejania danych.',
+    icon: Camera,
+    label: 'Fotografia',
+    text: 'Łapię kadry z podróży i z codzienności. Najbardziej kręci mnie światło, geometria i ten jeden właściwy moment.',
   },
   {
-    label: 'Operational web app',
-    title: 'Strona jako pełnoprawny system, nie wizytówka.',
-    text: 'Projektuję warstwę publiczną, panel admina, modele danych, uploady, wyszukiwarki, role, statusy i deployment, aby strona mogła rosnąć razem z biznesem.',
+    icon: Plane,
+    label: 'Lotnictwo',
+    text: 'Lotniska, samoloty, procedury i mapy nieba. Śledzę ruch lotniczy i regularnie planuję, dokąd dalej.',
   },
   {
-    label: 'Vibe coding + rygor',
-    title: 'Szybkie prototypowanie, ale z inżynierską kontrolą.',
-    text: 'Wykorzystuję AI do przyspieszania budowy, lecz finalnie liczą się testy, stabilność, czytelna architektura i deployment, który da się utrzymać.',
+    icon: Map,
+    label: 'Podróże',
+    text: 'Zbieram miejsca i opowiadam je zdjęciami. Stąd zresztą wzięła się część aplikacji, które buduję.',
   },
 ]
 
 const timeline = [
-  'Rozpoznanie procesu, danych i celu biznesowego',
-  'Projekt informacji: KPI, role, ekrany, źródła danych',
-  'Prototyp interfejsu i ścieżek użytkownika',
-  'Implementacja aplikacji, automatyzacji lub raportu',
-  'Docker, reverse proxy, monitoring i iteracje po wdrożeniu',
+  'Rozmowa o tym, co realnie ma się wydarzyć i po co',
+  'Szkic struktury: ekrany, dane, ścieżki użytkownika',
+  'Prototyp w działaniu — najszybciej jak się da, z pomocą AI',
+  'Dopracowanie, treść, estetyka i porządki w kodzie',
+  'Docker, serwer, domena i spokojne utrzymanie po wdrożeniu',
 ]
 
 function SectionHeader({ kicker, title, text }) {
@@ -188,9 +195,9 @@ export default function App() {
           <strong>Adam Rędzikowski</strong>
         </a>
         <nav>
-          <a href="#systems">Systemy</a>
+          <a href="#skills">Umiejętności</a>
           <a href="#apps">Aplikacje</a>
-          <a href="#craft">Proces</a>
+          <a href="#life">Po godzinach</a>
           <a href="#contact">Kontakt</a>
         </nav>
       </header>
@@ -205,18 +212,19 @@ export default function App() {
           >
             <motion.div className="hero-badge" variants={fade}>
               <Sparkles size={16} />
-              Data, web, automatyzacje i obrazy z charakterem
+              Vibecoder · Analityk danych · Fotograf
             </motion.div>
             <motion.h1 variants={fade}>
-              Projektuję systemy, które porządkują dane, procesy i doświadczenia.
+              Vibecoduję strony, układam dane w sens i łapię świat w kadr.
             </motion.h1>
             <motion.p className="hero-lead" variants={fade}>
-              Łączę analitykę biznesową, Power BI, Looker Studio, Excel, Google Apps Script,
-              aplikacje webowe, fotografię i myślenie produktowe. Tworzę dopracowane strony
-              i narzędzia, które stają się pełnym ekosystemem do zarządzania, analizy i rozwoju.
+              Cześć, jestem Adam. Nie jestem klasycznym programistą — poza HTML i CSS nie piszę
+              w żadnym języku. Ale z pomocą AI buduję realnie działające strony i aplikacje,
+              ogarniam Dockera, SSH i serwery, a na co dzień analizuję dane w Power BI, Looker
+              Studio i Excelu. Po godzinach fotografuję, śledzę lotnictwo i planuję kolejne podróże.
             </motion.p>
             <motion.div className="hero-actions" variants={fade}>
-              <a className="primary-action" href="#apps">Zobacz aplikacje</a>
+              <a className="primary-action" href="#apps">Zobacz, co zbudowałem</a>
               <a className="secondary-action" href="mailto:redzikowskia@gmail.com">Napisz do mnie</a>
             </motion.div>
           </motion.div>
@@ -231,15 +239,15 @@ export default function App() {
               <img src="/assets/adam.jpg" alt="Adam Rędzikowski" />
             </div>
             <div className="metric-grid">
-              <div><strong>BI</strong><span>raporty, KPI, decyzje</span></div>
-              <div><strong>WEB</strong><span>aplikacje i panele</span></div>
-              <div><strong>AI</strong><span>research i workflow</span></div>
-              <div><strong>PHOTO</strong><span>podróże i estetyka</span></div>
+              <div><strong>WEB</strong><span>strony i aplikacje</span></div>
+              <div><strong>DATA</strong><span>raporty i KPI</span></div>
+              <div><strong>PHOTO</strong><span>kadry z podróży</span></div>
+              <div><strong>AIR</strong><span>lotnictwo i mapy</span></div>
             </div>
           </motion.aside>
         </section>
 
-        <section className="tool-strip" aria-label="Technologie">
+        <section className="tool-strip" aria-label="Narzędzia">
           <div className="tool-track">
             {[...tools, ...tools].map((tool, index) => (
               <span key={`${tool}-${index}`}>{tool}</span>
@@ -248,7 +256,7 @@ export default function App() {
         </section>
 
         <motion.section
-          id="systems"
+          id="skills"
           className="content-section"
           initial="hidden"
           whileInView="show"
@@ -256,13 +264,13 @@ export default function App() {
           variants={stagger}
         >
           <SectionHeader
-            kicker="Co robię"
-            title="Analityka, automatyzacje i web w jednej architekturze."
-            text="Najlepsze projekty nie kończą się na ładnym ekranie. Muszą mieć dane, proces, kontrolę, zarządzanie i miejsce na rozwój."
+            kicker="Co potrafię"
+            title="Buduję, wdrażam i analizuję — z głową, nie z dyplomem informatyka."
+            text="Nie udaję inżyniera od niskopoziomowego kodu. Moja siła to łączenie narzędzi, AI i zdrowego rozsądku tak, żeby na końcu coś po prostu działało."
           />
 
           <div className="capability-grid">
-            {capabilities.map(({ icon: Icon, title, text }) => (
+            {skills.map(({ icon: Icon, title, text }) => (
               <motion.article className="capability-card" key={title} variants={fade}>
                 <Icon size={24} />
                 <h3>{title}</h3>
@@ -281,9 +289,9 @@ export default function App() {
           variants={stagger}
         >
           <SectionHeader
-            kicker="Live ecosystem"
-            title="Aplikacje działające na tym serwerze."
-            text="To nie są makiety. To zestaw usług spiętych Dockerem, reverse proxy i konsekwentną logiką rozwoju."
+            kicker="Co zbudowałem"
+            title="Aplikacje, które naprawdę działają na moim serwerze."
+            text="To nie są makiety ani szkice z portfolio. To zestaw usług, które sam postawiłem, spiąłem Dockerem i utrzymuję."
           />
           <div className="apps-grid">
             {liveApps.map((app) => <AppCard key={app.name} app={app} />)}
@@ -291,29 +299,29 @@ export default function App() {
         </motion.section>
 
         <motion.section
-          className="content-section case-section"
+          id="life"
+          className="content-section life-section"
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
           variants={stagger}
         >
           <SectionHeader
-            kicker="Specjalizacje"
-            title="Od dashboardu do pełnej platformy."
+            kicker="Po godzinach"
+            title="Poza ekranem najbardziej kocham latać myślami i podróżować naprawdę."
+            text="To nie jest część oferty — to po prostu ja. Często zresztą przecieka do tego, co buduję."
           />
           <div className="case-grid">
-            {cases.map((item) => (
-              <motion.article className="case-card" key={item.label} variants={fade}>
-                <span>{item.label}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+            {passions.map(({ icon: Icon, label, text }) => (
+              <motion.article className="case-card" key={label} variants={fade}>
+                <span><Icon size={15} /> {label}</span>
+                <p>{text}</p>
               </motion.article>
             ))}
           </div>
         </motion.section>
 
         <motion.section
-          id="craft"
           className="content-section craft-section"
           initial="hidden"
           whileInView="show"
@@ -322,8 +330,7 @@ export default function App() {
         >
           <SectionHeader
             kicker="Jak pracuję"
-            title="Estetyka premium, ale pod spodem konkretna inżynieria."
-            text="Projekt ma wyglądać jak spod ręki artysty, ale zachowywać się jak narzędzie, któremu można zaufać."
+            title="Szybko do działającego prototypu, potem spokojnie do porządku."
           />
           <div className="craft-layout">
             <motion.div className="timeline-card" variants={fade}>
@@ -336,18 +343,19 @@ export default function App() {
             </motion.div>
             <motion.div className="interest-card" variants={fade}>
               <div className="interest-icons">
-                <Globe2 />
-                <Plane />
-                <Route />
+                <Wand2 />
+                <Container />
+                <TerminalSquare />
                 <Camera />
-                <BrainCircuit />
-                <Workflow />
+                <Plane />
+                <LineChart />
               </div>
-              <h3>Biznes, podróże, lotnictwo, fotografia i AI jako jeden język projektowania.</h3>
+              <h3>Łączę rzeczy, które rzadko chodzą w parze — i to jest moja przewaga.</h3>
               <p>
-                Mapy uczą struktury, lotnictwo procedur, fotografia kompozycji, a analityka
-                dyscypliny. Z tego miksu powstają narzędzia, które są szczegółowe,
-                uporządkowane i przyjemne w użyciu.
+                Analityka uczy dyscypliny, fotografia kompozycji, lotnictwo procedur,
+                a AI daje tempo. Z tego miksu powstają projekty uporządkowane, dopracowane
+                i po prostu przyjemne w użyciu — nawet jeśli zaczynam je bez ani jednej linijki
+                napisanej „z głowy”.
               </p>
             </motion.div>
           </div>
@@ -355,10 +363,10 @@ export default function App() {
 
         <section className="content-section signal-section">
           <div className="signal-card">
-            <Gauge size={28} />
+            <Wand2 size={28} />
             <div>
-              <span>Tryb pracy</span>
-              <h2>Potrafię wejść od strony danych, produktu albo designu i dowieźć całość do Dockera.</h2>
+              <span>Tak w skrócie</span>
+              <h2>Daj mi pomysł, dane albo problem — a ja doprowadzę to do działającej strony na serwerze.</h2>
             </div>
             <Code2 size={28} />
           </div>
@@ -372,10 +380,10 @@ export default function App() {
             transition={{ duration: 0.7 }}
           >
             <span className="kicker">Kontakt</span>
-            <h2>Masz dane, proces albo pomysł na aplikację? Zróbmy z tego narzędzie.</h2>
+            <h2>Masz pomysł na stronę, dane do ogarnięcia albo po prostu chcesz pogadać?</h2>
             <p>
-              Najchętniej pracuję przy projektach, w których estetyka spotyka się z realnym
-              procesem: raporty, automatyzacje, aplikacje, systemy wiedzy i webowe ekosystemy.
+              Najfajniej pracuje mi się przy projektach, w których jest miejsce na estetykę,
+              trochę danych i odrobinę kombinowania. Odezwij się — chętnie zobaczę, co da się z tego zrobić.
             </p>
             <div className="contact-actions">
               <a className="primary-action" href="mailto:redzikowskia@gmail.com">redzikowskia@gmail.com</a>
