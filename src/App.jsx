@@ -77,14 +77,6 @@ const capabilities = [
 
 const liveApps = [
   {
-    name: 'Open Notebook',
-    href: '/open-notebook',
-    kind: 'AI research workspace',
-    text: 'Prywatny research assistant do źródeł, notatek, modeli AI i pracy z wiedzą.',
-    tags: ['AI', 'Research', 'Docker'],
-    status: 'Nowe',
-  },
-  {
     name: 'Galeria',
     href: '/galeria',
     kind: 'Photography system',
