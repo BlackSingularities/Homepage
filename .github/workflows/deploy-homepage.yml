@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
@@ -42,6 +42,23 @@ jobs:
           script_stop: true
           script: |
             set -euo pipefail
+
+            # The copy step wipes /opt/apps/homepage on every deploy, so the
+            # encryption key and the application data live next to it instead.
+            PERSIST=/opt/apps/homepage-persist
+            mkdir -p "$PERSIST/data"
+
+            if [ ! -f "$PERSIST/env" ]; then
+              umask 077
+              {
+                printf 'SETTINGS_ENCRYPTION_KEY=%s\n' "$(openssl rand -hex 32)"
+                printf 'HOMEPAGE_DATA_DIR=%s\n' "$PERSIST/data"
+              } > "$PERSIST/env"
+            fi
+
             cd /opt/apps/homepage
+            install -m 600 "$PERSIST/env" .env
             rm -rf .git node_modules dist
+
             docker compose up -d --build
+            docker image prune -f

@@ -18,7 +18,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
+      # Deploys wipe the app directory, so production points this at a path
+      # outside it (set in .env). Locally it stays ./data.
+      - ${HOMEPAGE_DATA_DIR:-./data}:/app/data
     networks:
       - homepage_internal
 

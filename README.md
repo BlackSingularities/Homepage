@@ -21,13 +21,22 @@ Vite proxuje `/api` i `/uploads` na `http://localhost:3001` (można nadpisać zm
 
 ## Produkcja
 
-```bash
-docker compose up -d --build
-```
+Wdrożenie idzie automatycznie z gałęzi `main` (`.github/workflows/deploy-homepage.yml`):
+pliki lądują w `/opt/apps/homepage`, a workflow uruchamia `docker compose up -d --build`.
 
 - `homepage` — nginx z zbudowanym frontendem, basic auth na `/admin` i `/api/admin/`
-- `homepage_api` — Express, dane w wolumenie `./data`
-- wymagany `.env` z `SETTINGS_ENCRYPTION_KEY`
+- `homepage_api` — Express z danymi na wolumenie
+
+**Katalog trwały: `/opt/apps/homepage-persist`.** Krok kopiujący czyści `/opt/apps/homepage`
+przy każdym wdrożeniu, więc rzeczy, które mają przetrwać, leżą obok:
+
+| Ścieżka | Zawartość |
+| --- | --- |
+| `homepage-persist/env` | `SETTINGS_ENCRYPTION_KEY` i `HOMEPAGE_DATA_DIR`, kopiowane do `.env` przed startem |
+| `homepage-persist/data` | Treści, podstrony, zgłoszenia i wgrane zdjęcia |
+
+Klucz generuje się sam przy pierwszym wdrożeniu i potem się nie zmienia.
+Podmiana go unieważnia zapisane hasło skrzynki — trzeba je wtedy wpisać ponownie w panelu.
 
 ## Panel `/admin`
 
@@ -49,7 +58,7 @@ pod `/p/<adres>` i pojawia się w menu, w sekcji oferty na stronie głównej ora
 
 ## Dane
 
-Katalog `data/` (wolumen kontenera):
+Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 
 | Plik | Zawartość |
 | --- | --- |
