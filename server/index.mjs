@@ -1,0 +1,729 @@
+import express from 'express'
+import crypto from 'node:crypto'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import nodemailer from 'nodemailer'
+import { ImapFlow } from 'imapflow'
+import { simpleParser } from 'mailparser'
+
+const app = express()
+const PORT = Number(process.env.PORT || 3001)
+const DATA_DIR = process.env.DATA_DIR || '/app/data'
+const SETTINGS_FILE = path.join(DATA_DIR, 'mail-settings.json')
+const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json')
+const OUTBOX_FILE = path.join(DATA_DIR, 'outbox.json')
+const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
+const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
+const encryptionSecret = process.env.SETTINGS_ENCRYPTION_KEY
+
+if (!encryptionSecret) {
+  throw new Error('SETTINGS_ENCRYPTION_KEY is required')
+}
+
+const encryptionKey = crypto.createHash('sha256').update(encryptionSecret).digest()
+const writeQueues = new Map()
+const rateLimits = new Map()
+
+const defaultContent = JSON.parse(
+  await fs.readFile(new URL('./content.default.json', import.meta.url), 'utf8'),
+)
+
+const IMAGE_TYPES = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+  'image/avif': 'avif',
+  'image/gif': 'gif',
+}
+
+const jsonSmall = express.json({ limit: '64kb' })
+const jsonLarge = express.json({ limit: '4mb' })
+
+app.set('trust proxy', 1)
+app.disable('x-powered-by')
+app.use((req, res, next) => (req.path.startsWith('/api/admin/') ? jsonLarge : jsonSmall)(req, res, next))
+
+await fs.mkdir(DATA_DIR, { recursive: true })
+await fs.mkdir(UPLOAD_DIR, { recursive: true })
+
+/* ── helpers ─────────────────────────────────────────────────────────── */
+
+function cleanText(value, max = 5000) {
+  return String(value ?? '').replace(/\u0000/g, '').trim().slice(0, max)
+}
+
+function isEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function slugify(value, fallback = 'strona') {
+  const slug = String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 70)
+  return slug || fallback
+}
+
+/** Accepts only site-relative media paths — blocks javascript: and foreign hosts. */
+function cleanMedia(value) {
+  const raw = cleanText(value, 400)
+  if (!raw) return ''
+  return /^\/(uploads|assets)\/[\w\-./]+$/.test(raw) ? raw : ''
+}
+
+function cleanLink(value, fallback = '') {
+  const raw = cleanText(value, 400)
+  if (!raw) return fallback
+  if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(raw)) return raw
+  return fallback
+}
+
+function encrypt(value) {
+  if (!value) return null
+  const iv = crypto.randomBytes(12)
+  const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey, iv)
+  const encrypted = Buffer.concat([cipher.update(value, 'utf8'), cipher.final()])
+  return {
+    iv: iv.toString('base64'),
+    tag: cipher.getAuthTag().toString('base64'),
+    value: encrypted.toString('base64'),
+  }
+}
+
+function decrypt(payload) {
+  if (!payload?.iv || !payload?.tag || !payload?.value) return ''
+  const decipher = crypto.createDecipheriv('aes-256-gcm', encryptionKey, Buffer.from(payload.iv, 'base64'))
+  decipher.setAuthTag(Buffer.from(payload.tag, 'base64'))
+  return Buffer.concat([
+    decipher.update(Buffer.from(payload.value, 'base64')),
+    decipher.final(),
+  ]).toString('utf8')
+}
+
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await fs.readFile(file, 'utf8'))
+  } catch (error) {
+    if (error.code === 'ENOENT') return fallback
+    throw error
+  }
+}
+
+function updateJson(file, fallback, updater) {
+  const previous = writeQueues.get(file) || Promise.resolve()
+  const next = previous.then(async () => {
+    const current = await readJson(file, fallback)
+    const updated = await updater(current)
+    const temporary = `${file}.${process.pid}.${Date.now()}.tmp`
+    await fs.writeFile(temporary, JSON.stringify(updated, null, 2), { mode: 0o600 })
+    await fs.rename(temporary, file)
+    return updated
+  })
+  writeQueues.set(file, next.catch(() => undefined))
+  return next
+}
+
+function enforceSameOrigin(req, res, next) {
+  const origin = req.get('origin')
+  if (!origin) return next()
+  try {
+    if (new URL(origin).host !== req.get('host')) {
+      return res.status(403).json({ error: 'Niedozwolone źródło żądania.' })
+    }
+  } catch {
+    return res.status(403).json({ error: 'Niedozwolone źródło żądania.' })
+  }
+  next()
+}
+
+/* ── content (homepage sections) ─────────────────────────────────────── */
+
+/** Stored content may be partial — defaults fill every gap so the site never breaks. */
+function mergeContent(stored) {
+  const merge = (base, override) => {
+    if (Array.isArray(base)) return Array.isArray(override) ? override : base
+    if (base && typeof base === 'object') {
+      if (!override || typeof override !== 'object' || Array.isArray(override)) return base
+      const result = { ...base }
+      for (const key of Object.keys(base)) result[key] = merge(base[key], override[key])
+      return result
+    }
+    return override === undefined || override === null ? base : override
+  }
+  return merge(defaultContent, stored)
+}
+
+/** Strings only, arrays of plain objects — never trusts shapes coming from the client. */
+function sanitizeContent(input) {
+  const walk = (base, value) => {
+    if (Array.isArray(base)) {
+      if (!Array.isArray(value)) return base
+      const template = base[0] ?? {}
+      return value.slice(0, 60).map(item => walk(template, item))
+    }
+    if (base && typeof base === 'object') {
+      const source = value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+      const result = {}
+      for (const key of Object.keys(base)) result[key] = walk(base[key], source[key])
+      return result
+    }
+    if (typeof base === 'number') {
+      const numeric = Number(value)
+      return Number.isFinite(numeric) ? numeric : base
+    }
+    if (typeof base === 'boolean') return typeof value === 'boolean' ? value : base
+    if (typeof value === 'string' || typeof value === 'number') return cleanText(value, 4000)
+    return typeof base === 'string' ? base : ''
+  }
+  const merged = walk(defaultContent, input)
+  merged.about.image = cleanMedia(input?.about?.image) || defaultContent.about.image
+  merged.work.items = merged.work.items.map((item, index) => ({
+    ...item,
+    href: cleanLink(input?.work?.items?.[index]?.href, '#'),
+    slides: (Array.isArray(input?.work?.items?.[index]?.slides) ? input.work.items[index].slides : [])
+      .map(cleanMedia)
+      .filter(Boolean)
+      .slice(0, 12),
+  }))
+  return merged
+}
+
+async function getContent() {
+  return mergeContent(await readJson(CONTENT_FILE, {}))
+}
+
+/* ── pages (CMS subpages) ────────────────────────────────────────────── */
+
+const BLOCK_BUILDERS = {
+  text: block => ({
+    heading: cleanText(block.heading, 200),
+    body: cleanText(block.body, 12000),
+    layout: block.layout === 'wide' ? 'wide' : 'default',
+  }),
+  image: block => ({
+    src: cleanMedia(block.src),
+    alt: cleanText(block.alt, 200),
+    caption: cleanText(block.caption, 300),
+    layout: block.layout === 'full' ? 'full' : 'default',
+  }),
+  gallery: block => ({
+    heading: cleanText(block.heading, 200),
+    images: (Array.isArray(block.images) ? block.images : [])
+      .slice(0, 40)
+      .map(image => ({ src: cleanMedia(image?.src), alt: cleanText(image?.alt, 200) }))
+      .filter(image => image.src),
+  }),
+  features: block => ({
+    heading: cleanText(block.heading, 200),
+    items: (Array.isArray(block.items) ? block.items : [])
+      .slice(0, 24)
+      .map(item => ({ title: cleanText(item?.title, 160), text: cleanText(item?.text, 1200) }))
+      .filter(item => item.title || item.text),
+  }),
+  stats: block => ({
+    heading: cleanText(block.heading, 200),
+    items: (Array.isArray(block.items) ? block.items : [])
+      .slice(0, 12)
+      .map(item => ({ value: cleanText(item?.value, 40), label: cleanText(item?.label, 160) }))
+      .filter(item => item.value || item.label),
+  }),
+  quote: block => ({
+    body: cleanText(block.body, 1200),
+    author: cleanText(block.author, 160),
+  }),
+  cta: block => ({
+    heading: cleanText(block.heading, 200),
+    body: cleanText(block.body, 800),
+    label: cleanText(block.label, 80) || 'Napisz do mnie',
+    href: cleanLink(block.href, '/#kontakt'),
+  }),
+}
+
+function sanitizeBlock(input) {
+  const type = BLOCK_BUILDERS[input?.type] ? input.type : 'text'
+  return {
+    id: cleanText(input?.id, 60) || crypto.randomUUID(),
+    type,
+    ...BLOCK_BUILDERS[type](input || {}),
+  }
+}
+
+function sanitizePage(input, existing = {}) {
+  const title = cleanText(input?.title, 180) || existing.title || 'Nowa strona'
+  return {
+    id: existing.id || crypto.randomUUID(),
+    slug: slugify(input?.slug || title),
+    title,
+    kicker: cleanText(input?.kicker, 80),
+    excerpt: cleanText(input?.excerpt, 600),
+    lead: cleanText(input?.lead, 1200),
+    cover: cleanMedia(input?.cover),
+    seoDescription: cleanText(input?.seoDescription, 320),
+    accent: ['gold', 'ivory', 'ember', 'mint'].includes(input?.accent) ? input.accent : 'gold',
+    published: input?.published !== false,
+    featured: input?.featured === true,
+    order: Number.isFinite(Number(input?.order)) ? Number(input.order) : 0,
+    blocks: (Array.isArray(input?.blocks) ? input.blocks : []).slice(0, 60).map(sanitizeBlock),
+    createdAt: existing.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+}
+
+function uniqueSlug(slug, pages, selfId) {
+  let candidate = slug
+  let counter = 2
+  while (pages.some(page => page.slug === candidate && page.id !== selfId)) {
+    candidate = `${slug}-${counter++}`
+  }
+  return candidate
+}
+
+function publicPageSummary(page) {
+  return {
+    id: page.id,
+    slug: page.slug,
+    title: page.title,
+    kicker: page.kicker,
+    excerpt: page.excerpt,
+    cover: page.cover,
+    accent: page.accent,
+    featured: page.featured,
+    order: page.order,
+    updatedAt: page.updatedAt,
+  }
+}
+
+const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0) || String(a.title).localeCompare(String(b.title), 'pl')
+
+/* ── mail ────────────────────────────────────────────────────────────── */
+
+async function getSettings({ includePassword = false } = {}) {
+  const stored = await readJson(SETTINGS_FILE, {})
+  const settings = {
+    fromName: stored.fromName || 'Adam Rędzikowski — Digital Studio',
+    ownerEmail: stored.ownerEmail || '',
+    imapHost: stored.imapHost || '',
+    imapPort: Number(stored.imapPort || 993),
+    imapSecure: stored.imapSecure !== false,
+    imapUsername: stored.imapUsername || '',
+    smtpHost: stored.smtpHost || '',
+    smtpPort: Number(stored.smtpPort || 465),
+    smtpSecure: stored.smtpSecure !== false,
+    smtpUsername: stored.smtpUsername || '',
+    hasPassword: Boolean(stored.password),
+  }
+  if (includePassword) settings.password = decrypt(stored.password)
+  return settings
+}
+
+function getTransport(settings) {
+  if (!settings.smtpHost || !settings.smtpUsername || !settings.password) return null
+  return nodemailer.createTransport({
+    host: settings.smtpHost,
+    port: settings.smtpPort,
+    secure: settings.smtpSecure,
+    auth: { user: settings.smtpUsername, pass: settings.password },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  })
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}
+
+function emailFrame(content) {
+  return `<!doctype html><html lang="pl"><head><meta charset="utf-8"></head>
+  <body style="margin:0;background:#0a0a0c;color:#f5f1e8;font-family:Arial,sans-serif">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0a0a0c;padding:32px 12px">
+      <tr><td align="center">
+        <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px;background:#111114;border:1px solid #2c2a26;border-radius:16px;overflow:hidden">
+          <tr><td style="padding:24px 28px;background:linear-gradient(120deg,#171410,#0e0d0c);border-bottom:1px solid #2c2a26">
+            <div style="font-size:21px;font-weight:700;letter-spacing:-1px;color:#e8c583">AR</div>
+            <div style="margin-top:5px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8d8579">Adam Rędzikowski · Digital Studio</div>
+          </td></tr>
+          <tr><td style="padding:42px 28px">${content}</td></tr>
+          <tr><td style="padding:18px 28px;border-top:1px solid #2c2a26;font-size:11px;color:#807a70">
+            redzikowski.com · Strony internetowe, systemy webowe, AI i dane
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body></html>`
+}
+
+async function appendOutbox(entry) {
+  await updateJson(OUTBOX_FILE, [], current => [entry, ...current].slice(0, 500))
+}
+
+async function sendLoggedMail(transport, message, kind, submissionId) {
+  const log = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    kind,
+    submissionId,
+    to: message.to,
+    subject: message.subject,
+    status: 'pending',
+  }
+  try {
+    const result = await transport.sendMail(message)
+    log.status = 'sent'
+    log.messageId = result.messageId
+  } catch (error) {
+    log.status = 'failed'
+    log.error = cleanText(error.message, 500)
+  }
+  await appendOutbox(log)
+  return log
+}
+
+/* ── public routes ───────────────────────────────────────────────────── */
+
+app.get('/health', (_req, res) => res.json({ ok: true }))
+
+app.get('/api/content', async (_req, res) => {
+  const [content, pages] = await Promise.all([getContent(), readJson(PAGES_FILE, [])])
+  res.set('Cache-Control', 'no-cache')
+  res.json({
+    content,
+    pages: pages.filter(page => page.published !== false).sort(byOrder).map(publicPageSummary),
+  })
+})
+
+app.get('/api/pages/:slug', async (req, res) => {
+  const pages = await readJson(PAGES_FILE, [])
+  const page = pages.find(item => item.slug === req.params.slug && item.published !== false)
+  if (!page) return res.status(404).json({ error: 'Nie znaleziono strony.' })
+  res.json(page)
+})
+
+app.post('/api/contact', async (req, res) => {
+  const ip = req.ip || 'unknown'
+  const now = Date.now()
+  const recent = (rateLimits.get(ip) || []).filter(timestamp => now - timestamp < 15 * 60 * 1000)
+  if (recent.length >= 5) {
+    return res.status(429).json({ error: 'Za dużo prób. Spróbuj ponownie za kilka minut.' })
+  }
+  recent.push(now)
+  rateLimits.set(ip, recent)
+
+  if (cleanText(req.body.website, 100)) {
+    return res.status(200).json({ ok: true })
+  }
+
+  const submission = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    name: cleanText(req.body.name, 120),
+    company: cleanText(req.body.company, 160),
+    email: cleanText(req.body.email, 200).toLowerCase(),
+    phone: cleanText(req.body.phone, 80),
+    contactMethod: req.body.contactMethod === 'phone' ? 'phone' : 'email',
+    subject: cleanText(req.body.subject, 200),
+    message: cleanText(req.body.message, 6000),
+    budget: cleanText(req.body.budget, 60),
+    timeline: cleanText(req.body.timeline, 60),
+    scope: (Array.isArray(req.body.scope) ? req.body.scope : []).slice(0, 12).map(item => cleanText(item, 60)).filter(Boolean),
+    source: cleanText(req.body.source, 60),
+    consent: req.body.consent === true,
+    status: 'new',
+  }
+
+  const errors = []
+  if (submission.name.length < 2) errors.push('Podaj imię.')
+  if (!isEmail(submission.email)) errors.push('Podaj poprawny adres e-mail.')
+  if (submission.contactMethod === 'phone' && submission.phone.length < 6) errors.push('Podaj numer telefonu.')
+  if (submission.message.length < 12) errors.push('Napisz kilka zdań o projekcie.')
+  if (!submission.consent) errors.push('Zaakceptuj zgodę na kontakt.')
+  if (errors.length) return res.status(400).json({ error: errors[0], fields: errors })
+
+  await updateJson(SUBMISSIONS_FILE, [], current => [submission, ...current].slice(0, 2000))
+
+  let mailStatus = 'not-configured'
+  try {
+    const settings = await getSettings({ includePassword: true })
+    const transport = getTransport(settings)
+    if (transport && settings.ownerEmail) {
+      const replyLabel = submission.contactMethod === 'phone'
+        ? `Telefon: ${escapeHtml(submission.phone)}`
+        : `E-mail: ${escapeHtml(submission.email)}`
+      const details = [
+        submission.budget && `Budżet: ${submission.budget}`,
+        submission.timeline && `Termin: ${submission.timeline}`,
+        submission.scope.length && `Zakres: ${submission.scope.join(', ')}`,
+      ].filter(Boolean)
+
+      const ownerMail = await sendLoggedMail(transport, {
+        from: { name: settings.fromName, address: settings.smtpUsername },
+        to: settings.ownerEmail,
+        replyTo: submission.email,
+        subject: `Nowe zapytanie: ${submission.subject || submission.name}`,
+        text: `${submission.name}\n${submission.company}\n${replyLabel}\n${details.join('\n')}\n\n${submission.message}`,
+        html: emailFrame(`
+          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowe zapytanie ze strony</div>
+          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(submission.subject || 'Nowy projekt')}</h1>
+          <p style="line-height:1.7;color:#cfc8bb"><b style="color:#fff">${escapeHtml(submission.name)}</b>${submission.company ? ` · ${escapeHtml(submission.company)}` : ''}<br>${replyLabel}</p>
+          ${details.length ? `<p style="line-height:1.8;font-size:13px;color:#a49d91">${details.map(escapeHtml).join('<br>')}</p>` : ''}
+          <div style="margin-top:28px;padding:22px;background:#17161a;border:1px solid #2c2a26;border-radius:12px;line-height:1.7;white-space:pre-wrap;color:#e7e1d6">${escapeHtml(submission.message)}</div>
+        `),
+      }, 'notification', submission.id)
+
+      const confirmationMail = await sendLoggedMail(transport, {
+        from: { name: settings.fromName, address: settings.smtpUsername },
+        to: submission.email,
+        replyTo: settings.ownerEmail,
+        subject: 'Dziękuję za wiadomość — Adam Rędzikowski',
+        text: `Cześć ${submission.name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
+        html: emailFrame(`
+          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Wiadomość dotarła</div>
+          <h1 style="font-size:34px;line-height:1.1;margin:15px 0 22px;color:#f7f2e8">Dziękuję, ${escapeHtml(submission.name)}.</h1>
+          <p style="font-size:16px;line-height:1.7;margin:0;color:#cfc8bb">Otrzymałem Twoje zapytanie i zapoznam się z nim osobiście. Odpowiem ${submission.contactMethod === 'phone' ? 'telefonicznie' : 'mailowo'} możliwie szybko.</p>
+          <p style="margin:32px 0 0;line-height:1.6;color:#e7e1d6">Adam Rędzikowski<br><span style="color:#8d8579">Digital Studio</span></p>
+        `),
+      }, 'confirmation', submission.id)
+      mailStatus = ownerMail.status === 'sent' && confirmationMail.status === 'sent' ? 'sent' : 'partial'
+    }
+  } catch (error) {
+    mailStatus = 'failed'
+    console.error('Mail dispatch failed:', error.message)
+  }
+
+  res.status(201).json({ ok: true, id: submission.id, mailStatus })
+})
+
+/* ── admin: submissions ──────────────────────────────────────────────── */
+
+app.get('/api/admin/submissions', async (_req, res) => {
+  res.json(await readJson(SUBMISSIONS_FILE, []))
+})
+
+app.patch('/api/admin/submissions/:id', enforceSameOrigin, async (req, res) => {
+  const allowed = new Set(['new', 'in-progress', 'closed'])
+  const status = cleanText(req.body.status, 30)
+  if (!allowed.has(status)) return res.status(400).json({ error: 'Niepoprawny status.' })
+  const updated = await updateJson(SUBMISSIONS_FILE, [], current =>
+    current.map(item => item.id === req.params.id ? { ...item, status } : item))
+  res.json(updated.find(item => item.id === req.params.id))
+})
+
+app.delete('/api/admin/submissions/:id', enforceSameOrigin, async (req, res) => {
+  await updateJson(SUBMISSIONS_FILE, [], current => current.filter(item => item.id !== req.params.id))
+  res.json({ ok: true })
+})
+
+/* ── admin: content ──────────────────────────────────────────────────── */
+
+app.get('/api/admin/content', async (_req, res) => {
+  res.json(await getContent())
+})
+
+app.put('/api/admin/content', enforceSameOrigin, async (req, res) => {
+  const sanitized = sanitizeContent(req.body)
+  await updateJson(CONTENT_FILE, {}, () => sanitized)
+  res.json(sanitized)
+})
+
+app.post('/api/admin/content/reset', enforceSameOrigin, async (_req, res) => {
+  await updateJson(CONTENT_FILE, {}, () => ({}))
+  res.json(await getContent())
+})
+
+/* ── admin: pages ────────────────────────────────────────────────────── */
+
+app.get('/api/admin/pages', async (_req, res) => {
+  const pages = await readJson(PAGES_FILE, [])
+  res.json([...pages].sort(byOrder))
+})
+
+app.post('/api/admin/pages', enforceSameOrigin, async (req, res) => {
+  let created
+  await updateJson(PAGES_FILE, [], current => {
+    const page = sanitizePage(req.body)
+    page.slug = uniqueSlug(page.slug, current, page.id)
+    page.order = Number.isFinite(Number(req.body?.order)) ? Number(req.body.order) : current.length
+    created = page
+    return [...current, page]
+  })
+  res.status(201).json(created)
+})
+
+app.put('/api/admin/pages/:id', enforceSameOrigin, async (req, res) => {
+  let saved = null
+  await updateJson(PAGES_FILE, [], current => {
+    const existing = current.find(page => page.id === req.params.id)
+    if (!existing) return current
+    const page = sanitizePage(req.body, existing)
+    page.slug = uniqueSlug(page.slug, current, existing.id)
+    saved = page
+    return current.map(item => item.id === existing.id ? page : item)
+  })
+  if (!saved) return res.status(404).json({ error: 'Nie znaleziono strony.' })
+  res.json(saved)
+})
+
+app.delete('/api/admin/pages/:id', enforceSameOrigin, async (req, res) => {
+  await updateJson(PAGES_FILE, [], current => current.filter(page => page.id !== req.params.id))
+  res.json({ ok: true })
+})
+
+app.post('/api/admin/pages/reorder', enforceSameOrigin, async (req, res) => {
+  const order = (Array.isArray(req.body?.ids) ? req.body.ids : []).map(id => cleanText(id, 60))
+  const updated = await updateJson(PAGES_FILE, [], current =>
+    current.map(page => {
+      const index = order.indexOf(page.id)
+      return index === -1 ? page : { ...page, order: index }
+    }))
+  res.json([...updated].sort(byOrder))
+})
+
+/* ── admin: media ────────────────────────────────────────────────────── */
+
+app.post(
+  '/api/admin/upload',
+  enforceSameOrigin,
+  express.raw({ type: Object.keys(IMAGE_TYPES), limit: '10mb' }),
+  async (req, res) => {
+    const extension = IMAGE_TYPES[cleanText(req.get('content-type'), 80).split(';')[0]]
+    if (!extension) return res.status(415).json({ error: 'Dozwolone formaty: PNG, JPG, WEBP, AVIF, GIF.' })
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+      return res.status(400).json({ error: 'Pusty plik.' })
+    }
+    const base = slugify(cleanText(req.get('x-file-name'), 120).replace(/\.[a-z0-9]+$/i, ''), 'obraz').slice(0, 48)
+    const name = `${base}-${crypto.randomBytes(4).toString('hex')}.${extension}`
+    await fs.writeFile(path.join(UPLOAD_DIR, name), req.body, { mode: 0o644 })
+    res.status(201).json({ url: `/uploads/${name}`, name, size: req.body.length })
+  },
+)
+
+app.get('/api/admin/media', async (_req, res) => {
+  const files = await fs.readdir(UPLOAD_DIR).catch(() => [])
+  const media = await Promise.all(
+    files
+      .filter(name => Object.values(IMAGE_TYPES).includes(name.split('.').pop()?.toLowerCase()))
+      .map(async name => {
+        const stat = await fs.stat(path.join(UPLOAD_DIR, name)).catch(() => null)
+        return stat && { name, url: `/uploads/${name}`, size: stat.size, createdAt: stat.mtime.toISOString() }
+      }),
+  )
+  res.json(media.filter(Boolean).sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+})
+
+app.delete('/api/admin/media/:name', enforceSameOrigin, async (req, res) => {
+  const name = path.basename(cleanText(req.params.name, 200))
+  if (!name || name.startsWith('.')) return res.status(400).json({ error: 'Niepoprawna nazwa pliku.' })
+  await fs.unlink(path.join(UPLOAD_DIR, name)).catch(() => undefined)
+  res.json({ ok: true })
+})
+
+app.use('/uploads', express.static(UPLOAD_DIR, {
+  index: false,
+  dotfiles: 'deny',
+  maxAge: '365d',
+  setHeaders: response => response.setHeader('X-Content-Type-Options', 'nosniff'),
+}))
+
+/* ── admin: mail settings & mailboxes ────────────────────────────────── */
+
+app.get('/api/admin/settings', async (_req, res) => {
+  res.json(await getSettings())
+})
+
+app.put('/api/admin/settings', enforceSameOrigin, async (req, res) => {
+  const previous = await readJson(SETTINGS_FILE, {})
+  const password = cleanText(req.body.password, 500)
+  const updated = {
+    fromName: cleanText(req.body.fromName, 150) || 'Adam Rędzikowski — Digital Studio',
+    ownerEmail: cleanText(req.body.ownerEmail, 200).toLowerCase(),
+    imapHost: cleanText(req.body.imapHost, 250),
+    imapPort: Number(req.body.imapPort) || 993,
+    imapSecure: req.body.imapSecure !== false,
+    imapUsername: cleanText(req.body.imapUsername, 250),
+    smtpHost: cleanText(req.body.smtpHost, 250),
+    smtpPort: Number(req.body.smtpPort) || 465,
+    smtpSecure: req.body.smtpSecure !== false,
+    smtpUsername: cleanText(req.body.smtpUsername, 250),
+    password: password ? encrypt(password) : previous.password || null,
+    updatedAt: new Date().toISOString(),
+  }
+  if (updated.ownerEmail && !isEmail(updated.ownerEmail)) {
+    return res.status(400).json({ error: 'Niepoprawny adres odbiorcy powiadomień.' })
+  }
+  await updateJson(SETTINGS_FILE, {}, () => updated)
+  res.json(await getSettings())
+})
+
+app.get('/api/admin/inbox', async (req, res) => {
+  let client
+  try {
+    const settings = await getSettings({ includePassword: true })
+    if (!settings.imapHost || !settings.imapUsername || !settings.password) {
+      return res.status(409).json({ error: 'Najpierw uzupełnij ustawienia IMAP.' })
+    }
+    client = new ImapFlow({
+      host: settings.imapHost,
+      port: settings.imapPort,
+      secure: settings.imapSecure,
+      auth: { user: settings.imapUsername, pass: settings.password },
+      logger: false,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
+    })
+    await client.connect()
+    const lock = await client.getMailboxLock('INBOX')
+    const messages = []
+    try {
+      const count = client.mailbox.exists
+      if (count > 0) {
+        const start = Math.max(1, count - 24)
+        for await (const message of client.fetch(`${start}:*`, { envelope: true, source: true, flags: true })) {
+          const parsed = await simpleParser(message.source)
+          messages.push({
+            uid: message.uid,
+            subject: cleanText(parsed.subject || '(bez tematu)', 300),
+            from: cleanText(parsed.from?.text || '', 300),
+            to: cleanText(parsed.to?.text || '', 300),
+            date: parsed.date?.toISOString() || null,
+            text: cleanText(parsed.text || parsed.html || '', 5000),
+            seen: message.flags?.has('\\Seen') || false,
+          })
+        }
+      }
+    } finally {
+      lock.release()
+    }
+    res.json(messages.reverse())
+  } catch (error) {
+    res.status(502).json({ error: `Nie udało się połączyć ze skrzynką: ${cleanText(error.message, 250)}` })
+  } finally {
+    if (client) await client.logout().catch(() => undefined)
+  }
+})
+
+app.get('/api/admin/outbox', async (_req, res) => {
+  res.json(await readJson(OUTBOX_FILE, []))
+})
+
+app.use((error, _req, res, _next) => {
+  console.error(error)
+  if (error?.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Przesłane dane są zbyt duże.' })
+  }
+  res.status(500).json({ error: 'Wystąpił błąd serwera.' })
+})
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Homepage API listening on ${PORT}`)
+})

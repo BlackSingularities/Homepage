@@ -3,10 +3,28 @@ services:
     build: .
     container_name: homepage
     restart: unless-stopped
+    depends_on:
+      - homepage_api
     networks:
       - webproxy
+      - homepage_internal
+
+  homepage_api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: homepage_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    networks:
+      - homepage_internal
 
 networks:
   webproxy:
     name: webproxy
     external: true
+  homepage_internal:
+    internal: true

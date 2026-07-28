@@ -1,0 +1,398 @@
+import { useCallback, useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  ArrowLeft, ArrowUpRight, FileStack, Files, Image, Inbox, LayoutDashboard, LoaderCircle,
+  MailCheck, MessageSquareText, RefreshCw, Save, Settings, Trash2,
+} from 'lucide-react'
+import { api, formatDate, json } from '../lib/api'
+import { Card, Empty, Notice, Text, Toggle } from './parts'
+import PagesManager from './PagesManager'
+import ContentManager from './ContentManager'
+import MediaManager from './MediaManager'
+import '../styles/admin.css'
+
+const TABS = [
+  ['dashboard', 'Pulpit', LayoutDashboard],
+  ['submissions', 'Zgłoszenia', MessageSquareText],
+  ['pages', 'Podstrony', Files],
+  ['content', 'Treści strony', FileStack],
+  ['media', 'Zdjęcia', Image],
+  ['inbox', 'Odebrane', Inbox],
+  ['outbox', 'Wysłane', MailCheck],
+  ['settings', 'Poczta', Settings],
+]
+
+const STATUS_LABEL = {
+  new: 'Nowe', 'in-progress': 'W toku', closed: 'Zamknięte',
+  sent: 'Wysłano', failed: 'Błąd', pending: 'Wysyłanie',
+}
+
+const EMPTY_SETTINGS = {
+  fromName: '', ownerEmail: '', imapHost: '', imapPort: 993, imapSecure: true, imapUsername: '',
+  smtpHost: '', smtpPort: 465, smtpSecure: true, smtpUsername: '', password: '', hasPassword: false,
+}
+
+function Status({ value }) {
+  return <span className={`ad-status is-${value}`}>{STATUS_LABEL[value] || value}</span>
+}
+
+/* ── submissions ────────────────────────────────────────────────── */
+
+function Submissions({ items, loading, onStatus, onDelete }) {
+  const [filter, setFilter] = useState('all')
+  const counts = {
+    all: items.length,
+    new: items.filter(item => item.status === 'new').length,
+    'in-progress': items.filter(item => item.status === 'in-progress').length,
+    closed: items.filter(item => item.status === 'closed').length,
+  }
+  const visible = filter === 'all' ? items : items.filter(item => item.status === filter)
+
+  return (
+    <div className="ad-stack">
+      <div className="ad-filters">
+        {[['all', 'Wszystkie'], ['new', 'Nowe'], ['in-progress', 'W toku'], ['closed', 'Zamknięte']].map(([id, label]) => (
+          <button key={id} className={filter === id ? 'is-active' : ''} onClick={() => setFilter(id)}>
+            {label} <b>{counts[id]}</b>
+          </button>
+        ))}
+      </div>
+
+      {!loading && visible.length === 0 && <Empty>Brak zgłoszeń w tym widoku.</Empty>}
+
+      <div className="ad-stack">
+        {visible.map(item => (
+          <article className="ad-submission" key={item.id}>
+            <header>
+              <Status value={item.status} />
+              <span>{formatDate(item.createdAt)}</span>
+              <span>{item.contactMethod === 'phone' ? 'Odpowiedź telefoniczna' : 'Odpowiedź mailowa'}</span>
+              {item.source === 'konfigurator' && <span className="ad-tag">z konfiguratora</span>}
+              <button className="ad-icon-btn is-danger" onClick={() => onDelete(item)} aria-label="Usuń zgłoszenie">
+                <Trash2 size={14} />
+              </button>
+            </header>
+
+            <div className="ad-submission-grid">
+              <div>
+                <h3>{item.subject || 'Nowy projekt'}</h3>
+                <p className="ad-strong">{item.name}{item.company ? ` · ${item.company}` : ''}</p>
+                <p><a href={`mailto:${item.email}`}>{item.email}</a>{item.phone ? ` · ${item.phone}` : ''}</p>
+                {(item.budget || item.timeline) && (
+                  <p className="ad-muted">{[item.budget, item.timeline].filter(Boolean).join(' · ')}</p>
+                )}
+                {item.scope?.length > 0 && (
+                  <div className="ad-chips">{item.scope.map(scope => <span key={scope}>{scope}</span>)}</div>
+                )}
+              </div>
+              <p className="ad-message">{item.message}</p>
+            </div>
+
+            <footer>
+              {['new', 'in-progress', 'closed'].map(status => (
+                <button
+                  key={status}
+                  className={item.status === status ? 'is-active' : ''}
+                  onClick={() => onStatus(item.id, status)}
+                >{STATUS_LABEL[status]}</button>
+              ))}
+              <a className="ad-reply" href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject || 'Twoje zapytanie'}`)}`}>
+                Odpowiedz <ArrowUpRight size={13} />
+              </a>
+            </footer>
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ── dashboard ──────────────────────────────────────────────────── */
+
+function Dashboard({ submissions, pages, onTab }) {
+  const stats = [
+    ['Zgłoszenia', submissions.length, 'submissions'],
+    ['Nowe zgłoszenia', submissions.filter(item => item.status === 'new').length, 'submissions'],
+    ['Podstrony', pages.length, 'pages'],
+    ['Opublikowane', pages.filter(page => page.published).length, 'pages'],
+  ]
+
+  return (
+    <div className="ad-stack">
+      <div className="ad-stats">
+        {stats.map(([label, value, tab]) => (
+          <button key={label} onClick={() => onTab(tab)}>
+            <span>{label}</span>
+            <b>{value}</b>
+          </button>
+        ))}
+      </div>
+
+      <div className="ad-two">
+        <Card title="Ostatnie zgłoszenia" description="Pięć najnowszych wiadomości z formularza.">
+          {submissions.slice(0, 5).map(item => (
+            <button key={item.id} className="ad-row" onClick={() => onTab('submissions')}>
+              <Status value={item.status} />
+              <span className="ad-row-main"><b>{item.name}</b><i>{item.subject || 'Nowy projekt'}</i></span>
+              <time>{formatDate(item.createdAt)}</time>
+            </button>
+          ))}
+          {!submissions.length && <Empty>Pierwsze zapytanie pojawi się tutaj.</Empty>}
+        </Card>
+
+        <Card title="Twoje podstrony" description="Strony oferty tworzone w panelu.">
+          {pages.slice(0, 6).map(page => (
+            <button key={page.id} className="ad-row" onClick={() => onTab('pages')}>
+              <span className={`ad-dot ${page.published ? 'is-live' : ''}`} />
+              <span className="ad-row-main"><b>{page.title}</b><i>/p/{page.slug}</i></span>
+              <time>{page.published ? 'opublikowana' : 'szkic'}</time>
+            </button>
+          ))}
+          {!pages.length && <Empty>Nie masz jeszcze podstron. Dodaj pierwszą w zakładce „Podstrony”.</Empty>}
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+/* ── mail ───────────────────────────────────────────────────────── */
+
+function MailSettings({ settings, setSettings, onSave, loading }) {
+  const update = value => setSettings(current => ({ ...current, ...value }))
+
+  return (
+    <form className="ad-stack" onSubmit={onSave}>
+      <Card title="Tożsamość nadawcy" description="Hasło jest szyfrowane przed zapisaniem. Zostaw puste, aby zachować obecne.">
+        <div className="ad-grid-2">
+          <Text label="Nazwa nadawcy" value={settings.fromName} onChange={fromName => update({ fromName })} />
+          <Text label="Adres odbierający powiadomienia" type="email" value={settings.ownerEmail} onChange={ownerEmail => update({ ownerEmail })} placeholder="kontakt@twojadomena.pl" />
+        </div>
+      </Card>
+
+      <div className="ad-two">
+        <Card title="IMAP — poczta przychodząca">
+          <Text label="Host" value={settings.imapHost} onChange={imapHost => update({ imapHost })} placeholder="imap.example.com" />
+          <div className="ad-grid-2">
+            <Text label="Port" type="number" value={settings.imapPort} onChange={imapPort => update({ imapPort: Number(imapPort) || 993 })} />
+            <Text label="Użytkownik" value={settings.imapUsername} onChange={imapUsername => update({ imapUsername })} />
+          </div>
+          <Toggle label="Połączenie szyfrowane TLS" checked={settings.imapSecure} onChange={imapSecure => update({ imapSecure })} />
+        </Card>
+
+        <Card title="SMTP — poczta wychodząca">
+          <Text label="Host" value={settings.smtpHost} onChange={smtpHost => update({ smtpHost })} placeholder="smtp.example.com" />
+          <div className="ad-grid-2">
+            <Text label="Port" type="number" value={settings.smtpPort} onChange={smtpPort => update({ smtpPort: Number(smtpPort) || 465 })} />
+            <Text label="Użytkownik / adres nadawcy" value={settings.smtpUsername} onChange={smtpUsername => update({ smtpUsername })} />
+          </div>
+          <Toggle label="Połączenie szyfrowane TLS" checked={settings.smtpSecure} onChange={smtpSecure => update({ smtpSecure })} />
+        </Card>
+      </div>
+
+      <Card title="Hasło skrzynki">
+        <Text
+          label={settings.hasPassword ? 'Nowe hasło (opcjonalnie)' : 'Hasło'}
+          type="password"
+          value={settings.password}
+          onChange={password => update({ password })}
+          placeholder={settings.hasPassword ? 'Zapisane — wpisz tylko, aby zmienić' : 'Hasło lub hasło aplikacji'}
+        />
+        <button className="ad-btn ad-btn-primary" type="submit" disabled={loading}>
+          {loading ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />} Zapisz ustawienia
+        </button>
+      </Card>
+    </form>
+  )
+}
+
+/* ── shell ──────────────────────────────────────────────────────── */
+
+export default function Admin() {
+  const [tab, setTab] = useState('dashboard')
+  const [submissions, setSubmissions] = useState([])
+  const [pages, setPages] = useState([])
+  const [inbox, setInbox] = useState([])
+  const [outbox, setOutbox] = useState([])
+  const [settings, setSettings] = useState(EMPTY_SETTINGS)
+  const [loading, setLoading] = useState(false)
+  const [notice, setNotice] = useState('')
+  const [error, setError] = useState('')
+
+  const notify = useCallback(message => {
+    setNotice(message)
+    setError('')
+    setTimeout(() => setNotice(current => (current === message ? '' : current)), 5000)
+  }, [])
+
+  const run = useCallback(async (action, success = '') => {
+    setLoading(true)
+    setError('')
+    try {
+      await action()
+      if (success) notify(success)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [notify])
+
+  const loadOverview = useCallback(() => run(async () => {
+    const [submissionList, pageList] = await Promise.all([
+      api('/api/admin/submissions'),
+      api('/api/admin/pages'),
+    ])
+    setSubmissions(submissionList)
+    setPages(pageList)
+  }), [run])
+
+  useEffect(() => { loadOverview() }, [loadOverview])
+
+  const refresh = () => {
+    if (tab === 'dashboard') return loadOverview()
+    if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
+    if (tab === 'inbox') return run(async () => setInbox(await api('/api/admin/inbox')))
+    if (tab === 'outbox') return run(async () => setOutbox(await api('/api/admin/outbox')))
+    if (tab === 'settings') return run(async () => {
+      const loaded = await api('/api/admin/settings')
+      setSettings(current => ({ ...current, ...loaded, password: '' }))
+    })
+    return undefined
+  }
+
+  const chooseTab = next => {
+    setTab(next)
+    setError('')
+    if (next === 'inbox' && !inbox.length) run(async () => setInbox(await api('/api/admin/inbox')))
+    if (next === 'outbox' && !outbox.length) run(async () => setOutbox(await api('/api/admin/outbox')))
+    if (next === 'settings') run(async () => {
+      const loaded = await api('/api/admin/settings')
+      setSettings(current => ({ ...current, ...loaded, password: '' }))
+    })
+    if (next === 'dashboard') loadOverview()
+  }
+
+  const changeStatus = (id, status) => run(async () => {
+    const updated = await api(`/api/admin/submissions/${id}`, json('PATCH', { status }))
+    setSubmissions(current => current.map(item => (item.id === id ? updated : item)))
+  })
+
+  const deleteSubmission = item => {
+    if (!window.confirm(`Usunąć zgłoszenie od ${item.name}?`)) return
+    run(async () => {
+      await api(`/api/admin/submissions/${item.id}`, { method: 'DELETE' })
+      setSubmissions(current => current.filter(entry => entry.id !== item.id))
+    }, 'Zgłoszenie zostało usunięte.')
+  }
+
+  const saveSettings = event => {
+    event.preventDefault()
+    run(async () => {
+      const updated = await api('/api/admin/settings', json('PUT', settings))
+      setSettings(current => ({ ...current, ...updated, password: '' }))
+    }, 'Ustawienia poczty zostały bezpiecznie zapisane.')
+  }
+
+  const active = TABS.find(item => item[0] === tab)
+
+  return (
+    <div className="ad-shell">
+      <aside className="ad-sidebar">
+        <a className="ad-brand" href="/">
+          <b>AR</b>
+          <span>Studio<i>Control</i></span>
+        </a>
+
+        <nav>
+          {TABS.map(([id, label, Icon]) => (
+            <button key={id} className={tab === id ? 'is-active' : ''} onClick={() => chooseTab(id)}>
+              <Icon size={17} /><span>{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <a className="ad-back" href="/"><ArrowLeft size={15} /> <span>Wróć na stronę</span></a>
+      </aside>
+
+      <main className="ad-main">
+        <header className="ad-header">
+          <div>
+            <span>redzikowski.com / panel</span>
+            <h1>{active?.[1]}</h1>
+          </div>
+          <div className="ad-header-actions">
+            <a className="ad-btn ad-btn-ghost" href="/" target="_blank" rel="noreferrer">
+              Zobacz stronę <ArrowUpRight size={14} />
+            </a>
+            <button className="ad-btn ad-btn-ghost" onClick={refresh} disabled={loading}>
+              <RefreshCw className={loading ? 'spin' : ''} size={14} /> Odśwież
+            </button>
+          </div>
+        </header>
+
+        <AnimatePresence>
+          {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
+          {notice && <Notice tone="success" onClose={() => setNotice('')}>{notice}</Notice>}
+        </AnimatePresence>
+
+        <motion.div className="ad-body" key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+          {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
+
+          {tab === 'submissions' && (
+            <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} />
+          )}
+
+          {tab === 'pages' && <PagesManager notify={notify} />}
+
+          {tab === 'content' && <ContentManager notify={notify} />}
+
+          {tab === 'media' && <MediaManager notify={notify} />}
+
+          {tab === 'inbox' && (
+            <div className="ad-stack">
+              {!loading && !inbox.length && <Empty>Brak wiadomości albo skrzynka IMAP nie została jeszcze skonfigurowana.</Empty>}
+              {inbox.map(message => (
+                <details className="ad-mail" key={`${message.uid}-${message.date}`}>
+                  <summary>
+                    <span className={`ad-dot ${message.seen ? '' : 'is-live'}`} />
+                    <span className="ad-row-main"><b>{message.subject}</b><i>{message.from}</i></span>
+                    <time>{formatDate(message.date)}</time>
+                  </summary>
+                  <div className="ad-mail-body">
+                    <span>Do: {message.to}</span>
+                    <p>{message.text || 'Wiadomość nie zawiera podglądu tekstowego.'}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
+
+          {tab === 'outbox' && (
+            <div className="ad-stack">
+              {!loading && !outbox.length && <Empty>Historia potwierdzeń i powiadomień pojawi się tutaj.</Empty>}
+              {outbox.map(message => (
+                <article className="ad-outbox" key={message.id}>
+                  <Status value={message.status} />
+                  <span className="ad-row-main">
+                    <b>{message.subject}</b>
+                    <i>Do: {message.to} · {message.kind === 'confirmation' ? 'potwierdzenie dla klienta' : 'powiadomienie wewnętrzne'}</i>
+                  </span>
+                  <time>{formatDate(message.createdAt)}</time>
+                  {message.error && <p className="ad-error-text">{message.error}</p>}
+                </article>
+              ))}
+            </div>
+          )}
+
+          {tab === 'settings' && (
+            <MailSettings settings={settings} setSettings={setSettings} onSave={saveSettings} loading={loading} />
+          )}
+        </motion.div>
+
+        {loading && (
+          <div className="ad-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>
+        )}
+      </main>
+    </div>
+  )
+}
