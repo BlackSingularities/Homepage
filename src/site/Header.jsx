@@ -7,7 +7,6 @@ const NAV = [
   ['uslugi', 'Zakres'],
   ['realizacje', 'Realizacje'],
   ['proces', 'Proces'],
-  ['wycena', 'Wycena'],
   ['o-mnie', 'O mnie'],
 ]
 

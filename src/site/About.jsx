@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Check } from 'lucide-react'
 import { Reveal } from '../lib/ui'
 
 export default function About({ data, brand }) {
@@ -20,9 +19,6 @@ export default function About({ data, brand }) {
         <Reveal as="h2" className="about-title">{data.title} <em className="accent">{data.accent}</em></Reveal>
         <Reveal as="p" className="about-lead" delay={0.06}>{data.lead}</Reveal>
         <Reveal as="p" className="about-text" delay={0.1}>{data.text}</Reveal>
-        <Reveal className="about-highlights" delay={0.14}>
-          {data.highlights.map(item => <span key={item}><Check size={14} />{item}</span>)}
-        </Reveal>
         <Reveal className="about-sign" delay={0.18}>
           <b>{brand.initials}</b>
           <span>{brand.tagline}<i>{brand.location}</i></span>

@@ -30,7 +30,7 @@ export default function PagesGrid({ data, pages, onNavigate }) {
   if (!pages.length) return null
   return (
     <section className="section pages-section" id="oferta">
-      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} lead={data.lead} index="008" />
+      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} lead={data.lead} index="006" />
       <div className="pages-grid">
         {pages.map((page, index) => (
           <PageCard key={page.id} page={page} index={index} onNavigate={onNavigate} />

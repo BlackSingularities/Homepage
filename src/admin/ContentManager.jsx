@@ -29,14 +29,6 @@ function Lines({ label, value = [], onChange, hint, rows = 4 }) {
   )
 }
 
-function Num({ label, value, onChange, hint }) {
-  return (
-    <Field label={label} hint={hint}>
-      <input type="number" value={value ?? 0} onChange={event => onChange(Number(event.target.value) || 0)} />
-    </Field>
-  )
-}
-
 function ImageList({ label, value = [], onChange }) {
   const { busy, upload } = useMedia()
   return (
@@ -171,11 +163,8 @@ export default function ContentManager({ notify }) {
         </div>
       </Section>
 
-      <Section id="hero" title="Sekcja powitalna" description="Pierwszy ekran: nagłówek, hasła, liczby i pasek kompetencji." open={open === 'hero'} onToggle={toggle}>
-        <div className="ad-grid-2">
-          <Text label="Etykieta" value={draft.hero.badge} onChange={badge => patch('hero', { badge })} />
-          <Text label="Informacja o dostępności" value={draft.hero.availability} onChange={availability => patch('hero', { availability })} />
-        </div>
+      <Section id="hero" title="Sekcja powitalna" description="Pierwszy ekran: etykiety, nagłówek, wprowadzenie i pasek kompetencji." open={open === 'hero'} onToggle={toggle}>
+        <Lines label="Etykiety nad nagłówkiem" value={draft.hero.badges} onChange={badges => patch('hero', { badges })} rows={3} />
         <div className="ad-grid-2">
           <Text label="Nagłówek" value={draft.hero.titleTop} onChange={titleTop => patch('hero', { titleTop })} />
           <Text label="Nagłówek — część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
@@ -185,20 +174,6 @@ export default function ContentManager({ notify }) {
           <Text label="Przycisk główny" value={draft.hero.primaryCta} onChange={primaryCta => patch('hero', { primaryCta })} />
           <Text label="Przycisk dodatkowy" value={draft.hero.secondaryCta} onChange={secondaryCta => patch('hero', { secondaryCta })} />
         </div>
-        <Repeater
-          items={draft.hero.stats}
-          onChange={stats => patch('hero', { stats })}
-          create={() => ({ value: '0', suffix: '', label: '' })}
-          addLabel="Dodaj liczbę"
-          itemLabel={item => item.label || 'Liczba'}
-          render={(item, update) => (
-            <div className="ad-grid-3">
-              <Text label="Wartość" value={item.value} onChange={value => update({ value })} />
-              <Text label="Sufiks" value={item.suffix} onChange={suffix => update({ suffix })} placeholder="%, h, +" />
-              <Text label="Podpis" value={item.label} onChange={label => update({ label })} />
-            </div>
-          )}
-        />
         <Lines label="Pasek kompetencji" value={draft.hero.marquee} onChange={marquee => patch('hero', { marquee })} rows={5} />
       </Section>
 
@@ -208,12 +183,12 @@ export default function ContentManager({ notify }) {
         <Area label="Notatka boczna" value={draft.manifesto.note} onChange={note => patch('manifesto', { note })} rows={3} />
       </Section>
 
-      <Section id="services" title="Zakres usług" description="Interaktywna lista usług z opisem i punktami." open={open === 'services'} onToggle={toggle}>
+      <Section id="services" title="Zakres usług" description="Interaktywna lista usług z opisem." open={open === 'services'} onToggle={toggle}>
         <HeadFields data={draft.services} patch={value => patch('services', value)} />
         <Repeater
           items={draft.services.items}
           onChange={items => patch('services', { items })}
-          create={() => ({ id: uid(), no: '00', title: '', lead: '', detail: '', points: [], priceFrom: 0, priceTo: 0 })}
+          create={() => ({ id: uid(), no: '00', title: '', lead: '', detail: '' })}
           addLabel="Dodaj usługę"
           itemLabel={item => item.title || 'Usługa'}
           render={(item, update) => (
@@ -224,7 +199,6 @@ export default function ContentManager({ notify }) {
                 <Text label="Hasło" value={item.lead} onChange={lead => update({ lead })} />
               </div>
               <Area label="Opis" value={item.detail} onChange={detail => update({ detail })} rows={3} />
-              <Lines label="Punkty" value={item.points} onChange={points => update({ points })} />
             </>
           )}
         />
@@ -280,74 +254,17 @@ export default function ContentManager({ notify }) {
         <Repeater
           items={draft.process.items}
           onChange={items => patch('process', { items })}
-          create={() => ({ no: '', title: '', text: '', duration: '' })}
+          create={() => ({ no: '', title: '', text: '' })}
           addLabel="Dodaj etap"
           itemLabel={item => item.title || 'Etap'}
           render={(item, update) => (
             <>
-              <div className="ad-grid-3">
+              <div className="ad-grid-2">
                 <Text label="Numer" value={item.no} onChange={no => update({ no })} />
                 <Text label="Nazwa" value={item.title} onChange={title => update({ title })} />
-                <Text label="Czas trwania" value={item.duration} onChange={duration => update({ duration })} />
               </div>
               <Area label="Opis" value={item.text} onChange={text => update({ text })} rows={2} />
             </>
-          )}
-        />
-      </Section>
-
-      <Section id="estimator" title="Konfigurator wyceny" description="Rodzaje projektów, moduły i widełki cenowe." open={open === 'estimator'} onToggle={toggle}>
-        <HeadFields data={draft.estimator} patch={value => patch('estimator', value)} />
-        <Area label="Zastrzeżenie pod wyceną" value={draft.estimator.disclaimer} onChange={disclaimer => patch('estimator', { disclaimer })} rows={2} />
-
-        <h3 className="ad-subhead">Rodzaje projektów</h3>
-        <Repeater
-          items={draft.estimator.types}
-          onChange={types => patch('estimator', { types })}
-          create={() => ({ id: uid(), label: '', desc: '', from: 0, to: 0 })}
-          addLabel="Dodaj rodzaj"
-          itemLabel={item => item.label || 'Rodzaj'}
-          render={(item, update) => (
-            <>
-              <div className="ad-grid-3">
-                <Text label="Nazwa" value={item.label} onChange={label => update({ label })} />
-                <Num label="Cena od (zł)" value={item.from} onChange={from => update({ from })} />
-                <Num label="Cena do (zł)" value={item.to} onChange={to => update({ to })} />
-              </div>
-              <Text label="Opis" value={item.desc} onChange={desc => update({ desc })} wide />
-            </>
-          )}
-        />
-
-        <h3 className="ad-subhead">Moduły dodatkowe</h3>
-        <Repeater
-          items={draft.estimator.modules}
-          onChange={modules => patch('estimator', { modules })}
-          create={() => ({ id: uid(), label: '', from: 0, to: 0 })}
-          addLabel="Dodaj moduł"
-          itemLabel={item => item.label || 'Moduł'}
-          render={(item, update) => (
-            <div className="ad-grid-3">
-              <Text label="Nazwa" value={item.label} onChange={label => update({ label })} />
-              <Num label="Cena od (zł)" value={item.from} onChange={from => update({ from })} />
-              <Num label="Cena do (zł)" value={item.to} onChange={to => update({ to })} />
-            </div>
-          )}
-        />
-
-        <h3 className="ad-subhead">Tryby realizacji</h3>
-        <Repeater
-          items={draft.estimator.timelines}
-          onChange={timelines => patch('estimator', { timelines })}
-          create={() => ({ id: uid(), label: '', desc: '', multiplier: 1 })}
-          addLabel="Dodaj tryb"
-          itemLabel={item => item.label || 'Tryb'}
-          render={(item, update) => (
-            <div className="ad-grid-3">
-              <Text label="Nazwa" value={item.label} onChange={label => update({ label })} />
-              <Text label="Opis" value={item.desc} onChange={desc => update({ desc })} />
-              <Num label="Mnożnik ceny" value={item.multiplier} onChange={multiplier => update({ multiplier })} hint="1 = bez zmiany, 1.25 = +25%" />
-            </div>
           )}
         />
       </Section>
@@ -360,7 +277,6 @@ export default function ContentManager({ notify }) {
           <ImagePicker label="Zdjęcie" value={draft.about.image} onChange={image => patch('about', { image })} />
           <Text label="Podpis pod zdjęciem" value={draft.about.caption} onChange={caption => patch('about', { caption })} />
         </div>
-        <Lines label="Wyróżniki" value={draft.about.highlights} onChange={highlights => patch('about', { highlights })} />
       </Section>
 
       <Section id="faq" title="FAQ" description="Najczęstsze pytania i odpowiedzi." open={open === 'faq'} onToggle={toggle}>
@@ -384,9 +300,8 @@ export default function ContentManager({ notify }) {
         <HeadFields data={draft.pagesSection} patch={value => patch('pagesSection', value)} />
       </Section>
 
-      <Section id="contact" title="Kontakt" description="Nagłówek formularza i obietnice dla klienta." open={open === 'contact'} onToggle={toggle}>
+      <Section id="contact" title="Kontakt" description="Nagłówek nad formularzem." open={open === 'contact'} onToggle={toggle}>
         <HeadFields data={draft.contact} patch={value => patch('contact', value)} />
-        <Lines label="Obietnice" value={draft.contact.assurances} onChange={assurances => patch('contact', { assurances })} />
       </Section>
 
       <SaveBar

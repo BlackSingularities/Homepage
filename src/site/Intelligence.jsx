@@ -20,13 +20,13 @@ export default function Intelligence({ data }) {
     <section className="section intelligence" id="ai">
       <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} index="003" align="center" />
       <div className="int-grid">
-        {data.cards.map((card, index) => <Card card={card} index={index} key={card.title} />)}
+        {(data.cards || []).map((card, index) => <Card card={card} index={index} key={card.title} />)}
       </div>
       <Reveal className="int-chain">
-        {data.chain.map((link, index) => (
+        {(data.chain || []).map((link, index) => (
           <span key={link}>
             <b>{link}</b>
-            {index < data.chain.length - 1 && <i />}
+            {index < (data.chain || []).length - 1 && <i />}
           </span>
         ))}
       </Reveal>

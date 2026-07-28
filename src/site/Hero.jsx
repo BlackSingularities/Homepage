@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react'
-import { Counter, KineticText, ease, useTilt } from '../lib/ui'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { KineticText, ease, useTilt } from '../lib/ui'
 
 function Showreel({ projects }) {
   const tilt = useTilt(6)
@@ -13,7 +13,7 @@ function Showreel({ projects }) {
 
   useEffect(() => {
     if (reduce || shots.length < 2) return undefined
-    const timer = setInterval(() => setIndex(current => (current + 1) % shots.length), 3800)
+    const timer = setInterval(() => setIndex(current => (current + 1) % shots.length), 4200)
     return () => clearInterval(timer)
   }, [shots.length, reduce])
 
@@ -68,6 +68,10 @@ export default function Hero({ hero, projects }) {
     <section className="hero" id="start">
       <div className="hero-aura" aria-hidden="true"><i /><i /><i /></div>
 
+      <div className="hero-index">
+        {(hero.badges || []).map(badge => <span key={badge}>{badge}</span>)}
+      </div>
+
       <div className="hero-inner">
         <motion.div
           className="hero-copy"
@@ -75,11 +79,6 @@ export default function Hero({ hero, projects }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="hero-badges">
-            <span className="pill pill-live"><i />{hero.availability}</span>
-            <span className="pill">{hero.badge}</span>
-          </div>
-
           <h1 className="hero-title">
             <KineticText text={hero.titleTop} accent={hero.titleAccent} />
           </h1>
@@ -101,22 +100,7 @@ export default function Hero({ hero, projects }) {
           >
             <a className="btn btn-primary" href="#kontakt">{hero.primaryCta} <ArrowRight size={17} /></a>
             <a className="btn btn-ghost" href="#realizacje">{hero.secondaryCta}</a>
-            <a className="hero-estimate" href="#wycena"><Sparkles size={15} /> Policz orientacyjny koszt</a>
           </motion.div>
-
-          <motion.dl
-            className="hero-stats"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.6 }}
-          >
-            {hero.stats.map(stat => (
-              <div key={stat.label}>
-                <dt><Counter value={stat.value} suffix={stat.suffix || ''} /></dt>
-                <dd>{stat.label}</dd>
-              </div>
-            ))}
-          </motion.dl>
         </motion.div>
 
         <motion.div
@@ -133,7 +117,7 @@ export default function Hero({ hero, projects }) {
         <div className="marquee-track">
           {[0, 1].map(copy => (
             <div className="marquee-group" key={copy}>
-              {hero.marquee.map(word => <span key={`${copy}-${word}`}>{word}<i>◆</i></span>)}
+              {(hero.marquee || []).map(word => <span key={`${copy}-${word}`}>{word}<i>◆</i></span>)}
             </div>
           ))}
         </div>

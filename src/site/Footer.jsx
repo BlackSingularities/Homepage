@@ -19,7 +19,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
             <a href={href('uslugi')}>Zakres</a>
             <a href={href('realizacje')}>Realizacje</a>
             <a href={href('proces')}>Proces</a>
-            <a href={href('wycena')}>Konfigurator wyceny</a>
+            <a href={href('o-mnie')}>O mnie</a>
           </div>
           {pages.length > 0 && (
             <div>

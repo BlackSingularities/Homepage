@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowUpRight, Check, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Reveal, ease, useTilt } from '../lib/ui'
@@ -11,6 +11,7 @@ export default function Work({ data }) {
   const [paused, setPaused] = useState(false)
   const reduce = useReducedMotion()
   const tilt = useTilt(4)
+  const dragFrom = useRef(0)
 
   const project = projects[Math.min(active, projects.length - 1)]
   const slides = project?.slides?.length ? project.slides : []
@@ -59,7 +60,7 @@ export default function Work({ data }) {
           <p className="work-statement">{project.statement}</p>
           <p className="work-description">{project.description}</p>
           <ul className="work-features">
-            {project.features.map(feature => <li key={feature}><Check size={13} />{feature}</li>)}
+            {(project.features || []).map(feature => <li key={feature}><Check size={13} />{feature}</li>)}
           </ul>
           <a className="work-open" href={project.href} target={external ? '_blank' : undefined} rel="noreferrer">
             <span>Otwórz projekt</span>
@@ -71,8 +72,21 @@ export default function Work({ data }) {
         <div
           className="work-viewport"
           ref={tilt}
+          tabIndex={0}
+          role="group"
+          aria-label={`Ekrany projektu ${project.name}`}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
+          onKeyDown={event => {
+            if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1) }
+            if (event.key === 'ArrowRight') { event.preventDefault(); step(1) }
+          }}
+          onPointerDown={event => { dragFrom.current = event.clientX }}
+          onPointerUp={event => {
+            const distance = event.clientX - dragFrom.current
+            if (Math.abs(distance) > 45) step(distance > 0 ? -1 : 1)
+            dragFrom.current = 0
+          }}
         >
           <div className="window-bar">
             <i /><i /><i />

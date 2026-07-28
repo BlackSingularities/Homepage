@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowUpRight, Check, Plus } from 'lucide-react'
+import { ArrowUpRight, Plus } from 'lucide-react'
 import { Reveal, ease, useSpotlight } from '../lib/ui'
 import SectionHead from './SectionHead'
 
@@ -14,21 +14,15 @@ function Detail({ service }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease }}
     >
+      <span className="svc-ghost" aria-hidden="true">{service.no}</span>
       <div className="svc-detail-head">
         <span className="svc-detail-no">{service.no}</span>
-        <div>
-          <h3>{service.title}</h3>
-          <p className="svc-detail-lead">{service.lead}</p>
-        </div>
+        <h3>{service.title}</h3>
       </div>
+      <p className="svc-detail-lead">{service.lead}</p>
       <p className="svc-detail-text">{service.detail}</p>
-      <ul className="svc-points">
-        {service.points.map(point => (
-          <li key={point}><Check size={14} />{point}</li>
-        ))}
-      </ul>
       <a className="svc-detail-cta" href="#kontakt">
-        Wyceń ten zakres <ArrowUpRight size={16} />
+        Zapytaj o ten zakres <ArrowUpRight size={16} />
       </a>
     </motion.div>
   )
@@ -87,9 +81,6 @@ export default function Services({ data }) {
                 >
                   <p className="svc-detail-lead">{item.lead}</p>
                   <p className="svc-detail-text">{item.detail}</p>
-                  <ul className="svc-points">
-                    {item.points.map(point => <li key={point}><Check size={14} />{point}</li>)}
-                  </ul>
                 </motion.div>
               )}
             </AnimatePresence>

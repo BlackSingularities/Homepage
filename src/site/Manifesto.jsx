@@ -10,7 +10,7 @@ export default function Manifesto({ data }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.9', 'end 0.55'] })
-  const words = data.lines.join(' \n ').split(' ')
+  const words = (data.lines || []).join(' \n ').split(' ')
 
   return (
     <section className="section manifesto" ref={ref}>
@@ -20,7 +20,7 @@ export default function Manifesto({ data }) {
       </div>
       <p className="manifesto-copy">
         {reduce
-          ? data.lines.join(' ')
+          ? (data.lines || []).join(' ')
           : words.map((word, index) => (
             word === '\n'
               ? <br key={`br-${index}`} />

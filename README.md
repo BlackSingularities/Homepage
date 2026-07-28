@@ -45,7 +45,7 @@ Podmiana go unieważnia zapisane hasło skrzynki — trzeba je wtedy wpisać pon
 | Pulpit | Liczby, ostatnie zgłoszenia, skróty |
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
-| Treści strony | Wszystkie teksty strony głównej — od nagłówka po widełki w konfiguratorze |
+| Treści strony | Wszystkie teksty strony głównej — hero, usługi, realizacje, proces, FAQ, kontakt |
 | Zdjęcia | Biblioteka mediów: upload przeciągnięciem, kopiowanie adresu, usuwanie |
 | Odebrane / Wysłane | Podgląd skrzynki IMAP i historia wysyłek |
 | Poczta | Dane IMAP/SMTP; hasło szyfrowane AES-256-GCM przed zapisem |

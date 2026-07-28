@@ -14,13 +14,12 @@ export default function Process({ data }) {
       <div className="proc-track" ref={ref}>
         <div className="proc-line" aria-hidden="true"><motion.i style={{ scaleX: line }} /></div>
         <div className="proc-steps">
-          {data.items.map((step, index) => (
+          {(data.items || []).map((step, index) => (
             <Reveal className="proc-step" key={step.no} delay={index * 0.09} amount={0.4}>
               <span className="proc-dot" aria-hidden="true" />
               <span className="proc-no">{step.no}</span>
               <h3>{step.title}</h3>
               <p>{step.text}</p>
-              {step.duration && <span className="proc-time">{step.duration}</span>}
             </Reveal>
           ))}
         </div>

@@ -3,36 +3,19 @@
     "initials": "AR",
     "name": "Adam Rędzikowski",
     "role": "Digital Studio",
-    "tagline": "Strony · systemy webowe · AI · dane",
+    "tagline": "Strony / systemy / AI / dane",
     "location": "Lublin · cała Polska",
     "email": "",
     "phone": ""
   },
   "hero": {
-    "badge": "Niezależne studio cyfrowe",
-    "availability": "Przyjmuję 2 projekty na Q3",
-    "titleTop": "Cyfrowe produkty",
-    "titleAccent": "bez kompromisów.",
-    "lead": "Projektuję i buduję wyjątkowe strony, dedykowane systemy webowe oraz rozwiązania oparte na AI i danych. Od pierwszego szkicu po działające wdrożenie.",
-    "primaryCta": "Porozmawiajmy o projekcie",
-    "secondaryCta": "Zobacz realizacje",
-    "stats": [
-      { "value": "5", "suffix": "", "label": "wdrożonych produktów" },
-      { "value": "100", "suffix": "%", "label": "kodu pisanego od zera" },
-      { "value": "1", "suffix": "", "label": "osoba odpowiedzialna za całość" },
-      { "value": "24", "suffix": "h", "label": "czas pierwszej odpowiedzi" }
-    ],
-    "marquee": [
-      "Strategia",
-      "Design",
-      "Development",
-      "Systemy webowe",
-      "Automatyzacja",
-      "AI",
-      "Dane",
-      "Wdrożenie",
-      "Opieka"
-    ]
+    "badges": ["Independent digital studio", "Polska / zdalnie", "Est. 2024"],
+    "titleTop": "Cyfrowe produkty.",
+    "titleAccent": "Bez kompromisów.",
+    "lead": "Projektuję i buduję wyjątkowe strony, dedykowane systemy webowe oraz rozwiązania wykorzystujące AI i dane.",
+    "primaryCta": "Porozmawiajmy",
+    "secondaryCta": "Wybrane realizacje",
+    "marquee": ["Strategia", "Design", "Development", "AI", "Dane"]
   },
   "manifesto": {
     "label": "Podejście / 001",
@@ -44,74 +27,42 @@
   },
   "services": {
     "kicker": "Zakres",
-    "title": "Jedno studio.",
-    "accent": "Cały produkt.",
-    "lead": "Zakres dobieramy do problemu. Strona może być początkiem. System administracyjny, dane i AI potrafią uczynić z niej centrum pracy całej firmy.",
+    "title": "One studio.",
+    "accent": "Entire product.",
+    "lead": "Zakres dobieramy do problemu. Strona może być początkiem. System administracyjny, dane i AI mogą uczynić z niej centrum pracy całej firmy.",
     "items": [
       {
         "id": "svc-www",
         "no": "01",
         "title": "Strony internetowe",
         "lead": "Projekt, który buduje pozycję marki — nie kolejny szablon.",
-        "detail": "Strategia, architektura informacji, autorski interfejs, treść, SEO, analityka i wdrożenie. Od pierwszego szkicu do działającej strony na serwerze.",
-        "points": [
-          "Autorski projekt graficzny",
-          "Treści i architektura informacji",
-          "SEO techniczne i analityka",
-          "Panel do samodzielnej edycji"
-        ],
-        "priceFrom": 6000,
-        "priceTo": 18000
+        "detail": "Strategia, architektura informacji, autorski interfejs, treść, SEO, analityka i wdrożenie. Od pierwszego szkicu do działającej strony na serwerze."
       },
       {
         "id": "svc-systems",
         "no": "02",
         "title": "Systemy webowe",
         "lead": "Oprogramowanie ułożone pod Twoją firmę, nie odwrotnie.",
-        "detail": "Panele administracyjne, użytkownicy i role, obieg zleceń, portale klienta, CMS, bazy danych, dokumenty, raporty oraz integracje.",
-        "points": [
-          "Panele i portale klienta",
-          "Role, uprawnienia, obieg pracy",
-          "Integracje i API",
-          "Dokumenty, raporty, eksporty"
-        ],
-        "priceFrom": 15000,
-        "priceTo": 90000
+        "detail": "Panele administracyjne, użytkownicy i role, obieg zleceń, portale klienta, CMS, bazy danych, dokumenty, raporty oraz integracje."
       },
       {
         "id": "svc-ai",
         "no": "03",
         "title": "Automatyzacja i AI",
         "lead": "Mniej klikania. Więcej pracy wykonanej bez Twojego udziału.",
-        "detail": "Asystenci znający dane firmy, obsługa korespondencji, odczyt dokumentów, generowanie treści, klasyfikacja i zlecanie AI konkretnych czynności.",
-        "points": [
-          "Asystent na danych firmy",
-          "Odczyt faktur i dokumentów",
-          "Automatyczna obsługa poczty",
-          "Generowanie i klasyfikacja treści"
-        ],
-        "priceFrom": 8000,
-        "priceTo": 45000
+        "detail": "Asystenci znający dane firmy, obsługa korespondencji, odczyt dokumentów, generowanie treści, klasyfikacja i zlecanie AI konkretnych czynności."
       },
       {
         "id": "svc-data",
         "no": "04",
         "title": "Dane i analityka",
         "lead": "Faktury, zamówienia i arkusze zamienione w decyzje.",
-        "detail": "Łączenie źródeł, automatyczne raporty, KPI, dashboardy, wykrywanie trendów i narzędzia, dzięki którym widzisz firmę bez zgadywania.",
-        "points": [
-          "Łączenie rozproszonych źródeł",
-          "Dashboardy i KPI",
-          "Raporty cykliczne",
-          "Prognozy i wykrywanie trendów"
-        ],
-        "priceFrom": 7000,
-        "priceTo": 40000
+        "detail": "Łączenie źródeł, automatyczne raporty, KPI, dashboardy, wykrywanie trendów i narzędzia, dzięki którym widzisz firmę bez zgadywania."
       }
     ]
   },
   "intelligence": {
-    "kicker": "Warstwa inteligencji",
+    "kicker": "Intelligence layer",
     "title": "AI nie jako ozdoba.",
     "accent": "Jako część pracy.",
     "cards": [
@@ -134,10 +85,10 @@
     "chain": ["AI", "automatyzacja", "dane", "realny efekt"]
   },
   "work": {
-    "kicker": "Wybrane realizacje",
+    "kicker": "Selected work",
     "title": "Dowód zamiast",
     "accent": "deklaracji.",
-    "lead": "Działające produkty. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
+    "lead": "Pięć działających produktów. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
     "items": [
       {
         "id": "prj-travel",
@@ -197,37 +148,10 @@
     "accent": "do systemu.",
     "lead": "Krótka ścieżka decyzyjna. Regularny kontakt. Działająca wersja szybciej niż rozbudowana dokumentacja.",
     "items": [
-      { "no": "01", "title": "Diagnoza", "text": "Zaczynam od procesu, problemu i celu biznesowego. Technologia przychodzi później.", "duration": "1–2 dni" },
-      { "no": "02", "title": "Kierunek", "text": "Układam architekturę, przepływy, dane i sposób, w jaki produkt ma być używany.", "duration": "3–7 dni" },
-      { "no": "03", "title": "Budowa", "text": "Szybko pokazuję działającą wersję. Rozwijamy ją na realnym produkcie, nie na prezentacji.", "duration": "2–10 tygodni" },
-      { "no": "04", "title": "Wdrożenie", "text": "Uruchamiam, zabezpieczam, przekazuję i zostaję przy dalszym rozwoju systemu.", "duration": "ciągle" }
-    ]
-  },
-  "estimator": {
-    "kicker": "Konfigurator",
-    "title": "Policz zakres",
-    "accent": "w minutę.",
-    "lead": "Zaznacz, czego potrzebujesz. Zobaczysz orientacyjne widełki i gotowy opis projektu, który jednym kliknięciem trafi do formularza.",
-    "disclaimer": "Widełki mają charakter orientacyjny. Ostateczna wycena powstaje po rozmowie i doprecyzowaniu zakresu.",
-    "types": [
-      { "id": "landing", "label": "Strona wizytówka", "desc": "Jedna dopracowana strona z ofertą i formularzem.", "from": 6000, "to": 12000 },
-      { "id": "website", "label": "Strona firmowa z CMS", "desc": "Wiele podstron, blog, panel do samodzielnej edycji.", "from": 12000, "to": 26000 },
-      { "id": "system", "label": "Dedykowany system webowy", "desc": "Panele, role, obieg pracy, portal klienta.", "from": 25000, "to": 90000 },
-      { "id": "automation", "label": "Automatyzacja i AI", "desc": "Asystenci, obsługa dokumentów i korespondencji.", "from": 10000, "to": 50000 }
-    ],
-    "modules": [
-      { "id": "cms", "label": "Panel administracyjny", "from": 4000, "to": 12000 },
-      { "id": "auth", "label": "Konta i uprawnienia", "from": 3500, "to": 10000 },
-      { "id": "payments", "label": "Płatności online", "from": 3000, "to": 9000 },
-      { "id": "integrations", "label": "Integracje i API", "from": 3000, "to": 15000 },
-      { "id": "ai", "label": "Moduł AI", "from": 6000, "to": 25000 },
-      { "id": "analytics", "label": "Dashboardy i raporty", "from": 4000, "to": 16000 },
-      { "id": "content", "label": "Treści i copywriting", "from": 2500, "to": 8000 },
-      { "id": "care", "label": "Opieka powdrożeniowa", "from": 500, "to": 2500 }
-    ],
-    "timelines": [
-      { "id": "standard", "label": "Standard", "desc": "Normalny rytm pracy", "multiplier": 1 },
-      { "id": "fast", "label": "Priorytet", "desc": "Pierwszeństwo w kolejce", "multiplier": 1.25 }
+      { "no": "01", "title": "Diagnoza", "text": "Zaczynam od procesu, problemu i celu biznesowego. Technologia przychodzi później." },
+      { "no": "02", "title": "Kierunek", "text": "Układam architekturę, przepływy, dane i sposób, w jaki produkt ma być używany." },
+      { "no": "03", "title": "Budowa", "text": "Szybko pokazuję działającą wersję. Rozwijamy ją na realnym produkcie, nie na prezentacji." },
+      { "no": "04", "title": "Wdrożenie", "text": "Uruchamiam, zabezpieczam, przekazuję i zostaję przy dalszym rozwoju systemu." }
     ]
   },
   "about": {
@@ -237,12 +161,7 @@
     "lead": "Rozmawiasz bezpośrednio z osobą, która myśli o produkcie, projektuje go, buduje i uruchamia.",
     "text": "Łączę analityczne podejście, wyczucie wizualne oraz możliwości nowoczesnych narzędzi AI. Dzięki temu mogę samodzielnie prowadzić kompletny projekt i pilnować, żeby strategia, interfejs oraz technologia mówiły jednym głosem.",
     "image": "/assets/adam.jpg",
-    "caption": "Adam Rędzikowski / Founder & builder",
-    "highlights": [
-      "Jeden rozmówca od pierwszego maila do wdrożenia",
-      "Kod pisany od zera, bez gotowych motywów",
-      "Wsparcie i rozwój także po uruchomieniu"
-    ]
+    "caption": "Adam Rędzikowski / Founder & builder"
   },
   "faq": {
     "kicker": "FAQ",
@@ -252,25 +171,19 @@
       { "q": "Czy muszę mieć gotową specyfikację?", "a": "Nie. Wystarczy problem, pomysł albo proces, który dziś nie działa tak, jak powinien. Pomogę zamienić go w konkretny zakres." },
       { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak — dokładnie taki, jakiego wymaga projekt. Bez przeładowanego panelu z funkcjami, których nigdy nie użyjesz." },
       { "q": "Czy wszystko musi wykorzystywać AI?", "a": "Nie. AI ma rozwiązywać problem, a nie dekorować ofertę. Jeśli zwykła automatyzacja będzie lepsza, właśnie ją zaproponuję." },
-      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, rozwijać i monitorować produkt. Zakres opieki ustalamy tak samo indywidualnie jak sam system." },
-      { "q": "Ile trwa realizacja?", "a": "Prosta strona to zwykle 2–4 tygodnie. Rozbudowany system webowy — od 2 do 4 miesięcy, z działającą wersją do oglądania już po kilkunastu dniach." }
+      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, rozwijać i monitorować produkt. Zakres opieki ustalamy tak samo indywidualnie jak sam system." }
     ]
   },
   "pagesSection": {
-    "kicker": "Oferta szczegółowa",
-    "title": "Wejdź głębiej",
-    "accent": "w konkretny temat.",
-    "lead": "Rozwinięcia oferty, opisy usług i case studies — każda z tych stron powstaje i żyje w panelu administracyjnym."
+    "kicker": "Więcej",
+    "title": "Rozwinięcia",
+    "accent": "oferty.",
+    "lead": "Szczegółowe opisy usług i tematów. Każda z tych stron powstaje i żyje w panelu administracyjnym."
   },
   "contact": {
     "kicker": "Nowy projekt / kontakt",
     "title": "Zbudujmy coś,",
     "accent": "czego nie da się pomylić.",
-    "lead": "Opowiedz mi o problemie, procesie albo produkcie, który chcesz stworzyć. Wybierz, czy mam odpowiedzieć telefonicznie, czy mailowo.",
-    "assurances": [
-      "Odpowiadam osobiście, zwykle w ciągu 24 godzin",
-      "Pierwsza rozmowa i wstępna wycena są bezpłatne",
-      "Twoje dane nie trafiają do żadnej listy mailingowej"
-    ]
+    "lead": "Opowiedz mi o problemie, procesie albo produkcie, który chcesz stworzyć. Wybierz, czy mam odpowiedzieć telefonicznie, czy mailowo."
   }
 }

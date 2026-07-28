@@ -35,10 +35,4 @@ export const formatDay = value => (value
   ? new Intl.DateTimeFormat('pl-PL', { dateStyle: 'medium' }).format(new Date(value))
   : '—')
 
-export const formatMoney = value => new Intl.NumberFormat('pl-PL', {
-  style: 'currency',
-  currency: 'PLN',
-  maximumFractionDigits: 0,
-}).format(Math.round(value / 100) * 100)
-
 export const formatSize = bytes => `${(bytes / 1024 / 1024).toFixed(bytes > 512 * 1024 ? 1 : 2)} MB`

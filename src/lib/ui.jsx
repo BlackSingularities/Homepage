@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 export const ease = [0.22, 1, 0.36, 1]
 
@@ -116,40 +116,34 @@ export function useTilt(strength = 7) {
   return ref
 }
 
-/** Counts up to `value` once the element scrolls into view. */
-export function Counter({ value, suffix = '', duration = 1500 }) {
+/** Warm light that trails the cursor across the page. Decorative, desktop only. */
+export function PointerGlow() {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, amount: 0.6 })
   const reduce = useReducedMotion()
-  const target = Number(String(value).replace(/[^\d.]/g, '')) || 0
-  const prefix = String(value).replace(/[\d.].*$/, '')
-  const [display, setDisplay] = useState(reduce ? target : 0)
-
-  // A number stuck at zero looks broken, so the final value always lands even if
-  // the count-up never gets a chance to run (hidden tab, no frames, no observer).
-  useEffect(() => {
-    const guard = setTimeout(() => setDisplay(target), 2600)
-    return () => clearTimeout(guard)
-  }, [target])
 
   useEffect(() => {
-    if (!inView || reduce) return undefined
+    const node = ref.current
+    if (!node || reduce || window.matchMedia('(hover: none)').matches) return undefined
     let frame = 0
-    const start = performance.now()
-    const tick = now => {
-      const progress = Math.min((now - start) / duration, 1)
-      setDisplay(Math.round(target * (1 - Math.pow(1 - progress, 3))))
-      if (progress < 1) frame = requestAnimationFrame(tick)
+    const move = event => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        node.style.setProperty('--px', `${event.clientX}px`)
+        node.style.setProperty('--py', `${event.clientY}px`)
+        node.style.opacity = '1'
+      })
     }
-    frame = requestAnimationFrame(tick)
-    const safety = setTimeout(() => setDisplay(target), duration + 250)
+    const hide = () => { node.style.opacity = '0' }
+    window.addEventListener('pointermove', move, { passive: true })
+    document.addEventListener('pointerleave', hide)
     return () => {
       cancelAnimationFrame(frame)
-      clearTimeout(safety)
+      window.removeEventListener('pointermove', move)
+      document.removeEventListener('pointerleave', hide)
     }
-  }, [inView, target, duration, reduce])
+  }, [reduce])
 
-  return <span ref={ref}>{prefix}{display}{suffix}</span>
+  return <div className="pointer-glow" ref={ref} aria-hidden="true" />
 }
 
 /** Tracks which section is currently in the viewport for nav highlighting. */
@@ -173,8 +167,17 @@ export function useActiveSection(ids) {
   return active
 }
 
-export function scrollToId(id) {
-  const node = document.getElementById(id)
-  if (!node) return
-  node.scrollIntoView({ behavior: 'smooth', block: 'start' })
+/** Fixed dot navigation mirroring the sections currently on screen. */
+export function SectionRail({ sections }) {
+  const active = useActiveSection(sections.map(([id]) => id))
+  return (
+    <nav className="section-rail" aria-label="Sekcje strony">
+      {sections.map(([id, label]) => (
+        <a key={id} href={`#${id}`} className={active === id ? 'is-active' : ''}>
+          <i aria-hidden="true" />
+          <span>{label}</span>
+        </a>
+      ))}
+    </nav>
+  )
 }

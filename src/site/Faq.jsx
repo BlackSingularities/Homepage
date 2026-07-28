@@ -9,9 +9,9 @@ export default function Faq({ data }) {
 
   return (
     <section className="section faq" id="faq">
-      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} index="009" />
+      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} index="008" />
       <div className="faq-list">
-        {data.items.map((item, index) => (
+        {(data.items || []).map((item, index) => (
           <Reveal className={`faq-item ${open === index ? 'is-open' : ''}`} key={item.q} delay={index * 0.04} amount={0.3}>
             <button onClick={() => setOpen(open === index ? -1 : index)} aria-expanded={open === index}>
               <span>{item.q}</span>

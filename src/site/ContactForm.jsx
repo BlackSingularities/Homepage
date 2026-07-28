@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, Mail, Phone, Send } from 'lucide-react'
 import { ease } from '../lib/ui'
@@ -14,18 +14,11 @@ const EMPTY = {
 
 const isEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
-export default function ContactForm({ scopeOptions = [], prefill }) {
+export default function ContactForm({ scopeOptions = [] }) {
   const [form, setForm] = useState(EMPTY)
   const [step, setStep] = useState(0)
   const [touched, setTouched] = useState(false)
   const [state, setState] = useState({ status: 'idle', message: '' })
-
-  useEffect(() => {
-    if (!prefill) return
-    setForm(current => ({ ...current, ...prefill, source: 'konfigurator' }))
-    setStep(0)
-    setState({ status: 'idle', message: '' })
-  }, [prefill])
 
   const update = event => {
     const { name, value, type, checked } = event.target
