@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, LoaderCircle, RotateCcw, Trash2 } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
-import { Area, Dropzone, Field, ImagePicker, Notice, Repeater, SaveBar, Text, useMedia } from './parts'
+import { Area, Dropzone, Field, Notice, Repeater, SaveBar, Text, useMedia } from './parts'
 
 /**
  * Newline-separated editor for arrays of plain strings. The textarea keeps its
@@ -269,14 +269,10 @@ export default function ContentManager({ notify }) {
         />
       </Section>
 
-      <Section id="about" title="O mnie" description="Zdjęcie, opis i podpis." open={open === 'about'} onToggle={toggle}>
+      <Section id="about" title="O mnie" description="Opis i podpis." open={open === 'about'} onToggle={toggle}>
         <HeadFields data={draft.about} patch={value => patch('about', value)} withLead={false} />
         <Area label="Zdanie przewodnie" value={draft.about.lead} onChange={lead => patch('about', { lead })} rows={2} />
         <Area label="Opis" value={draft.about.text} onChange={text => patch('about', { text })} rows={4} />
-        <div className="ad-grid-2">
-          <ImagePicker label="Zdjęcie" value={draft.about.image} onChange={image => patch('about', { image })} />
-          <Text label="Podpis pod zdjęciem" value={draft.about.caption} onChange={caption => patch('about', { caption })} />
-        </div>
       </Section>
 
       <Section id="faq" title="FAQ" description="Najczęstsze pytania i odpowiedzi." open={open === 'faq'} onToggle={toggle}>
