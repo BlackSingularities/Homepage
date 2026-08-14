@@ -61,4 +61,5 @@ jobs:
             rm -rf .git node_modules dist
 
             docker compose up -d --build
+            docker compose exec -T homepage_api node server/migrate-playmaster.mjs
             docker image prune -f
