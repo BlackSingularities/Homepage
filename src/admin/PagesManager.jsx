@@ -355,7 +355,6 @@ export default function PagesManager({ notify }) {
                 <Text label="Adres (slug)" value={draft.slug} onChange={slug => patch({ slug })} hint={`Strona będzie dostępna pod /p/${draft.slug || '…'}`} />
               </div>
               <div className="ad-grid-2">
-                <Text label="Nadtytuł" value={draft.kicker} onChange={kicker => patch({ kicker })} placeholder="np. Oferta / Usługa" />
                 <Select
                   label="Kolor akcentu"
                   value={draft.accent}

@@ -73,8 +73,7 @@ function Section({ id, title, description, open, onToggle, children }) {
 function HeadFields({ data, patch, withLead = true }) {
   return (
     <>
-      <div className="ad-grid-3">
-        <Text label="Nadtytuł sekcji" value={data.kicker} onChange={kicker => patch({ kicker })} />
+      <div className="ad-grid-2">
         <Text label="Nagłówek" value={data.title} onChange={title => patch({ title })} />
         <Text label="Nagłówek — część wyróżniona" value={data.accent} onChange={accent => patch({ accent })} />
       </div>
@@ -163,8 +162,7 @@ export default function ContentManager({ notify }) {
         </div>
       </Section>
 
-      <Section id="hero" title="Sekcja powitalna" description="Pierwszy ekran: etykiety, nagłówek, wprowadzenie i pasek kompetencji." open={open === 'hero'} onToggle={toggle}>
-        <Lines label="Etykiety nad nagłówkiem" value={draft.hero.badges} onChange={badges => patch('hero', { badges })} rows={3} />
+      <Section id="hero" title="Sekcja powitalna" description="Pierwszy ekran: nagłówek, wprowadzenie i pasek kompetencji." open={open === 'hero'} onToggle={toggle}>
         <div className="ad-grid-2">
           <Text label="Nagłówek" value={draft.hero.titleTop} onChange={titleTop => patch('hero', { titleTop })} />
           <Text label="Nagłówek — część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
@@ -178,7 +176,6 @@ export default function ContentManager({ notify }) {
       </Section>
 
       <Section id="manifesto" title="Manifest" description="Zdanie przewodnie odsłaniane przy przewijaniu." open={open === 'manifesto'} onToggle={toggle}>
-        <Text label="Etykieta" value={draft.manifesto.label} onChange={label => patch('manifesto', { label })} />
         <Lines label="Zdania" value={draft.manifesto.lines} onChange={lines => patch('manifesto', { lines })} rows={4} hint="Każda linia to osobne zdanie manifestu." />
         <Area label="Notatka boczna" value={draft.manifesto.note} onChange={note => patch('manifesto', { note })} rows={3} />
       </Section>
@@ -273,6 +270,7 @@ export default function ContentManager({ notify }) {
         <HeadFields data={draft.about} patch={value => patch('about', value)} withLead={false} />
         <Area label="Zdanie przewodnie" value={draft.about.lead} onChange={lead => patch('about', { lead })} rows={2} />
         <Area label="Opis" value={draft.about.text} onChange={text => patch('about', { text })} rows={4} />
+        <Lines label="Kompetencje" value={draft.about.strengths} onChange={strengths => patch('about', { strengths })} rows={5} />
       </Section>
 
       <Section id="faq" title="FAQ" description="Najczęstsze pytania i odpowiedzi." open={open === 'faq'} onToggle={toggle}>

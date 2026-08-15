@@ -9,7 +9,7 @@ export default function Faq({ data }) {
 
   return (
     <section className="section faq" id="faq">
-      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} index="008" />
+      <SectionHead title={data.title} accent={data.accent} />
       <div className="faq-list">
         {(data.items || []).map((item, index) => (
           <Reveal className={`faq-item ${open === index ? 'is-open' : ''}`} key={item.q} delay={index * 0.04} amount={0.3}>

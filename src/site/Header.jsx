@@ -49,7 +49,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
       <motion.div className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
       <header className={`masthead ${scrolled ? 'is-scrolled' : ''}`}>
         <a className="wordmark" href="/" onClick={event => { if (onNavigate) { event.preventDefault(); onNavigate('/') } }}>
-          <b>{brand.initials}</b>
+          <img className="wordmark-logo" src="/assets/brand/logo-ar-web.png" alt="" />
           <span>{brand.name}<i>{brand.role}</i></span>
         </a>
 

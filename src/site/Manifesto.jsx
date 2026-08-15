@@ -15,7 +15,6 @@ export default function Manifesto({ data }) {
   return (
     <section className="section manifesto" ref={ref}>
       <div className="manifesto-side">
-        <span className="section-index">{data.label}</span>
         <p className="manifesto-note">{data.note}</p>
       </div>
       <p className="manifesto-copy">

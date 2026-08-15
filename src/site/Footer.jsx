@@ -8,7 +8,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
     <footer className="site-footer">
       <div className="footer-top">
         <div className="footer-brand">
-          <b>{brand.initials}</b>
+          <img className="footer-logo" src="/assets/brand/logo-ar-web.png" alt="" />
           <span>{brand.name}<i>{brand.role}</i></span>
           <p>{brand.tagline}</p>
         </div>

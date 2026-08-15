@@ -5,8 +5,6 @@ export default function Contact({ data, brand, scopeOptions }) {
   return (
     <section className="section contact" id="kontakt">
       <div className="contact-glow" aria-hidden="true" />
-      <div className="section-kicker"><span>{data.kicker}</span><span className="section-index">009</span></div>
-
       <div className="contact-head">
         <Reveal as="h2" className="contact-title">{data.title}<br /><em className="accent">{data.accent}</em></Reveal>
         <Reveal className="contact-side" delay={0.08}>

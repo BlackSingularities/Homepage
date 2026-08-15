@@ -32,7 +32,7 @@ export default function Work({ data }) {
 
   return (
     <section className="section work" id="realizacje">
-      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} lead={data.lead} index="004" />
+      <SectionHead title={data.title} accent={data.accent} lead={data.lead} />
 
       <Reveal className="work-tabs" amount={0.2}>
         {projects.map((item, index) => (
@@ -55,7 +55,6 @@ export default function Work({ data }) {
         transition={{ duration: 0.5, ease }}
       >
         <div className="work-copy">
-          <span className="work-label">{project.label}</span>
           <h3>{project.name}</h3>
           <p className="work-statement">{project.statement}</p>
           <p className="work-description">{project.description}</p>

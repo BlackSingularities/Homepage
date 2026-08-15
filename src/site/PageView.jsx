@@ -152,7 +152,6 @@ export default function PageView({ slug, onNavigate }) {
         <a className="page-back" href="/" onClick={event => { event.preventDefault(); onNavigate('/') }}>
           <ArrowLeft size={15} /> Strona główna
         </a>
-        {page.kicker && <span className="page-kicker">{page.kicker}</span>}
         <motion.h1 initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease }}>
           {page.title}
         </motion.h1>

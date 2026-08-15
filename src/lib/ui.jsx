@@ -173,7 +173,12 @@ export function SectionRail({ sections }) {
   return (
     <nav className="section-rail" aria-label="Sekcje strony">
       {sections.map(([id, label]) => (
-        <a key={id} href={`#${id}`} className={active === id ? 'is-active' : ''}>
+        <a
+          key={id}
+          href={`#${id}`}
+          className={active === id ? 'is-active' : ''}
+          aria-current={active === id ? 'location' : undefined}
+        >
           <i aria-hidden="true" />
           <span>{label}</span>
         </a>

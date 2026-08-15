@@ -66,12 +66,6 @@ function Showreel({ projects }) {
 export default function Hero({ hero, projects }) {
   return (
     <section className="hero" id="start">
-      <div className="hero-aura" aria-hidden="true"><i /><i /><i /></div>
-
-      <div className="hero-index">
-        {(hero.badges || []).map(badge => <span key={badge}>{badge}</span>)}
-      </div>
-
       <div className="hero-inner">
         <motion.div
           className="hero-copy"

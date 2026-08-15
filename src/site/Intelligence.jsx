@@ -18,7 +18,7 @@ function Card({ card, index }) {
 export default function Intelligence({ data }) {
   return (
     <section className="section intelligence" id="ai">
-      <SectionHead kicker={data.kicker} title={data.title} accent={data.accent} index="003" align="center" />
+      <SectionHead title={data.title} accent={data.accent} align="center" />
       <div className="int-grid">
         {(data.cards || []).map((card, index) => <Card card={card} index={index} key={card.title} />)}
       </div>
