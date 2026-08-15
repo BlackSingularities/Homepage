@@ -88,7 +88,7 @@
     "kicker": "Selected work",
     "title": "Dowód zamiast",
     "accent": "deklaracji.",
-    "lead": "Sześć działających produktów. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
+    "lead": "Siedem działających produktów. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
     "items": [
       {
         "id": "prj-travel",
@@ -149,6 +149,16 @@
         "description": "Wodospad nut, klasyczna notacja, wejście MIDI, trzy tryby pracy, biblioteka utworów oraz konta użytkowników połączone w jedno narzędzie do świadomego ćwiczenia.",
         "features": ["wizualizacja MIDI w czasie rzeczywistym", "tryby słuchania, ćwiczenia i występu", "128 brzmień General MIDI", "biblioteka i konta użytkowników"],
         "slides": ["/assets/portfolio/playmaster-1.png"]
+      },
+      {
+        "id": "prj-arcadia",
+        "name": "Arcadia",
+        "href": "/Arcadia/",
+        "label": "Galeria gier / aplikacja webowa",
+        "statement": "Wspólna przestrzeń dla dopracowanych gier przeglądarkowych — od klasyki po symulację lądowania na Księżycu.",
+        "description": "Modułowa galeria z Tetrisem, Bubble Burst i LUNARIS, pełnoekranową rozgrywką, wspólnym rankingiem serwerowym oraz oprawą inspirowaną aparaturą misji Apollo.",
+        "features": ["trzy rozbudowane gry", "osobne rankingi i rekordy", "pełnoekranowa rozgrywka bez przewijania", "responsywny interfejs i obsługa dotykowa"],
+        "slides": ["/assets/portfolio/arcadia-1.png"]
       }
     ]
   },
