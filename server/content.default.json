@@ -88,7 +88,7 @@
     "kicker": "Selected work",
     "title": "Dowód zamiast",
     "accent": "deklaracji.",
-    "lead": "Siedem działających produktów. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
+    "lead": "Osiem działających produktów. Każdy zaprojektowany od zera, każdy rozwiązujący inny zestaw problemów.",
     "items": [
       {
         "id": "prj-travel",
@@ -159,6 +159,16 @@
         "description": "Modułowa galeria z Tetrisem, Bubble Burst i LUNARIS, pełnoekranową rozgrywką, wspólnym rankingiem serwerowym oraz oprawą inspirowaną aparaturą misji Apollo.",
         "features": ["trzy rozbudowane gry", "osobne rankingi i rekordy", "pełnoekranowa rozgrywka bez przewijania", "responsywny interfejs i obsługa dotykowa"],
         "slides": ["/assets/portfolio/arcadia-1.png"]
+      },
+      {
+        "id": "prj-blinkbeam",
+        "name": "Blinkbeam",
+        "href": "/Blinkbeam/",
+        "label": "Optical transfer / privacy",
+        "statement": "Pliki przesyłane światłem — bez sieci, serwera i konta.",
+        "description": "Przeglądarkowa aplikacja dzieli plik na strumień kodów QR odporny na zgubione ramki. Drugi telefon składa dane aparatem i udostępnia plik dopiero po kryptograficznej weryfikacji całości.",
+        "features": ["transfer ekran → aparat", "brak wysyłki na serwer", "automatyczna optymalizacja tempa", "weryfikacja integralności SHA-256"],
+        "slides": ["/assets/portfolio/blinkbeam-1.png"]
       }
     ]
   },

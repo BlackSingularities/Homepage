@@ -63,4 +63,5 @@ jobs:
             docker compose up -d --build
             docker compose exec -T homepage_api node server/migrate-playmaster.mjs
             docker compose exec -T homepage_api node server/migrate-arcadia.mjs
+            docker compose exec -T homepage_api node server/migrate-blinkbeam.mjs
             docker image prune -f
