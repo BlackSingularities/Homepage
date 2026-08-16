@@ -76,4 +76,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-personal-brand-v2.mjs
             docker compose exec -T homepage_api node server/migrate-expanded-faq-v3.mjs
             docker compose exec -T homepage_api node server/migrate-gallery-integration.mjs
+            docker compose exec -T homepage_api node server/migrate-manifesto-v4.mjs
+            docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f

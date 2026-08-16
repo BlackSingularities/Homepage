@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Braces, GitBranch, Terminal } from 'lucide-react'
 import { KineticText, ease, useTilt } from '../lib/ui'
 
 function Showreel({ projects }) {
@@ -25,9 +25,10 @@ function Showreel({ projects }) {
     <div className="showreel" ref={tilt}>
       <div className="showreel-frame">
         <div className="window-bar">
-          <i /><i /><i />
-          <span>{host}</span>
-          <ArrowUpRight size={14} />
+          <div className="window-controls" aria-hidden="true"><i /><i /><i /></div>
+          <span className="window-path"><Terminal size={12} /> {host}</span>
+          <span className="window-branch"><GitBranch size={11} /> main</span>
+          <ArrowUpRight className="window-open" size={14} />
         </div>
         <div className="showreel-stage">
           {shots.map((item, position) => (
@@ -39,14 +40,19 @@ function Showreel({ projects }) {
               loading={position === 0 ? 'eager' : 'lazy'}
             />
           ))}
+          <div className="showreel-grid" aria-hidden="true" />
+          <div className="showreel-hud" aria-hidden="true">
+            <span><Braces size={11} /> custom_build</span>
+            <span>1440 / live</span>
+          </div>
           <div className="showreel-scan" />
         </div>
       </div>
 
       <div className="showreel-tag">
-        <span>Aktualnie na ekranie</span>
+        <span>// active_project</span>
         <b>{shot.name}</b>
-        <i>{shot.label}</i>
+        <i><em aria-hidden="true" />{shot.label}</i>
       </div>
 
       <div className="showreel-dots">
@@ -107,7 +113,7 @@ export default function Hero({ hero, projects }) {
         </motion.div>
       </div>
 
-      <div className="marquee" aria-hidden="true">
+      <div className="marquee" id="kompetencje" aria-hidden="true">
         <div className="marquee-track">
           {[0, 1].map(copy => (
             <div className="marquee-group" key={copy}>
