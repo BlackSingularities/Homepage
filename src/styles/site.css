@@ -91,7 +91,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 9px 15px;
+  padding: 9px 16px;
   border: 1px solid transparent;
   border-radius: 100px;
   background: transparent;
@@ -423,7 +423,7 @@
 
 .showreel-stage {
   position: relative;
-  aspect-ratio: 16 / 10.5;
+  aspect-ratio: 16 / 9;
   background: #0e0e11;
   overflow: hidden;
 }
@@ -465,17 +465,18 @@
 .showreel-tag {
   position: absolute;
   left: 0;
+  right: 0;
   bottom: 0;
   display: grid;
-  gap: 3px;
-  padding: 22px 20px 16px;
+  gap: 4px;
+  padding: 46px 20px 16px;
   pointer-events: none;
-  background: linear-gradient(0deg, rgba(6, 6, 8, .88) 0%, rgba(6, 6, 8, .5) 55%, transparent 100%);
+  background: linear-gradient(0deg, rgba(4, 4, 5, .96) 0%, rgba(4, 4, 5, .82) 40%, rgba(4, 4, 5, .3) 75%, transparent 100%);
 }
 
-.showreel-tag b { font-size: 15px; letter-spacing: -.01em; color: #fff; }
-.showreel-tag i { display: flex; align-items: center; gap: 6px; font-style: normal; font-size: 10.5px; color: var(--ink-3); }
-.showreel-tag i em { width: 6px; height: 6px; border-radius: 50%; background: #6fd49c; box-shadow: 0 0 10px rgba(111, 212, 156, .75); }
+.showreel-tag b { font-size: 15px; letter-spacing: -.01em; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .6); }
+.showreel-tag i { display: flex; align-items: center; gap: 6px; font-style: normal; font-size: 10.5px; color: var(--ink-2); text-shadow: 0 1px 6px rgba(0, 0, 0, .6); }
+.showreel-tag i em { width: 6px; height: 6px; border-radius: 50%; background: #6fd49c; box-shadow: 0 0 10px rgba(111, 212, 156, .85); }
 
 .showreel-dots {
   display: flex;
@@ -955,7 +956,7 @@
 
 .work-screens {
   position: relative;
-  aspect-ratio: 16 / 8.6;
+  aspect-ratio: 16 / 9;
   background: #0e0e11;
 }
 
@@ -1665,7 +1666,7 @@
   border: 1px solid var(--line);
   border-radius: 100px;
   background: transparent;
-  padding: 8px 15px;
+  padding: 9px 16px;
   font-size: 11px;
   color: var(--ink-3);
   transition: .25s;
@@ -1717,7 +1718,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 17px;
+  padding: 9px 16px;
   border: 1px solid var(--line);
   border-radius: 100px;
   font-size: 12px;
