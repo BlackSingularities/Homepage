@@ -16,7 +16,7 @@
   --border-2:   rgba(255,255,255,.06);
   --radius:     6px;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'Inter', system-ui, sans-serif;
+  --font-sans:  'General Sans', 'Archivo', system-ui, sans-serif;
   --transition: .22s ease;
 }
 

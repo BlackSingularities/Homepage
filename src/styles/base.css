@@ -41,7 +41,7 @@
   --shadow-lg: 0 50px 140px rgba(0, 0, 0, .62);
   --ring: 0 0 0 1px var(--line);
 
-  --font: 'Manrope', 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font: 'General Sans', 'Archivo', system-ui, -apple-system, sans-serif;
   --font-display: 'Instrument Serif', Georgia, serif;
 
   color-scheme: dark;
