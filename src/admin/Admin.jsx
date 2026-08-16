@@ -241,13 +241,7 @@ function AuthScreen({ mode, onAuthenticated }) {
 
   return (
     <main className="ad-auth">
-      <motion.form
-        className="ad-auth-card"
-        onSubmit={submit}
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
+      <form className="ad-auth-card" onSubmit={submit}>
         <section className="ad-auth-intro">
           <a className="ad-auth-brand" href="/">
             <img src="/assets/brand/logo-ar-web.png" alt="" />
@@ -275,57 +269,59 @@ function AuthScreen({ mode, onAuthenticated }) {
             </div>
           </div>
 
-          {error && <Notice tone="error">{error}</Notice>}
+          <div className="ad-auth-fields">
+            {error && <Notice tone="error">{error}</Notice>}
 
-          <label className="ad-field">
-            <span>Nazwa administratora</span>
-            <input
-              autoComplete="username"
-              autoFocus
-              value={username}
-              onChange={event => setUsername(event.target.value)}
-              placeholder="np. adam"
-              minLength={3}
-              maxLength={60}
-              required
-            />
-          </label>
-
-          <label className="ad-field">
-            <span>Hasło</span>
-            <input
-              type="password"
-              autoComplete={setup ? 'new-password' : 'current-password'}
-              value={password}
-              onChange={event => setPassword(event.target.value)}
-              minLength={setup ? 10 : undefined}
-              maxLength={200}
-              required
-            />
-            {setup && <i>Minimum 10 znaków. Nie używaj hasła z innych serwisów.</i>}
-          </label>
-
-          {setup && (
             <label className="ad-field">
-              <span>Powtórz hasło</span>
+              <span>Nazwa administratora</span>
               <input
-                type="password"
-                autoComplete="new-password"
-                value={confirmation}
-                onChange={event => setConfirmation(event.target.value)}
-                minLength={10}
-                maxLength={200}
+                autoComplete="username"
+                autoFocus
+                value={username}
+                onChange={event => setUsername(event.target.value)}
+                placeholder="np. adam"
+                minLength={3}
+                maxLength={60}
                 required
               />
             </label>
-          )}
 
-          <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
-            {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
-            {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
-          </button>
+            <label className="ad-field">
+              <span>Hasło</span>
+              <input
+                type="password"
+                autoComplete={setup ? 'new-password' : 'current-password'}
+                value={password}
+                onChange={event => setPassword(event.target.value)}
+                minLength={setup ? 10 : undefined}
+                maxLength={200}
+                required
+              />
+              {setup && <i>Minimum 10 znaków. Nie używaj hasła z innych serwisów.</i>}
+            </label>
+
+            {setup && (
+              <label className="ad-field">
+                <span>Powtórz hasło</span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmation}
+                  onChange={event => setConfirmation(event.target.value)}
+                  minLength={10}
+                  maxLength={200}
+                  required
+                />
+              </label>
+            )}
+
+            <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
+              {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
+              {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
+            </button>
+          </div>
         </section>
-      </motion.form>
+      </form>
     </main>
   )
 }
