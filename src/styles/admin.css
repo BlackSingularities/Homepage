@@ -57,6 +57,22 @@
   transform: none !important;
 }
 
+.ad-auth-fields .ad-field > span { color: var(--ink-2); }
+
+.ad-auth-fields .ad-field input {
+  min-height: 46px;
+  border-color: rgba(255, 255, 255, .26);
+  background: #101015;
+  font-size: 14.5px;
+}
+
+.ad-auth-fields .ad-field input:hover { border-color: rgba(255, 255, 255, .38); }
+
+.ad-auth-fields .ad-field input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(231, 198, 138, .16);
+}
+
 .ad-auth-brand {
   display: flex;
   align-items: center;
@@ -362,15 +378,19 @@
 .ad-field textarea,
 .ad-field select {
   width: 100%;
-  border: 1px solid var(--ad-line);
+  border: 1px solid rgba(255, 255, 255, .2);
   border-radius: 11px;
-  background: #0b0b0f;
+  background: #08080b;
   color: var(--ink);
   font: 500 13.5px/1.6 var(--font);
   padding: 11px 13px;
   outline: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
   transition: border-color .2s, box-shadow .2s;
 }
+
+.ad-field input::placeholder,
+.ad-field textarea::placeholder { color: var(--ink-4); opacity: 1; }
 
 .ad-field textarea { resize: vertical; min-height: 84px; }
 
