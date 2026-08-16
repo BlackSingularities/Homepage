@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowUpRight, Check, ChevronLeft, ChevronRight, GitBranch, Layers3, Terminal } from 'lucide-react'
+import { ArrowUpRight, Check, ChevronLeft, ChevronRight, GitBranch, Terminal } from 'lucide-react'
 import { Reveal, ease, useTilt } from '../lib/ui'
 import SectionHead from './SectionHead'
 
@@ -64,7 +64,6 @@ export default function Work({ data }) {
       >
         <header className="work-case-head">
           <div>
-            <span className="work-case-kicker"><Layers3 size={14} /> Projekt autorski</span>
             <h3>{project.name}</h3>
           </div>
           <p className="work-statement">{project.statement}</p>
