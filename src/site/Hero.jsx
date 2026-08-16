@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight, Braces, GitBranch, Terminal } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, GitBranch, Terminal } from 'lucide-react'
 import { KineticText, ease, useTilt } from '../lib/ui'
 
 function Showreel({ projects }) {
@@ -41,18 +41,12 @@ function Showreel({ projects }) {
             />
           ))}
           <div className="showreel-grid" aria-hidden="true" />
-          <div className="showreel-hud" aria-hidden="true">
-            <span><Braces size={11} /> custom_build</span>
-            <span>1440 / live</span>
-          </div>
           <div className="showreel-scan" />
+          <div className="showreel-tag">
+            <b>{shot.name}</b>
+            <i><em aria-hidden="true" />{shot.label}</i>
+          </div>
         </div>
-      </div>
-
-      <div className="showreel-tag">
-        <span>// active_project</span>
-        <b>{shot.name}</b>
-        <i><em aria-hidden="true" />{shot.label}</i>
       </div>
 
       <div className="showreel-dots">

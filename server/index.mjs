@@ -5,6 +5,7 @@ import path from 'node:path'
 import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
+import sharp from 'sharp'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -39,6 +40,31 @@ const IMAGE_TYPES = {
   'image/webp': 'webp',
   'image/avif': 'avif',
   'image/gif': 'gif',
+}
+
+const UPLOAD_MAX_DIMENSION = 2400
+
+// Nowe zrzuty ekranu potrafią mieć po kilka MB w oryginalnej rozdzielczości —
+// przeglądarka i tak skaluje je w dół do rozmiaru kontenera, co przy dużym
+// źródle daje słabą interpolację. Dociskamy je tutaj raz, przy uploadzie.
+async function resizeForUpload(buffer, extension) {
+  if (extension === 'gif') return buffer
+  try {
+    const resized = sharp(buffer)
+      .rotate()
+      .resize(UPLOAD_MAX_DIMENSION, UPLOAD_MAX_DIMENSION, {
+        fit: 'inside',
+        withoutEnlargement: true,
+        kernel: sharp.kernel.lanczos3,
+      })
+    if (extension === 'png') return await resized.png({ quality: 85, compressionLevel: 9 }).toBuffer()
+    if (extension === 'jpg') return await resized.jpeg({ quality: 85, progressive: true }).toBuffer()
+    if (extension === 'webp') return await resized.webp({ quality: 85 }).toBuffer()
+    if (extension === 'avif') return await resized.avif({ quality: 60 }).toBuffer()
+    return buffer
+  } catch {
+    return buffer
+  }
 }
 
 const jsonSmall = express.json({ limit: '64kb' })
@@ -790,8 +816,9 @@ app.post(
     }
     const base = slugify(cleanText(req.get('x-file-name'), 120).replace(/\.[a-z0-9]+$/i, ''), 'obraz').slice(0, 48)
     const name = `${base}-${crypto.randomBytes(4).toString('hex')}.${extension}`
-    await fs.writeFile(path.join(UPLOAD_DIR, name), req.body, { mode: 0o644 })
-    res.status(201).json({ url: `/uploads/${name}`, name, size: req.body.length })
+    const processed = await resizeForUpload(req.body, extension)
+    await fs.writeFile(path.join(UPLOAD_DIR, name), processed, { mode: 0o644 })
+    res.status(201).json({ url: `/uploads/${name}`, name, size: processed.length })
   },
 )
 
