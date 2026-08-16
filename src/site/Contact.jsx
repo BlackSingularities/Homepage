@@ -18,7 +18,7 @@ export default function Contact({ data, brand, scopeOptions }) {
         </Reveal>
       </div>
 
-      <Reveal className="contact-panel" amount={0.1}>
+      <Reveal className="contact-panel" id="formularz" amount={0.1}>
         <ContactForm scopeOptions={scopeOptions} />
       </Reveal>
     </section>
