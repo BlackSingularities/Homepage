@@ -1,39 +1,36 @@
-import { useRef } from 'react'
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
-
-function Word({ children, progress, range }) {
-  const opacity = useTransform(progress, range, [0.16, 1])
-  return <motion.span className="mf-word" style={{ opacity }}>{children} </motion.span>
-}
+import { motion, useReducedMotion } from 'framer-motion'
+import { ease } from '../lib/ui'
 
 export default function Manifesto({ data }) {
-  const ref = useRef(null)
   const reduce = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.9', 'end 0.55'] })
-  const words = (data.lines || []).join(' \n ').split(' ')
+  const lines = data.lines || []
 
   return (
-    <section className="section manifesto" ref={ref}>
-      <div className="manifesto-side">
-        <p className="manifesto-note">{data.note}</p>
+    <section className="section manifesto" id="manifest">
+      <div className="manifesto-copy">
+        {lines.map((line, index) => (
+          <motion.p
+            className={index === lines.length - 1 ? 'is-accent' : ''}
+            key={line}
+            initial={reduce ? false : { opacity: 0, y: 28 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.65 }}
+            transition={{ duration: 0.8, delay: index * 0.12, ease }}
+          >
+            {line}
+          </motion.p>
+        ))}
       </div>
-      <p className="manifesto-copy">
-        {reduce
-          ? (data.lines || []).join(' ')
-          : words.map((word, index) => (
-            word === '\n'
-              ? <br key={`br-${index}`} />
-              : (
-                <Word
-                  key={`${word}-${index}`}
-                  progress={scrollYProgress}
-                  range={[index / words.length, Math.min((index + 6) / words.length, 1)]}
-                >
-                  {word}
-                </Word>
-              )
-          ))}
-      </p>
+      <motion.aside
+        className="manifesto-note"
+        initial={reduce ? false : { opacity: 0, x: 24 }}
+        whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.6 }}
+        transition={{ duration: 0.75, delay: 0.2, ease }}
+      >
+        <i aria-hidden="true" />
+        <p>{data.note}</p>
+      </motion.aside>
     </section>
   )
 }

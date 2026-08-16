@@ -5,7 +5,6 @@ import path from 'node:path'
 import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
-import apacheMd5 from 'apache-md5'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -150,11 +149,6 @@ async function hashPassword(password) {
 }
 
 async function verifyPassword(password, admin) {
-  if (admin?.legacyHash?.startsWith('$apr1$')) {
-    const expected = Buffer.from(admin.legacyHash)
-    const actual = Buffer.from(apacheMd5(password, admin.legacyHash))
-    return actual.length === expected.length && crypto.timingSafeEqual(actual, expected)
-  }
   if (!admin?.salt || !admin?.hash) return false
   const expected = Buffer.from(admin.hash, 'base64')
   const actual = await scrypt(password, Buffer.from(admin.salt, 'base64'))
@@ -555,7 +549,7 @@ app.post('/api/auth/login', enforceSameOrigin, async (req, res, next) => {
       return res.status(429).json({ error: 'Za dużo prób logowania. Spróbuj ponownie za 15 minut.' })
     }
 
-    let adminRecord = await readJson(ADMIN_FILE, null)
+    const adminRecord = await readJson(ADMIN_FILE, null)
     if (!adminRecord) return res.status(409).json({ error: 'Najpierw utwórz konto administratora.' })
 
     const username = cleanText(req.body.username, 60)
@@ -564,15 +558,6 @@ app.post('/api/auth/login', enforceSameOrigin, async (req, res, next) => {
     const validPassword = await verifyPassword(password, adminRecord)
     if (!validUsername || !validPassword) {
       return res.status(401).json({ error: 'Nieprawidłowa nazwa administratora lub hasło.' })
-    }
-
-    if (adminRecord.legacyHash) {
-      const credentials = await hashPassword(password)
-      adminRecord = await updateJson(ADMIN_FILE, null, current => {
-        const upgraded = { ...current, ...credentials, upgradedAt: new Date().toISOString() }
-        delete upgraded.legacyHash
-        return upgraded
-      })
     }
 
     loginRateLimits.delete(ip)

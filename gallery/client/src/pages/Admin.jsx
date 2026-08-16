@@ -746,24 +746,19 @@ export default function Admin() {
   useEffect(() => {
     adminSession()
       .then(() => setAuthState('authenticated'))
-      .catch(() => setAuthState('unauthorized'))
-  }, [])
+      .catch(() => {
+        const destination = '/galeria/admin'
+        const login = `/admin?next=${encodeURIComponent(destination)}`
+        if (embedded && window.top) window.top.location.replace(login)
+        else window.location.replace(login)
+      })
+  }, [embedded])
 
   const navigate = (t) => { setTab(t); if (t !== 'albumManage') setManageAlbum(null) }
   const manage = (album) => { setManageAlbum(album); setTab('albumManage') }
 
   if (authState === 'checking') return <div className="login-wrap"><div className="spinner" /></div>
-  if (authState === 'unauthorized') {
-    return (
-      <div className="login-wrap">
-        <div className="login-box">
-          <h1 className="login-title">Wymagane logowanie</h1>
-          <p className="login-sub">Galeria korzysta teraz z tego samego konta co główny panel.</p>
-          <a className="btn" href="/admin" target={embedded ? '_top' : undefined}>Przejdź do logowania</a>
-        </div>
-      </div>
-    )
-  }
+  if (authState !== 'authenticated') return <div className="login-wrap"><div className="spinner" /></div>
 
   const tabs = [
     { id:'dashboard', label:'Pulpit',              icon:<IconImage /> },

@@ -33,6 +33,11 @@ const EMPTY_SETTINGS = {
   smtpHost: '', smtpPort: 465, smtpSecure: true, smtpUsername: '', password: '', hasPassword: false,
 }
 
+function galleryReturnPath() {
+  const next = new URLSearchParams(window.location.search).get('next') || ''
+  return /^\/galeria\/admin(?:[/?#]|$)/.test(next) ? next : ''
+}
+
 function Status({ value }) {
   return <span className={`ad-status is-${value}`}>{STATUS_LABEL[value] || value}</span>
 }
@@ -243,70 +248,83 @@ function AuthScreen({ mode, onAuthenticated }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <a className="ad-auth-brand" href="/">
-          <img src="/assets/brand/logo-ar-web.png" alt="" />
-          <span>Adam Rędzikowski<i>Panel administracyjny</i></span>
-        </a>
-
-        <div className="ad-auth-heading">
-          <span>{setup ? <ShieldCheck size={18} /> : <LockKeyhole size={18} />}</span>
-          <div>
-            <h1>{setup ? 'Utwórz administratora' : 'Zaloguj się'}</h1>
-            <p>{setup
-              ? 'Pierwsza osoba tworzy jedyne konto administratora tej instalacji. Wystarczą nazwa i hasło — bez adresu e-mail.'
-              : 'Podaj nazwę administratora i hasło ustawione przy pierwszym uruchomieniu.'}</p>
+        <section className="ad-auth-intro">
+          <a className="ad-auth-brand" href="/">
+            <img src="/assets/brand/logo-ar-web.png" alt="" />
+            <span>Adam Rędzikowski<i>Panel administracyjny</i></span>
+          </a>
+          <div className="ad-auth-promise">
+            <span>{setup ? 'Pierwsza konfiguracja' : 'Prywatna strefa'}</span>
+            <h1>{setup ? 'Ustaw dostęp po swojemu.' : 'Jedno konto. Cały panel.'}</h1>
+            <p>Treści strony i galeria działają w jednej, wspólnej sesji administratora.</p>
           </div>
-        </div>
+          <ul className="ad-auth-facts">
+            <li><ShieldCheck size={14} /> Bez adresu e-mail</li>
+            <li><Camera size={14} /> Ten sam dostęp do galerii</li>
+          </ul>
+        </section>
 
-        {error && <Notice tone="error">{error}</Notice>}
+        <section className="ad-auth-form">
+          <div className="ad-auth-heading">
+            <span>{setup ? <ShieldCheck size={18} /> : <LockKeyhole size={18} />}</span>
+            <div>
+              <h2>{setup ? 'Utwórz administratora' : 'Zaloguj się'}</h2>
+              <p>{setup
+                ? 'Podaj nazwę i mocne hasło. To wszystko, czego potrzebujesz.'
+                : 'Użyj danych ustawionych podczas pierwszej konfiguracji.'}</p>
+            </div>
+          </div>
 
-        <label className="ad-field">
-          <span>Nazwa administratora</span>
-          <input
-            autoComplete="username"
-            autoFocus
-            value={username}
-            onChange={event => setUsername(event.target.value)}
-            placeholder="np. adam"
-            minLength={3}
-            maxLength={60}
-            required
-          />
-        </label>
+          {error && <Notice tone="error">{error}</Notice>}
 
-        <label className="ad-field">
-          <span>Hasło</span>
-          <input
-            type="password"
-            autoComplete={setup ? 'new-password' : 'current-password'}
-            value={password}
-            onChange={event => setPassword(event.target.value)}
-            minLength={setup ? 10 : undefined}
-            maxLength={200}
-            required
-          />
-          {setup && <i>Minimum 10 znaków. Użyj hasła, którego nie stosujesz w innych serwisach.</i>}
-        </label>
-
-        {setup && (
           <label className="ad-field">
-            <span>Powtórz hasło</span>
+            <span>Nazwa administratora</span>
             <input
-              type="password"
-              autoComplete="new-password"
-              value={confirmation}
-              onChange={event => setConfirmation(event.target.value)}
-              minLength={10}
-              maxLength={200}
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={event => setUsername(event.target.value)}
+              placeholder="np. adam"
+              minLength={3}
+              maxLength={60}
               required
             />
           </label>
-        )}
 
-        <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
-          {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
-          {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
-        </button>
+          <label className="ad-field">
+            <span>Hasło</span>
+            <input
+              type="password"
+              autoComplete={setup ? 'new-password' : 'current-password'}
+              value={password}
+              onChange={event => setPassword(event.target.value)}
+              minLength={setup ? 10 : undefined}
+              maxLength={200}
+              required
+            />
+            {setup && <i>Minimum 10 znaków. Nie używaj hasła z innych serwisów.</i>}
+          </label>
+
+          {setup && (
+            <label className="ad-field">
+              <span>Powtórz hasło</span>
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={confirmation}
+                onChange={event => setConfirmation(event.target.value)}
+                minLength={10}
+                maxLength={200}
+                required
+              />
+            </label>
+          )}
+
+          <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
+            {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
+            {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
+          </button>
+        </section>
       </motion.form>
     </main>
   )
@@ -531,6 +549,11 @@ export default function Admin() {
     setError('')
     try {
       const status = await api('/api/auth/status')
+      const next = galleryReturnPath()
+      if (status.authenticated && next) {
+        window.location.replace(next)
+        return
+      }
       setAuth({ loading: false, ...status })
     } catch (requestError) {
       setError(requestError.message)
@@ -557,7 +580,11 @@ export default function Admin() {
     return <main className="ad-auth"><div className="ad-auth-card"><Notice tone="error">{error}</Notice><button className="ad-btn" onClick={check}>Spróbuj ponownie</button></div></main>
   }
   if (!auth.authenticated) {
-    return <AuthScreen mode={auth.mode} onAuthenticated={admin => setAuth({ loading: false, mode: 'login', authenticated: true, admin })} />
+    return <AuthScreen mode={auth.mode} onAuthenticated={admin => {
+      const next = galleryReturnPath()
+      if (next) window.location.replace(next)
+      else setAuth({ loading: false, mode: 'login', authenticated: true, admin })
+    }} />
   }
   return <AdminPanel admin={auth.admin} onLogout={logout} />
 }
