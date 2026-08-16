@@ -46,7 +46,16 @@
     linear-gradient(145deg, rgba(231, 198, 138, .055), transparent 60%);
 }
 
-.ad-auth-form { display: grid; align-content: start; gap: 18px; min-height: 470px; }
+.ad-auth-form { display: flex; flex-direction: column; gap: 18px; min-height: 470px; }
+
+.ad-auth-fields {
+  display: grid !important;
+  gap: 16px;
+  width: 100%;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
 
 .ad-auth-brand {
   display: flex;
@@ -97,6 +106,7 @@
   .ad-auth-promise { padding: 28px 0; }
   .ad-auth-promise h1 { font-size: 42px; }
   .ad-auth-form { gap: 13px; }
+  .ad-auth-fields { gap: 11px; }
   .ad-auth-heading p { margin-top: 5px; line-height: 1.45; }
   .ad-auth-form .ad-field { gap: 5px; }
   .ad-auth-form .ad-field input { min-height: 42px; padding-top: 9px; padding-bottom: 9px; }
