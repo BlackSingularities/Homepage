@@ -63,7 +63,7 @@ function GalleryEditor({ block, patch }) {
         }}
       />
       {block.images.length > 0 && (
-        <div className="ad-gallery-edit">
+        <div className="ap-gallery-edit">
           {block.images.map((image, index) => (
             <figure key={`${image.src}-${index}`}>
               <img src={image.src} alt="" />
@@ -82,7 +82,7 @@ function GalleryEditor({ block, patch }) {
         </div>
       )}
       {items.length > 0 && block.images.length === 0 && (
-        <div className="ad-gallery-suggest">
+        <div className="ap-gallery-suggest">
           <span>Z biblioteki:</span>
           {items.slice(0, 8).map(item => (
             <button type="button" key={item.name} onClick={() => add(item.url)}>
@@ -101,7 +101,7 @@ function BlockEditor({ block, patch }) {
       return (
         <>
           <ImagePicker label="Zdjęcie" value={block.src} onChange={src => patch({ src })} />
-          <div className="ad-grid-2">
+          <div className="ap-grid-2">
             <Text label="Opis alternatywny" value={block.alt} onChange={alt => patch({ alt })} placeholder="Co przedstawia zdjęcie" />
             <Text label="Podpis pod zdjęciem" value={block.caption} onChange={caption => patch({ caption })} />
           </div>
@@ -148,7 +148,7 @@ function BlockEditor({ block, patch }) {
             addLabel="Dodaj liczbę"
             itemLabel={item => item.value || 'Liczba'}
             render={(item, update) => (
-              <div className="ad-grid-2">
+              <div className="ap-grid-2">
                 <Text label="Wartość" value={item.value} onChange={value => update({ value })} placeholder="np. 120%" />
                 <Text label="Podpis" value={item.label} onChange={label => update({ label })} />
               </div>
@@ -170,7 +170,7 @@ function BlockEditor({ block, patch }) {
         <>
           <Text label="Nagłówek" value={block.heading} onChange={heading => patch({ heading })} />
           <Area label="Opis" value={block.body} onChange={body => patch({ body })} rows={2} />
-          <div className="ad-grid-2">
+          <div className="ap-grid-2">
             <Text label="Tekst przycisku" value={block.label} onChange={label => patch({ label })} />
             <Text label="Adres" value={block.href} onChange={href => patch({ href })} placeholder="/#kontakt" />
           </div>
@@ -296,35 +296,35 @@ export default function PagesManager({ notify }) {
     !query || `${page.title} ${page.slug} ${page.kicker}`.toLowerCase().includes(query.toLowerCase()))
 
   return (
-    <div className="ad-pages">
-      <aside className="ad-pages-list">
-        <div className="ad-pages-search">
+    <div className="ap-pages">
+      <aside className="ap-pages-list">
+        <div className="ap-pages-search">
           <Search size={15} />
           <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Szukaj strony…" />
         </div>
 
-        <button className="ad-btn ad-btn-primary ad-new-page" onClick={create} disabled={saving}>
+        <button className="ap-btn ap-btn-primary ap-new-page" onClick={create} disabled={saving}>
           <Plus size={16} /> Nowa strona
         </button>
 
-        <div className="ad-pages-scroll">
-          {loading && <div className="ad-inline-loading"><LoaderCircle className="spin" size={16} /> Wczytuję…</div>}
+        <div className="ap-pages-scroll">
+          {loading && <div className="ap-inline-loading"><LoaderCircle className="spin" size={16} /> Wczytuję…</div>}
           {!loading && filtered.length === 0 && <Empty>Brak stron. Dodaj pierwszą podstronę oferty.</Empty>}
           {filtered.map((page, index) => (
-            <article key={page.id} className={`ad-page-row ${page.id === selectedId ? 'is-active' : ''}`}>
-              <button className="ad-page-open" onClick={() => select(page)}>
-                <span className="ad-page-thumb">
+            <article key={page.id} className={`ap-page-row ${page.id === selectedId ? 'is-active' : ''}`}>
+              <button className="ap-page-open" onClick={() => select(page)}>
+                <span className="ap-page-thumb">
                   {page.cover ? <img src={page.cover} alt="" /> : <FileText size={16} />}
                 </span>
-                <span className="ad-page-meta">
+                <span className="ap-page-meta">
                   <b>{page.title}</b>
                   <i>/p/{page.slug}</i>
                 </span>
-                <span className={`ad-dot ${page.published ? 'is-live' : ''}`} title={page.published ? 'Opublikowana' : 'Szkic'}>
+                <span className={`ap-dot ${page.published ? 'is-live' : ''}`} title={page.published ? 'Opublikowana' : 'Szkic'}>
                   {page.published ? <BadgeCheck size={14} /> : <EyeOff size={14} />}
                 </span>
               </button>
-              <div className="ad-page-tools">
+              <div className="ap-page-tools">
                 <button onClick={() => reorder(index, -1)} disabled={index === 0} aria-label="W górę">↑</button>
                 <button onClick={() => reorder(index, 1)} disabled={index === pages.length - 1} aria-label="W dół">↓</button>
                 <button className="is-danger" onClick={() => remove(page)} aria-label="Usuń"><Trash2 size={13} /></button>
@@ -334,7 +334,7 @@ export default function PagesManager({ notify }) {
         </div>
       </aside>
 
-      <div className="ad-pages-editor">
+      <div className="ap-pages-editor">
         {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
         {!draft ? (
@@ -345,16 +345,16 @@ export default function PagesManager({ notify }) {
               title="Podstawy"
               description="Tytuł, adres i zajawka pokazywana na stronie głównej."
               actions={(
-                <a className="ad-btn ad-btn-ghost" href={`/p/${draft.slug}`} target="_blank" rel="noreferrer">
+                <a className="ap-btn ap-btn-ghost" href={`/p/${draft.slug}`} target="_blank" rel="noreferrer">
                   Podgląd <ArrowUpRight size={14} />
                 </a>
               )}
             >
-              <div className="ad-grid-2">
+              <div className="ap-grid-2">
                 <Text label="Tytuł strony" value={draft.title} onChange={title => patch({ title })} />
                 <Text label="Adres (slug)" value={draft.slug} onChange={slug => patch({ slug })} hint={`Strona będzie dostępna pod /p/${draft.slug || '…'}`} />
               </div>
-              <div className="ad-grid-2">
+              <div className="ap-grid-2">
                 <Select
                   label="Kolor akcentu"
                   value={draft.accent}
@@ -366,7 +366,7 @@ export default function PagesManager({ notify }) {
               <Area label="Wprowadzenie (nagłówek strony)" value={draft.lead} onChange={lead => patch({ lead })} rows={3} />
               <Area label="Opis dla wyszukiwarek" value={draft.seoDescription} onChange={seoDescription => patch({ seoDescription })} rows={2} hint="Do 320 znaków." />
               <ImagePicker label="Zdjęcie główne" value={draft.cover} onChange={cover => patch({ cover })} hint="Widoczne w nagłówku strony i na kafelku." />
-              <div className="ad-switch-row">
+              <div className="ap-switch-row">
                 <Toggle label="Opublikowana" hint="Widoczna dla odwiedzających" checked={draft.published} onChange={published => patch({ published })} />
                 <Toggle label="Pokaż na stronie głównej" hint="Kafelek w sekcji oferty" checked={draft.featured} onChange={featured => patch({ featured })} />
               </div>
@@ -382,7 +382,7 @@ export default function PagesManager({ notify }) {
                 render={(block, update) => <BlockEditor block={block} patch={update} />}
               />
 
-              <div className="ad-block-add">
+              <div className="ap-block-add">
                 <span>Dodaj blok:</span>
                 {BLOCK_TYPES.map(([type, label, Icon]) => (
                   <button key={type} type="button" onClick={() => patch({ blocks: [...draft.blocks, newBlock(type)] })}>

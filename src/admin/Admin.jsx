@@ -39,7 +39,7 @@ function galleryReturnPath() {
 }
 
 function Status({ value }) {
-  return <span className={`ad-status is-${value}`}>{STATUS_LABEL[value] || value}</span>
+  return <span className={`ap-status is-${value}`}>{STATUS_LABEL[value] || value}</span>
 }
 
 /* ── submissions ────────────────────────────────────────────────── */
@@ -55,8 +55,8 @@ function Submissions({ items, loading, onStatus, onDelete }) {
   const visible = filter === 'all' ? items : items.filter(item => item.status === filter)
 
   return (
-    <div className="ad-stack">
-      <div className="ad-filters">
+    <div className="ap-stack">
+      <div className="ap-filters">
         {[['all', 'Wszystkie'], ['new', 'Nowe'], ['in-progress', 'W toku'], ['closed', 'Zamknięte']].map(([id, label]) => (
           <button key={id} className={filter === id ? 'is-active' : ''} onClick={() => setFilter(id)}>
             {label} <b>{counts[id]}</b>
@@ -66,32 +66,32 @@ function Submissions({ items, loading, onStatus, onDelete }) {
 
       {!loading && visible.length === 0 && <Empty>Brak zgłoszeń w tym widoku.</Empty>}
 
-      <div className="ad-stack">
+      <div className="ap-stack">
         {visible.map(item => (
-          <article className="ad-submission" key={item.id}>
+          <article className="ap-submission" key={item.id}>
             <header>
               <Status value={item.status} />
               <span>{formatDate(item.createdAt)}</span>
               <span>{item.contactMethod === 'phone' ? 'Odpowiedź telefoniczna' : 'Odpowiedź mailowa'}</span>
-              {item.source === 'konfigurator' && <span className="ad-tag">z konfiguratora</span>}
-              <button className="ad-icon-btn is-danger" onClick={() => onDelete(item)} aria-label="Usuń zgłoszenie">
+              {item.source === 'konfigurator' && <span className="ap-tag">z konfiguratora</span>}
+              <button className="ap-icon-btn is-danger" onClick={() => onDelete(item)} aria-label="Usuń zgłoszenie">
                 <Trash2 size={14} />
               </button>
             </header>
 
-            <div className="ad-submission-grid">
+            <div className="ap-submission-grid">
               <div>
                 <h3>{item.subject || 'Nowy projekt'}</h3>
-                <p className="ad-strong">{item.name}{item.company ? ` · ${item.company}` : ''}</p>
+                <p className="ap-strong">{item.name}{item.company ? ` · ${item.company}` : ''}</p>
                 <p><a href={`mailto:${item.email}`}>{item.email}</a>{item.phone ? ` · ${item.phone}` : ''}</p>
                 {(item.budget || item.timeline) && (
-                  <p className="ad-muted">{[item.budget, item.timeline].filter(Boolean).join(' · ')}</p>
+                  <p className="ap-muted">{[item.budget, item.timeline].filter(Boolean).join(' · ')}</p>
                 )}
                 {item.scope?.length > 0 && (
-                  <div className="ad-chips">{item.scope.map(scope => <span key={scope}>{scope}</span>)}</div>
+                  <div className="ap-chips">{item.scope.map(scope => <span key={scope}>{scope}</span>)}</div>
                 )}
               </div>
-              <p className="ad-message">{item.message}</p>
+              <p className="ap-message">{item.message}</p>
             </div>
 
             <footer>
@@ -102,7 +102,7 @@ function Submissions({ items, loading, onStatus, onDelete }) {
                   onClick={() => onStatus(item.id, status)}
                 >{STATUS_LABEL[status]}</button>
               ))}
-              <a className="ad-reply" href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject || 'Twoje zapytanie'}`)}`}>
+              <a className="ap-reply" href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject || 'Twoje zapytanie'}`)}`}>
                 Odpowiedz <ArrowUpRight size={13} />
               </a>
             </footer>
@@ -124,8 +124,8 @@ function Dashboard({ submissions, pages, onTab }) {
   ]
 
   return (
-    <div className="ad-stack">
-      <div className="ad-stats">
+    <div className="ap-stack">
+      <div className="ap-stats">
         {stats.map(([label, value, tab]) => (
           <button key={label} onClick={() => onTab(tab)}>
             <span>{label}</span>
@@ -134,12 +134,12 @@ function Dashboard({ submissions, pages, onTab }) {
         ))}
       </div>
 
-      <div className="ad-two">
+      <div className="ap-two">
         <Card title="Ostatnie zgłoszenia" description="Pięć najnowszych wiadomości z formularza.">
           {submissions.slice(0, 5).map(item => (
-            <button key={item.id} className="ad-row" onClick={() => onTab('submissions')}>
+            <button key={item.id} className="ap-row" onClick={() => onTab('submissions')}>
               <Status value={item.status} />
-              <span className="ad-row-main"><b>{item.name}</b><i>{item.subject || 'Nowy projekt'}</i></span>
+              <span className="ap-row-main"><b>{item.name}</b><i>{item.subject || 'Nowy projekt'}</i></span>
               <time>{formatDate(item.createdAt)}</time>
             </button>
           ))}
@@ -148,9 +148,9 @@ function Dashboard({ submissions, pages, onTab }) {
 
         <Card title="Twoje podstrony" description="Strony oferty tworzone w panelu.">
           {pages.slice(0, 6).map(page => (
-            <button key={page.id} className="ad-row" onClick={() => onTab('pages')}>
-              <span className={`ad-dot ${page.published ? 'is-live' : ''}`} />
-              <span className="ad-row-main"><b>{page.title}</b><i>/p/{page.slug}</i></span>
+            <button key={page.id} className="ap-row" onClick={() => onTab('pages')}>
+              <span className={`ap-dot ${page.published ? 'is-live' : ''}`} />
+              <span className="ap-row-main"><b>{page.title}</b><i>/p/{page.slug}</i></span>
               <time>{page.published ? 'opublikowana' : 'szkic'}</time>
             </button>
           ))}
@@ -167,18 +167,18 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
   const update = value => setSettings(current => ({ ...current, ...value }))
 
   return (
-    <form className="ad-stack" onSubmit={onSave}>
+    <form className="ap-stack" onSubmit={onSave}>
       <Card title="Tożsamość nadawcy" description="Hasło jest szyfrowane przed zapisaniem. Zostaw puste, aby zachować obecne.">
-        <div className="ad-grid-2">
+        <div className="ap-grid-2">
           <Text label="Nazwa nadawcy" value={settings.fromName} onChange={fromName => update({ fromName })} />
           <Text label="Adres odbierający powiadomienia" type="email" value={settings.ownerEmail} onChange={ownerEmail => update({ ownerEmail })} placeholder="kontakt@twojadomena.pl" />
         </div>
       </Card>
 
-      <div className="ad-two">
+      <div className="ap-two">
         <Card title="IMAP — poczta przychodząca">
           <Text label="Host" value={settings.imapHost} onChange={imapHost => update({ imapHost })} placeholder="imap.example.com" />
-          <div className="ad-grid-2">
+          <div className="ap-grid-2">
             <Text label="Port" type="number" value={settings.imapPort} onChange={imapPort => update({ imapPort: Number(imapPort) || 993 })} />
             <Text label="Użytkownik" value={settings.imapUsername} onChange={imapUsername => update({ imapUsername })} />
           </div>
@@ -187,7 +187,7 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
 
         <Card title="SMTP — poczta wychodząca">
           <Text label="Host" value={settings.smtpHost} onChange={smtpHost => update({ smtpHost })} placeholder="smtp.example.com" />
-          <div className="ad-grid-2">
+          <div className="ap-grid-2">
             <Text label="Port" type="number" value={settings.smtpPort} onChange={smtpPort => update({ smtpPort: Number(smtpPort) || 465 })} />
             <Text label="Użytkownik / adres nadawcy" value={settings.smtpUsername} onChange={smtpUsername => update({ smtpUsername })} />
           </div>
@@ -203,7 +203,7 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
           onChange={password => update({ password })}
           placeholder={settings.hasPassword ? 'Zapisane — wpisz tylko, aby zmienić' : 'Hasło lub hasło aplikacji'}
         />
-        <button className="ad-btn ad-btn-primary" type="submit" disabled={loading}>
+        <button className="ap-btn ap-btn-primary" type="submit" disabled={loading}>
           {loading ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />} Zapisz ustawienia
         </button>
       </Card>
@@ -240,26 +240,26 @@ function AuthScreen({ mode, onAuthenticated }) {
   }
 
   return (
-    <main className="ad-auth">
-      <form className="ad-auth-card" onSubmit={submit}>
-        <section className="ad-auth-intro">
-          <a className="ad-auth-brand" href="/">
+    <main className="ap-auth">
+      <form className="ap-auth-card" onSubmit={submit}>
+        <section className="ap-auth-intro">
+          <a className="ap-auth-brand" href="/">
             <img src="/assets/brand/logo-ar-web.png" alt="" />
             <span>Adam Rędzikowski<i>Panel administracyjny</i></span>
           </a>
-          <div className="ad-auth-promise">
+          <div className="ap-auth-promise">
             <span>{setup ? 'Pierwsza konfiguracja' : 'Prywatna strefa'}</span>
             <h1>{setup ? 'Ustaw dostęp po swojemu.' : 'Jedno konto. Cały panel.'}</h1>
             <p>Treści strony i galeria działają w jednej, wspólnej sesji administratora.</p>
           </div>
-          <ul className="ad-auth-facts">
+          <ul className="ap-auth-facts">
             <li><ShieldCheck size={14} /> Bez adresu e-mail</li>
             <li><Camera size={14} /> Ten sam dostęp do galerii</li>
           </ul>
         </section>
 
-        <section className="ad-auth-form">
-          <div className="ad-auth-heading">
+        <section className="ap-auth-form">
+          <div className="ap-auth-heading">
             <span>{setup ? <ShieldCheck size={18} /> : <LockKeyhole size={18} />}</span>
             <div>
               <h2>{setup ? 'Utwórz administratora' : 'Zaloguj się'}</h2>
@@ -269,10 +269,10 @@ function AuthScreen({ mode, onAuthenticated }) {
             </div>
           </div>
 
-          <div className="ad-auth-fields">
+          <div className="ap-auth-fields">
             {error && <Notice tone="error">{error}</Notice>}
 
-            <label className="ad-field">
+            <label className="ap-field">
               <span>Nazwa administratora</span>
               <input
                 autoComplete="username"
@@ -286,7 +286,7 @@ function AuthScreen({ mode, onAuthenticated }) {
               />
             </label>
 
-            <label className="ad-field">
+            <label className="ap-field">
               <span>Hasło</span>
               <input
                 type="password"
@@ -301,7 +301,7 @@ function AuthScreen({ mode, onAuthenticated }) {
             </label>
 
             {setup && (
-              <label className="ad-field">
+              <label className="ap-field">
                 <span>Powtórz hasło</span>
                 <input
                   type="password"
@@ -315,7 +315,7 @@ function AuthScreen({ mode, onAuthenticated }) {
               </label>
             )}
 
-            <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
+            <button className="ap-btn ap-btn-primary ap-auth-submit" type="submit" disabled={loading}>
               {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
               {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
             </button>
@@ -328,14 +328,14 @@ function AuthScreen({ mode, onAuthenticated }) {
 
 function GalleryManager() {
   return (
-    <div className="ad-gallery-manager">
-      <div className="ad-gallery-toolbar">
+    <div className="ap-gallery-manager">
+      <div className="ap-gallery-toolbar">
         <p>Portfolio, albumy klientów, upload i metadane zdjęć — dostępne w tej samej sesji administratora.</p>
-        <a className="ad-btn ad-btn-ghost" href="/galeria/admin" target="_blank" rel="noreferrer">
+        <a className="ap-btn ap-btn-ghost" href="/galeria/admin" target="_blank" rel="noreferrer">
           Otwórz pełny widok <ArrowUpRight size={14} />
         </a>
       </div>
-      <iframe className="ad-gallery-frame" title="Zarządzanie galerią" src="/galeria/admin?embedded=1" />
+      <iframe className="ap-gallery-frame" title="Zarządzanie galerią" src="/galeria/admin?embedded=1" />
     </div>
   )
 }
@@ -431,9 +431,9 @@ function AdminPanel({ admin, onLogout }) {
   const active = TABS.find(item => item[0] === tab)
 
   return (
-    <div className="ad-shell">
-      <aside className="ad-sidebar">
-        <a className="ad-brand" href="/">
+    <div className="ap-shell">
+      <aside className="ap-sidebar">
+        <a className="ap-brand" href="/">
           <b>AR</b>
           <span>Studio<i>Control</i></span>
         </a>
@@ -446,23 +446,23 @@ function AdminPanel({ admin, onLogout }) {
           ))}
         </nav>
 
-        <a className="ad-back" href="/"><ArrowLeft size={15} /> <span>Wróć na stronę</span></a>
+        <a className="ap-back" href="/"><ArrowLeft size={15} /> <span>Wróć na stronę</span></a>
       </aside>
 
-      <main className="ad-main">
-        <header className="ad-header">
+      <main className="ap-main">
+        <header className="ap-header">
           <div>
             <span>redzikowski.com / {admin.username}</span>
             <h1>{active?.[1]}</h1>
           </div>
-          <div className="ad-header-actions">
-            <a className="ad-btn ad-btn-ghost" href="/" target="_blank" rel="noreferrer">
+          <div className="ap-header-actions">
+            <a className="ap-btn ap-btn-ghost" href="/" target="_blank" rel="noreferrer">
               Zobacz stronę <ArrowUpRight size={14} />
             </a>
-            <button className="ad-btn ad-btn-ghost" onClick={refresh} disabled={loading}>
+            <button className="ap-btn ap-btn-ghost" onClick={refresh} disabled={loading}>
               <RefreshCw className={loading ? 'spin' : ''} size={14} /> Odśwież
             </button>
-            <button className="ad-btn ad-btn-ghost" onClick={onLogout}>
+            <button className="ap-btn ap-btn-ghost" onClick={onLogout}>
               <LogOut size={14} /> Wyloguj
             </button>
           </div>
@@ -473,7 +473,7 @@ function AdminPanel({ admin, onLogout }) {
           {notice && <Notice tone="success" onClose={() => setNotice('')}>{notice}</Notice>}
         </AnimatePresence>
 
-        <motion.div className="ad-body" key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <motion.div className="ap-body" key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
 
           {tab === 'submissions' && (
@@ -489,16 +489,16 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'gallery' && <GalleryManager />}
 
           {tab === 'inbox' && (
-            <div className="ad-stack">
+            <div className="ap-stack">
               {!loading && !inbox.length && <Empty>Brak wiadomości albo skrzynka IMAP nie została jeszcze skonfigurowana.</Empty>}
               {inbox.map(message => (
-                <details className="ad-mail" key={`${message.uid}-${message.date}`}>
+                <details className="ap-mail" key={`${message.uid}-${message.date}`}>
                   <summary>
-                    <span className={`ad-dot ${message.seen ? '' : 'is-live'}`} />
-                    <span className="ad-row-main"><b>{message.subject}</b><i>{message.from}</i></span>
+                    <span className={`ap-dot ${message.seen ? '' : 'is-live'}`} />
+                    <span className="ap-row-main"><b>{message.subject}</b><i>{message.from}</i></span>
                     <time>{formatDate(message.date)}</time>
                   </summary>
-                  <div className="ad-mail-body">
+                  <div className="ap-mail-body">
                     <span>Do: {message.to}</span>
                     <p>{message.text || 'Wiadomość nie zawiera podglądu tekstowego.'}</p>
                   </div>
@@ -508,17 +508,17 @@ function AdminPanel({ admin, onLogout }) {
           )}
 
           {tab === 'outbox' && (
-            <div className="ad-stack">
+            <div className="ap-stack">
               {!loading && !outbox.length && <Empty>Historia potwierdzeń i powiadomień pojawi się tutaj.</Empty>}
               {outbox.map(message => (
-                <article className="ad-outbox" key={message.id}>
+                <article className="ap-outbox" key={message.id}>
                   <Status value={message.status} />
-                  <span className="ad-row-main">
+                  <span className="ap-row-main">
                     <b>{message.subject}</b>
                     <i>Do: {message.to} · {message.kind === 'confirmation' ? 'potwierdzenie dla klienta' : 'powiadomienie wewnętrzne'}</i>
                   </span>
                   <time>{formatDate(message.createdAt)}</time>
-                  {message.error && <p className="ad-error-text">{message.error}</p>}
+                  {message.error && <p className="ap-error-text">{message.error}</p>}
                 </article>
               ))}
             </div>
@@ -530,7 +530,7 @@ function AdminPanel({ admin, onLogout }) {
         </motion.div>
 
         {loading && (
-          <div className="ad-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>
+          <div className="ap-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>
         )}
       </main>
     </div>
@@ -573,7 +573,7 @@ export default function Admin() {
     return <div className="page-state"><LoaderCircle className="spin" size={26} /><span>Sprawdzam dostęp</span></div>
   }
   if (error) {
-    return <main className="ad-auth"><div className="ad-auth-card"><Notice tone="error">{error}</Notice><button className="ad-btn" onClick={check}>Spróbuj ponownie</button></div></main>
+    return <main className="ap-auth"><div className="ap-auth-card"><Notice tone="error">{error}</Notice><button className="ap-btn" onClick={check}>Spróbuj ponownie</button></div></main>
   }
   if (!auth.authenticated) {
     return <AuthScreen mode={auth.mode} onAuthenticated={admin => {
