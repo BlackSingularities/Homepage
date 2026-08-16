@@ -6,7 +6,6 @@ function Card({ card, index }) {
   return (
     <Reveal className="int-card spotlight" delay={index * 0.08} amount={0.3}>
       <div ref={spotlight} className="int-card-inner">
-        <span className="int-no">{card.no}</span>
         <h3>{card.title}</h3>
         <p>{card.text}</p>
         <i className="int-glyph" aria-hidden="true">{String(index + 1).padStart(2, '0')}</i>

@@ -773,13 +773,6 @@
   flex-direction: column;
 }
 
-.int-no {
-  font-size: 10px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-
 .int-card h3 { margin-top: auto; padding-top: 60px; }
 
 .int-card p {
