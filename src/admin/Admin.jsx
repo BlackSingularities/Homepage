@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, FileStack, Files, Image, Inbox, LayoutDashboard, LoaderCircle,
-  MailCheck, MessageSquareText, RefreshCw, Save, Settings, Trash2,
+  ArrowLeft, ArrowUpRight, Camera, FileStack, Files, Image, Inbox, LayoutDashboard, LoaderCircle,
+  LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toggle } from './parts'
@@ -17,6 +17,7 @@ const TABS = [
   ['pages', 'Podstrony', Files],
   ['content', 'Treści strony', FileStack],
   ['media', 'Zdjęcia', Image],
+  ['gallery', 'Galeria', Camera],
   ['inbox', 'Odebrane', Inbox],
   ['outbox', 'Wysłane', MailCheck],
   ['settings', 'Poczta', Settings],
@@ -205,9 +206,129 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
   )
 }
 
+/* ── authentication ─────────────────────────────────────────────── */
+
+function AuthScreen({ mode, onAuthenticated }) {
+  const setup = mode === 'setup'
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const submit = async event => {
+    event.preventDefault()
+    setError('')
+    if (setup && password !== confirmation) {
+      setError('Hasła nie są identyczne.')
+      return
+    }
+    setLoading(true)
+    try {
+      const result = await api(`/api/auth/${setup ? 'setup' : 'login'}`, json('POST', { username, password }))
+      onAuthenticated(result.admin)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="ad-auth">
+      <motion.form
+        className="ad-auth-card"
+        onSubmit={submit}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <a className="ad-auth-brand" href="/">
+          <img src="/assets/brand/logo-ar-web.png" alt="" />
+          <span>Adam Rędzikowski<i>Panel administracyjny</i></span>
+        </a>
+
+        <div className="ad-auth-heading">
+          <span>{setup ? <ShieldCheck size={18} /> : <LockKeyhole size={18} />}</span>
+          <div>
+            <h1>{setup ? 'Utwórz administratora' : 'Zaloguj się'}</h1>
+            <p>{setup
+              ? 'Pierwsza osoba tworzy jedyne konto administratora tej instalacji. Wystarczą nazwa i hasło — bez adresu e-mail.'
+              : 'Podaj nazwę administratora i hasło ustawione przy pierwszym uruchomieniu.'}</p>
+          </div>
+        </div>
+
+        {error && <Notice tone="error">{error}</Notice>}
+
+        <label className="ad-field">
+          <span>Nazwa administratora</span>
+          <input
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={event => setUsername(event.target.value)}
+            placeholder="np. adam"
+            minLength={3}
+            maxLength={60}
+            required
+          />
+        </label>
+
+        <label className="ad-field">
+          <span>Hasło</span>
+          <input
+            type="password"
+            autoComplete={setup ? 'new-password' : 'current-password'}
+            value={password}
+            onChange={event => setPassword(event.target.value)}
+            minLength={setup ? 10 : undefined}
+            maxLength={200}
+            required
+          />
+          {setup && <i>Minimum 10 znaków. Użyj hasła, którego nie stosujesz w innych serwisach.</i>}
+        </label>
+
+        {setup && (
+          <label className="ad-field">
+            <span>Powtórz hasło</span>
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={confirmation}
+              onChange={event => setConfirmation(event.target.value)}
+              minLength={10}
+              maxLength={200}
+              required
+            />
+          </label>
+        )}
+
+        <button className="ad-btn ad-btn-primary ad-auth-submit" type="submit" disabled={loading}>
+          {loading ? <LoaderCircle className="spin" size={16} /> : setup ? <ShieldCheck size={16} /> : <LockKeyhole size={16} />}
+          {setup ? 'Utwórz konto i otwórz panel' : 'Otwórz panel'}
+        </button>
+      </motion.form>
+    </main>
+  )
+}
+
+function GalleryManager() {
+  return (
+    <div className="ad-gallery-manager">
+      <div className="ad-gallery-toolbar">
+        <p>Portfolio, albumy klientów, upload i metadane zdjęć — dostępne w tej samej sesji administratora.</p>
+        <a className="ad-btn ad-btn-ghost" href="/galeria/admin" target="_blank" rel="noreferrer">
+          Otwórz pełny widok <ArrowUpRight size={14} />
+        </a>
+      </div>
+      <iframe className="ad-gallery-frame" title="Zarządzanie galerią" src="/galeria/admin?embedded=1" />
+    </div>
+  )
+}
+
 /* ── shell ──────────────────────────────────────────────────────── */
 
-export default function Admin() {
+function AdminPanel({ admin, onLogout }) {
   const [tab, setTab] = useState('dashboard')
   const [submissions, setSubmissions] = useState([])
   const [pages, setPages] = useState([])
@@ -317,7 +438,7 @@ export default function Admin() {
       <main className="ad-main">
         <header className="ad-header">
           <div>
-            <span>redzikowski.com / panel</span>
+            <span>redzikowski.com / {admin.username}</span>
             <h1>{active?.[1]}</h1>
           </div>
           <div className="ad-header-actions">
@@ -326,6 +447,9 @@ export default function Admin() {
             </a>
             <button className="ad-btn ad-btn-ghost" onClick={refresh} disabled={loading}>
               <RefreshCw className={loading ? 'spin' : ''} size={14} /> Odśwież
+            </button>
+            <button className="ad-btn ad-btn-ghost" onClick={onLogout}>
+              <LogOut size={14} /> Wyloguj
             </button>
           </div>
         </header>
@@ -347,6 +471,8 @@ export default function Admin() {
           {tab === 'content' && <ContentManager notify={notify} />}
 
           {tab === 'media' && <MediaManager notify={notify} />}
+
+          {tab === 'gallery' && <GalleryManager />}
 
           {tab === 'inbox' && (
             <div className="ad-stack">
@@ -395,4 +521,43 @@ export default function Admin() {
       </main>
     </div>
   )
+}
+
+export default function Admin() {
+  const [auth, setAuth] = useState({ loading: true, mode: 'login', authenticated: false, admin: null })
+  const [error, setError] = useState('')
+
+  const check = useCallback(async () => {
+    setError('')
+    try {
+      const status = await api('/api/auth/status')
+      setAuth({ loading: false, ...status })
+    } catch (requestError) {
+      setError(requestError.message)
+      setAuth(current => ({ ...current, loading: false }))
+    }
+  }, [])
+
+  useEffect(() => { check() }, [check])
+  useEffect(() => {
+    const unauthorized = () => setAuth(current => ({ ...current, authenticated: false, admin: null, mode: 'login' }))
+    window.addEventListener('admin:unauthorized', unauthorized)
+    return () => window.removeEventListener('admin:unauthorized', unauthorized)
+  }, [])
+
+  const logout = async () => {
+    await api('/api/auth/logout', json('POST', {})).catch(() => undefined)
+    setAuth(current => ({ ...current, authenticated: false, admin: null, mode: 'login' }))
+  }
+
+  if (auth.loading) {
+    return <div className="page-state"><LoaderCircle className="spin" size={26} /><span>Sprawdzam dostęp</span></div>
+  }
+  if (error) {
+    return <main className="ad-auth"><div className="ad-auth-card"><Notice tone="error">{error}</Notice><button className="ad-btn" onClick={check}>Spróbuj ponownie</button></div></main>
+  }
+  if (!auth.authenticated) {
+    return <AuthScreen mode={auth.mode} onAuthenticated={admin => setAuth({ loading: false, mode: 'login', authenticated: true, admin })} />
+  }
+  return <AdminPanel admin={auth.admin} onLogout={logout} />
 }

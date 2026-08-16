@@ -14,9 +14,7 @@ function Detail({ service }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease }}
     >
-      <span className="svc-ghost" aria-hidden="true">{service.no}</span>
       <div className="svc-detail-head">
-        <span className="svc-detail-no">{service.no}</span>
         <h3>{service.title}</h3>
       </div>
       <p className="svc-detail-lead">{service.lead}</p>
@@ -51,7 +49,6 @@ export default function Services({ data }) {
               onFocus={() => setActive(index)}
               onClick={() => setActive(index)}
             >
-              <span className="svc-no">{item.no}</span>
               <span className="svc-name">{item.title}</span>
               <span className="svc-arrow"><ArrowUpRight size={16} /></span>
             </button>
@@ -66,7 +63,6 @@ export default function Services({ data }) {
         {items.map((item, index) => (
           <article key={item.id} className={openMobile === index ? 'is-open' : ''}>
             <button onClick={() => setOpenMobile(openMobile === index ? -1 : index)} aria-expanded={openMobile === index}>
-              <span className="svc-no">{item.no}</span>
               <span className="svc-name">{item.title}</span>
               <Plus size={18} />
             </button>

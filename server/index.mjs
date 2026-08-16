@@ -5,6 +5,7 @@ import path from 'node:path'
 import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
+import apacheMd5 from 'apache-md5'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -14,6 +15,7 @@ const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json')
 const OUTBOX_FILE = path.join(DATA_DIR, 'outbox.json')
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
 const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
+const ADMIN_FILE = path.join(DATA_DIR, 'admin.json')
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
 const encryptionSecret = process.env.SETTINGS_ENCRYPTION_KEY
 
@@ -24,6 +26,9 @@ if (!encryptionSecret) {
 const encryptionKey = crypto.createHash('sha256').update(encryptionSecret).digest()
 const writeQueues = new Map()
 const rateLimits = new Map()
+const loginRateLimits = new Map()
+const SESSION_COOKIE = 'homepage_admin_session'
+const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60
 
 const defaultContent = JSON.parse(
   await fs.readFile(new URL('./content.default.json', import.meta.url), 'utf8'),
@@ -81,6 +86,99 @@ function cleanLink(value, fallback = '') {
   if (!raw) return fallback
   if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(raw)) return raw
   return fallback
+}
+
+function parseCookies(header = '') {
+  return Object.fromEntries(header.split(';').map(part => {
+    const separator = part.indexOf('=')
+    if (separator === -1) return ['', '']
+    const key = part.slice(0, separator).trim()
+    const value = part.slice(separator + 1).trim()
+    return [key, value]
+  }).filter(([key]) => key))
+}
+
+function encodeSession(admin) {
+  const payload = Buffer.from(JSON.stringify({
+    username: admin.username,
+    version: admin.sessionVersion,
+    expiresAt: Date.now() + SESSION_TTL_SECONDS * 1000,
+  })).toString('base64url')
+  const signature = crypto.createHmac('sha256', encryptionKey).update(payload).digest('base64url')
+  return `${payload}.${signature}`
+}
+
+function decodeSession(token) {
+  const [payload, signature] = String(token || '').split('.')
+  if (!payload || !signature) return null
+  const expected = crypto.createHmac('sha256', encryptionKey).update(payload).digest()
+  const received = Buffer.from(signature, 'base64url')
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) return null
+  try {
+    const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'))
+    return Number(session.expiresAt) > Date.now() ? session : null
+  } catch {
+    return null
+  }
+}
+
+function sessionCookie(value, { clear = false } = {}) {
+  const parts = [
+    `${SESSION_COOKIE}=${clear ? '' : value}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Strict',
+    clear ? 'Max-Age=0' : `Max-Age=${SESSION_TTL_SECONDS}`,
+  ]
+  if (process.env.NODE_ENV === 'production') parts.push('Secure')
+  return parts.join('; ')
+}
+
+function scrypt(password, salt) {
+  return new Promise((resolve, reject) => {
+    crypto.scrypt(password, salt, 64, { N: 16384, r: 8, p: 1 }, (error, key) => {
+      if (error) reject(error)
+      else resolve(key)
+    })
+  })
+}
+
+async function hashPassword(password) {
+  const salt = crypto.randomBytes(16)
+  const hash = await scrypt(password, salt)
+  return { salt: salt.toString('base64'), hash: hash.toString('base64') }
+}
+
+async function verifyPassword(password, admin) {
+  if (admin?.legacyHash?.startsWith('$apr1$')) {
+    const expected = Buffer.from(admin.legacyHash)
+    const actual = Buffer.from(apacheMd5(password, admin.legacyHash))
+    return actual.length === expected.length && crypto.timingSafeEqual(actual, expected)
+  }
+  if (!admin?.salt || !admin?.hash) return false
+  const expected = Buffer.from(admin.hash, 'base64')
+  const actual = await scrypt(password, Buffer.from(admin.salt, 'base64'))
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected)
+}
+
+async function authenticatedAdmin(req) {
+  const token = parseCookies(req.get('cookie'))[SESSION_COOKIE]
+  const session = decodeSession(token)
+  if (!session) return null
+  const admin = await readJson(ADMIN_FILE, null)
+  if (!admin || admin.username !== session.username || admin.sessionVersion !== session.version) return null
+  return { username: admin.username, createdAt: admin.createdAt }
+}
+
+async function requireAdmin(req, res, next) {
+  try {
+    const admin = await authenticatedAdmin(req)
+    if (!admin) return res.status(401).json({ error: 'Zaloguj się, aby otworzyć panel.' })
+    req.admin = admin
+    next()
+  } catch (error) {
+    next(error)
+  }
 }
 
 function encrypt(value) {
@@ -389,6 +487,107 @@ async function sendLoggedMail(transport, message, kind, submissionId) {
   return log
 }
 
+/* ── administrator bootstrap & session ───────────────────────────────── */
+
+function recordLoginAttempt(ip) {
+  const now = Date.now()
+  const recent = (loginRateLimits.get(ip) || []).filter(timestamp => now - timestamp < 15 * 60 * 1000)
+  recent.push(now)
+  loginRateLimits.set(ip, recent)
+  return recent.length
+}
+
+app.get('/api/auth/status', async (req, res, next) => {
+  try {
+    const adminRecord = await readJson(ADMIN_FILE, null)
+    const admin = adminRecord ? await authenticatedAdmin(req) : null
+    res.set('Cache-Control', 'no-store')
+    res.json({
+      mode: adminRecord ? 'login' : 'setup',
+      authenticated: Boolean(admin),
+      admin,
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.post('/api/auth/setup', enforceSameOrigin, async (req, res, next) => {
+  try {
+    if (await readJson(ADMIN_FILE, null)) {
+      return res.status(409).json({ error: 'Administrator został już utworzony. Zaloguj się.' })
+    }
+
+    const username = cleanText(req.body.username, 60)
+    const password = String(req.body.password || '')
+    if (username.length < 3) return res.status(400).json({ error: 'Nazwa administratora musi mieć co najmniej 3 znaki.' })
+    if (password.length < 10) return res.status(400).json({ error: 'Hasło musi mieć co najmniej 10 znaków.' })
+    if (password.length > 200) return res.status(400).json({ error: 'Hasło jest zbyt długie.' })
+
+    const credentials = await hashPassword(password)
+    const adminRecord = {
+      username,
+      ...credentials,
+      sessionVersion: crypto.randomBytes(16).toString('base64url'),
+      createdAt: new Date().toISOString(),
+    }
+
+    try {
+      await fs.writeFile(ADMIN_FILE, `${JSON.stringify(adminRecord, null, 2)}\n`, { flag: 'wx', mode: 0o600 })
+    } catch (error) {
+      if (error.code === 'EEXIST') {
+        return res.status(409).json({ error: 'Administrator został już utworzony. Zaloguj się.' })
+      }
+      throw error
+    }
+
+    res.set('Set-Cookie', sessionCookie(encodeSession(adminRecord)))
+    res.status(201).json({ admin: { username, createdAt: adminRecord.createdAt } })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.post('/api/auth/login', enforceSameOrigin, async (req, res, next) => {
+  try {
+    const ip = req.ip || 'unknown'
+    if (recordLoginAttempt(ip) > 8) {
+      return res.status(429).json({ error: 'Za dużo prób logowania. Spróbuj ponownie za 15 minut.' })
+    }
+
+    let adminRecord = await readJson(ADMIN_FILE, null)
+    if (!adminRecord) return res.status(409).json({ error: 'Najpierw utwórz konto administratora.' })
+
+    const username = cleanText(req.body.username, 60)
+    const password = String(req.body.password || '')
+    const validUsername = username === adminRecord.username
+    const validPassword = await verifyPassword(password, adminRecord)
+    if (!validUsername || !validPassword) {
+      return res.status(401).json({ error: 'Nieprawidłowa nazwa administratora lub hasło.' })
+    }
+
+    if (adminRecord.legacyHash) {
+      const credentials = await hashPassword(password)
+      adminRecord = await updateJson(ADMIN_FILE, null, current => {
+        const upgraded = { ...current, ...credentials, upgradedAt: new Date().toISOString() }
+        delete upgraded.legacyHash
+        return upgraded
+      })
+    }
+
+    loginRateLimits.delete(ip)
+    res.set('Set-Cookie', sessionCookie(encodeSession(adminRecord)))
+    res.json({ admin: { username: adminRecord.username, createdAt: adminRecord.createdAt } })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.post('/api/auth/logout', enforceSameOrigin, (_req, res) => {
+  res.set('Set-Cookie', sessionCookie('', { clear: true }))
+  res.json({ ok: true })
+})
+
 /* ── public routes ───────────────────────────────────────────────────── */
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
@@ -502,6 +701,10 @@ app.post('/api/contact', async (req, res) => {
 
   res.status(201).json({ ok: true, id: submission.id, mailStatus })
 })
+
+/* ── protected admin API ─────────────────────────────────────────────── */
+
+app.use('/api/admin', requireAdmin)
 
 /* ── admin: submissions ──────────────────────────────────────────────── */
 

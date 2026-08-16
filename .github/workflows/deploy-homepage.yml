@@ -56,13 +56,24 @@ jobs:
               } > "$PERSIST/env"
             fi
 
+            mkdir -p "$PERSIST/gallery"
+            if ! grep -q '^GALLERY_JWT_SECRET=' "$PERSIST/env"; then
+              printf 'GALLERY_JWT_SECRET=%s\n' "$(openssl rand -hex 32)" >> "$PERSIST/env"
+            fi
+            if ! grep -q '^HOMEPAGE_GALLERY_DATA_DIR=' "$PERSIST/env"; then
+              printf 'HOMEPAGE_GALLERY_DATA_DIR=%s\n' "$PERSIST/gallery" >> "$PERSIST/env"
+            fi
+
             cd /opt/apps/homepage
             install -m 600 "$PERSIST/env" .env
             rm -rf .git node_modules dist
 
             docker compose up -d --build
+            docker compose exec -T homepage_gallery node -e "const D=require('better-sqlite3');const d=new D(process.env.DB_PATH,{readonly:true});console.log('Galeria:',d.prepare('SELECT COUNT(*) AS photos FROM photos').get())"
             docker compose exec -T homepage_api node server/migrate-playmaster.mjs
             docker compose exec -T homepage_api node server/migrate-arcadia.mjs
             docker compose exec -T homepage_api node server/migrate-blinkbeam.mjs
             docker compose exec -T homepage_api node server/migrate-personal-brand-v2.mjs
+            docker compose exec -T homepage_api node server/migrate-expanded-faq-v3.mjs
+            docker compose exec -T homepage_api node server/migrate-gallery-integration.mjs
             docker image prune -f

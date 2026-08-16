@@ -1,6 +1,9 @@
 export async function api(path, options = {}) {
   const response = await fetch(path, options)
   const payload = await response.json().catch(() => ({}))
+  if (response.status === 401 && path.startsWith('/api/admin/')) {
+    window.dispatchEvent(new CustomEvent('admin:unauthorized'))
+  }
   if (!response.ok) throw new Error(payload.error || 'Nie udało się wykonać operacji.')
   return payload
 }

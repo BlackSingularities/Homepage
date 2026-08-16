@@ -95,7 +95,7 @@
     "kicker": "",
     "title": "Nie obietnice.",
     "accent": "Działające realizacje.",
-    "lead": "Osiem produktów zaprojektowanych i zbudowanych od zera. Każdy ma własną architekturę, interfejs i zaplecze dopasowane do konkretnego zastosowania.",
+    "lead": "Dziewięć produktów zaprojektowanych i zbudowanych od zera. Każdy ma własną architekturę, interfejs i zaplecze dopasowane do konkretnego zastosowania.",
     "items": [
       {
         "id": "prj-travel",
@@ -176,6 +176,16 @@
         "description": "Przeglądarkowa aplikacja dzieli plik na strumień kodów QR odporny na zgubione ramki. Drugi telefon składa dane aparatem i udostępnia plik dopiero po kryptograficznej weryfikacji całości.",
         "features": ["transfer ekran → aparat", "brak wysyłki na serwer", "automatyczna optymalizacja tempa", "weryfikacja integralności SHA-256"],
         "slides": ["/assets/portfolio/blinkbeam-1.png"]
+      },
+      {
+        "id": "prj-gallery",
+        "name": "Galeria fotograficzna",
+        "href": "/galeria/",
+        "label": "Fotografia / podróże / sesje",
+        "statement": "Kocham podróże i lubię zatrzymywać ich światło, miejsca oraz ludzi w kadrach.",
+        "description": "Fotografuję przede wszystkim dla przyjemności, a czasami także komercyjnie. Tutaj zebrałem galerię moich najlepszych i ulubionych zdjęć.",
+        "features": ["fotografia podróżnicza", "ulubione kadry", "wybrane realizacje komercyjne", "pełnoekranowa galeria"],
+        "slides": ["/assets/projects/galeria.png"]
       }
     ]
   },
@@ -196,8 +206,8 @@
     "kicker": "",
     "title": "Prowadzę cały projekt.",
     "accent": "I zostaję po wdrożeniu.",
-    "lead": "Jestem analitykiem danych, projektantem i twórcą aplikacji webowych. Łączę kompetencje, które w większych realizacjach często są rozdzielone pomiędzy kilka osób.",
-    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje oraz wewnętrzne systemy zarządzania — zawsze od zera i pod konkretny sposób działania. AI traktuję jak narzędzie: wykorzystuję je do analizy, porządkowania treści, automatyzacji i obsługi systemu, kiedy daje to rzeczywistą przewagę. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
+    "lead": "Jestem analitykiem danych, projektantem i twórcą aplikacji webowych. Kocham podróże, lubię robić zdjęcia i czasami fotografuję także komercyjnie.",
+    "text": "Łączę kompetencje, które w większych realizacjach często są rozdzielone pomiędzy kilka osób. Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje oraz wewnętrzne systemy zarządzania — zawsze od zera i pod konkretny sposób działania. Fotografia jest dla mnie drugim sposobem opowiadania o miejscach i ludziach; w galerii pokazuję najlepsze oraz najbardziej lubiane przeze mnie kadry. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
     "strengths": ["Analityka danych i raportowanie", "Grafika i projektowanie interfejsów", "Aplikacje oraz systemy webowe", "Autorskie CMS-y i panele zarządzania", "Automatyzacja, AI i dalsza opieka"]
   },
   "faq": {
@@ -207,8 +217,16 @@
     "items": [
       { "q": "Czy korzystasz z gotowych szablonów?", "a": "Nie buduję projektu wokół gotowego motywu. Każde rozwiązanie otrzymuje własną architekturę, język wizualny i funkcje dopasowane do celu — niezależnie od tego, czy jest to blog, strona marki, CMS czy rozbudowana aplikacja." },
       { "q": "Czy muszę mieć gotową specyfikację?", "a": "Nie. Wystarczy problem, pomysł albo proces, który dziś nie działa tak, jak powinien. Pomogę uporządkować potrzeby, ustalić priorytety i zamienić je w konkretny plan." },
-      { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak — dokładnie taki, jakiego wymaga projekt. Bez przeładowanego panelu z funkcjami, których nigdy nie użyjesz." },
+      { "q": "Jak zaczyna się współpraca?", "a": "Od rozmowy o celu, odbiorcach i obecnym sposobie pracy. Na tej podstawie porządkuję zakres, wskazuję najważniejsze decyzje i proponuję kierunek realizacji. Zanim powstanie interfejs lub kod, obie strony wiedzą, co budujemy, po co i według jakich kryteriów ocenimy efekt." },
+      { "q": "Ile trwa realizacja?", "a": "Termin zależy od skali i liczby zależności. Skupiona strona lub blog mogą powstać w kilka tygodni, natomiast aplikacja, autorski CMS albo system z integracjami wymagają zwykle pracy etapowej. Po krótkiej analizie przedstawiam realistyczny harmonogram, bez obiecywania terminu oderwanego od zakresu." },
+      { "q": "Jak wygląda wycena projektu?", "a": "Wyceniam konkretny zakres, odpowiedzialność i oczekiwany rezultat, a nie samą liczbę ekranów. Przed rozpoczęciem otrzymujesz przejrzysty opis prac, etapów oraz kosztów. Jeśli projekt warto podzielić na wersję podstawową i dalszy rozwój, pokażę to wprost, aby można było świadomie zarządzać budżetem." },
+      { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak, jeśli projekt tego potrzebuje. Panel projektuję pod rzeczywiste zadania użytkowników: publikowanie, zarządzanie danymi, obsługę klientów, raportowanie albo sterowanie procesem. Nie dokładam dziesiątek przypadkowych funkcji tylko dlatego, że znajdują się w gotowym CMS-ie." },
       { "q": "Czy wszystko musi wykorzystywać AI?", "a": "Nie. AI ma rozwiązywać problem, a nie dekorować ofertę. Stosuję je tam, gdzie może analizować dane, pomagać w obsłudze CMS-u, porządkować wiedzę lub wykonywać konkretne zadania. Jeśli prostsza automatyzacja będzie lepsza, właśnie ją zaproponuję." },
+      { "q": "Czy system może współpracować z narzędziami, których już używam?", "a": "Tak. Mogę połączyć rozwiązanie z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą, systemem CRM lub innymi usługami wykorzystywanymi w firmie. Najpierw sprawdzam jakość i ograniczenia integracji, żeby nie budować kluczowego procesu na niestabilnym założeniu." },
+      { "q": "Czy możesz rozwinąć albo uporządkować istniejący produkt?", "a": "Tak, po wcześniejszym audycie kodu, danych i sposobu wdrożenia. Oceniam, co warto zachować, co wymaga przebudowy i czy bezpieczniej będzie rozwijać obecną bazę, czy stworzyć nowy fundament. Rekomendację uzasadniam technicznie i biznesowo — bez przepisywania wszystkiego dla samego przepisywania." },
+      { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu, dostępów oraz materiałów ustalamy jasno przed rozpoczęciem. Projekt nie powinien uzależniać klienta od jednej osoby przez brak dokumentacji lub dostępu do infrastruktury. Zakres przekazania dopasowuję do modelu współpracy i późniejszej opieki." },
+      { "q": "Czy dbasz o wydajność, bezpieczeństwo i dostępność?", "a": "Tak — traktuję je jako część jakości produktu, a nie dodatki na ostatnią chwilę. Dobieram rozwiązania do ryzyka i charakteru danych, pilnuję szybkości działania, poprawnego zachowania na różnych urządzeniach oraz czytelnej obsługi. Przy bardziej wymagających systemach zakres zabezpieczeń i monitoringu ustalam osobno." },
+      { "q": "Czy pracujesz tylko z klientami z Łodzi?", "a": "Nie. Jestem związany z Łodzią i chętnie spotykam się lokalnie, ale cały proces może przebiegać zdalnie. Najważniejsze są sprawna komunikacja, dostęp do osób decyzyjnych i regularne zatwierdzanie kolejnych etapów." },
       { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." }
     ]
   },

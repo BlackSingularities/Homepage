@@ -19,6 +19,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
   const active = useActiveSection(home ? SECTION_IDS : [])
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 })
+  const roleParts = brand.role?.split(/\s+na\s+/i) || []
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -50,7 +51,14 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
       <header className={`masthead ${scrolled ? 'is-scrolled' : ''}`}>
         <a className="wordmark" href="/" onClick={event => { if (onNavigate) { event.preventDefault(); onNavigate('/') } }}>
           <img className="wordmark-logo" src="/assets/brand/logo-ar-web.png" alt="" />
-          <span>{brand.name}<i>{brand.role}</i></span>
+          <span>
+            {brand.name}
+            <i>
+              {roleParts.length === 2 ? (
+                <><span>{roleParts[0]}</span><span>na {roleParts[1]}</span></>
+              ) : brand.role}
+            </i>
+          </span>
         </a>
 
         {/* Both navigations are always rendered — CSS decides which one shows,

@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     depends_on:
       - homepage_api
+      - homepage_gallery
     networks:
       - webproxy
       - homepage_internal
@@ -22,6 +23,29 @@ services:
       # outside it (set in .env). Locally it stays ./data.
       - ${HOMEPAGE_DATA_DIR:-./data}:/app/data
     networks:
+      - homepage_internal
+
+  homepage_gallery:
+    build:
+      context: ./gallery
+    container_name: homepage_gallery
+    restart: unless-stopped
+    depends_on:
+      - homepage_api
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      HOMEPAGE_API_URL: http://homepage_api:3001
+      GALLERY_JWT_SECRET: ${GALLERY_JWT_SECRET}
+      UPLOADS_DIR: /app/persist/uploads
+      THUMBS_DIR: /app/persist/thumbs
+      DB_PATH: /app/persist/db/galeria.db
+    volumes:
+      - ${HOMEPAGE_GALLERY_DATA_DIR:-./gallery/persist}:/app/persist
+    networks:
+      - webproxy
       - homepage_internal
 
 networks:

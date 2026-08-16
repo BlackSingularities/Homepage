@@ -24,21 +24,30 @@ Vite proxuje `/api` i `/uploads` na `http://localhost:3001` (można nadpisać zm
 Wdrożenie idzie automatycznie z gałęzi `main` (`.github/workflows/deploy-homepage.yml`):
 pliki lądują w `/opt/apps/homepage`, a workflow uruchamia `docker compose up -d --build`.
 
-- `homepage` — nginx z zbudowanym frontendem, basic auth na `/admin` i `/api/admin/`
-- `homepage_api` — Express z danymi na wolumenie
+- `homepage` — nginx z zbudowanym frontendem
+- `homepage_api` — Express z danymi na wolumenie i wspólnym uwierzytelnianiem panelu
+- `homepage_gallery` — publiczna galeria i jej API, uruchamiane z tego samego repozytorium pod `/galeria`
 
 **Katalog trwały: `/opt/apps/homepage-persist`.** Krok kopiujący czyści `/opt/apps/homepage`
 przy każdym wdrożeniu, więc rzeczy, które mają przetrwać, leżą obok:
 
 | Ścieżka | Zawartość |
 | --- | --- |
-| `homepage-persist/env` | `SETTINGS_ENCRYPTION_KEY` i `HOMEPAGE_DATA_DIR`, kopiowane do `.env` przed startem |
+| `homepage-persist/env` | Klucze i ścieżki danych, kopiowane do `.env` przed startem |
 | `homepage-persist/data` | Treści, podstrony, zgłoszenia i wgrane zdjęcia |
+| `homepage-persist/gallery` | Baza SQLite galerii, oryginały zdjęć i miniatury |
 
 Klucz generuje się sam przy pierwszym wdrożeniu i potem się nie zmienia.
 Podmiana go unieważnia zapisane hasło skrzynki — trzeba je wtedy wpisać ponownie w panelu.
 
 ## Panel `/admin`
+
+Przy pierwszym wejściu panel prosi wyłącznie o nazwę administratora i hasło. Pierwsza
+osoba, która zakończy ten krok, tworzy konto administratora; kolejne wejścia pokazują
+zwykłe logowanie. Adres e-mail nie jest wymagany. Hasło jest skrótowane przez `scrypt`,
+a dostęp do `/api/admin/*` wymaga bezpiecznej sesji w ciasteczku `HttpOnly`.
+Ta sama sesja otwiera zakładkę **Galeria** oraz pełny widok `/galeria/admin`, bez
+drugiego logowania i bez osobnego hasła galerii.
 
 | Zakładka | Do czego służy |
 | --- | --- |
@@ -47,6 +56,7 @@ Podmiana go unieważnia zapisane hasło skrzynki — trzeba je wtedy wpisać pon
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
 | Treści strony | Wszystkie teksty strony głównej — hero, usługi, realizacje, proces, FAQ, kontakt |
 | Zdjęcia | Biblioteka mediów: upload przeciągnięciem, kopiowanie adresu, usuwanie |
+| Galeria | Portfolio fotograficzne, albumy klientów, metadane i upload zdjęć |
 | Odebrane / Wysłane | Podgląd skrzynki IMAP i historia wysyłek |
 | Poczta | Dane IMAP/SMTP; hasło szyfrowane AES-256-GCM przed zapisem |
 
@@ -67,9 +77,11 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 | `submissions.json` | Zgłoszenia z formularza |
 | `outbox.json` | Historia wysłanych powiadomień |
 | `mail-settings.json` | Konfiguracja poczty (hasło zaszyfrowane) |
+| `admin.json` | Nazwa administratora, skrót hasła i wersja sesji |
 | `uploads/` | Zdjęcia wgrane w panelu |
 
 ## API
 
 Publiczne: `GET /api/content`, `GET /api/pages/:slug`, `POST /api/contact`.
-Administracyjne (za basic auth): `/api/admin/*` — zgłoszenia, treści, podstrony, media, poczta.
+Uwierzytelnianie: `/api/auth/status`, `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout`.
+Administracyjne (za sesją): `/api/admin/*` — zgłoszenia, treści, podstrony, media, poczta.

@@ -74,7 +74,7 @@ export default function Hero({ hero, projects }) {
           transition={{ duration: 0.6 }}
         >
           <h1 className="hero-title">
-            <KineticText text={hero.titleTop} accent={hero.titleAccent} />
+            <KineticText className="hero-kinetic" text={hero.titleTop} accent={hero.titleAccent} />
           </h1>
 
           <motion.p
