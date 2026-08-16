@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, LoaderCircle, Mail, Phone, Send } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole, Mail, Phone, Send } from 'lucide-react'
 import { ease } from '../lib/ui'
 
 const BUDGETS = ['do 10 000 zł', '10 000 – 25 000 zł', '25 000 – 60 000 zł', 'powyżej 60 000 zł', 'do ustalenia']
@@ -78,173 +78,147 @@ export default function ContactForm({ scopeOptions = [] }) {
 
   return (
     <form className="contact-form" onSubmit={submit} noValidate>
-      <div className="form-steps">
-        {['Projekt', 'Kontakt'].map((label, index) => (
-          <button
-            key={label}
-            type="button"
-            className={`form-step ${step === index ? 'is-active' : ''} ${step > index ? 'is-done' : ''}`}
-            onClick={() => index === 0 && setStep(0)}
-          >
-            <i>{step > index ? <Check size={12} /> : String(index + 1).padStart(2, '0')}</i>
-            {label}
-          </button>
-        ))}
+      <aside className="form-steps">
+        <div className="form-steps-intro">
+          <span>Brief projektu</span>
+          <h3>Kilka konkretów wystarczy.</h3>
+          <p>Nie potrzebujesz gotowej specyfikacji. Opisz cel albo problem — resztę uporządkujemy wspólnie.</p>
+        </div>
+
+        <div className="form-step-list">
+          {['Projekt', 'Kontakt'].map((label, index) => (
+            <button
+              key={label}
+              type="button"
+              className={`form-step ${step === index ? 'is-active' : ''} ${step > index ? 'is-done' : ''}`}
+              onClick={() => index === 0 && setStep(0)}
+            >
+              <i>{step > index ? <Check size={12} /> : String(index + 1).padStart(2, '0')}</i>
+              <span>{label}<small>{index === 0 ? 'Cel, zakres i termin' : 'Dane do odpowiedzi'}</small></span>
+            </button>
+          ))}
+        </div>
+
         <div className="form-progress"><i style={{ width: step === 0 ? '50%' : '100%' }} /></div>
-      </div>
+        <p className="form-privacy"><LockKeyhole size={13} /> Dane służą wyłącznie do odpowiedzi na zapytanie.</p>
+      </aside>
 
-      {step === 0 ? (
-        <motion.div
-          className="form-stage"
-          key="stage-project"
-          initial={{ opacity: 0, x: -14 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, ease }}
-        >
-          <label className="field">
-            <span>Temat projektu</span>
-            <input name="subject" value={form.subject} onChange={update} placeholder="Strona, system, automatyzacja, inny pomysł…" />
-          </label>
+      <div className="form-content">
+        <header className="form-stage-head">
+          <span>Krok {step + 1} z 2</span>
+          <h3>{step === 0 ? 'Opowiedz o projekcie.' : 'Jak mogę się z Tobą skontaktować?'}</h3>
+          <p>{step === 0
+            ? 'Wybierz to, co już wiesz. Budżet i termin możesz zostawić do wspólnego ustalenia.'
+            : 'Potrzebuję tylko danych niezbędnych do udzielenia odpowiedzi.'}</p>
+        </header>
 
-          {scopeOptions.length > 0 && (
-            <div className="field">
-              <span>Czego potrzebujesz?</span>
-              <div className="chips">
-                {scopeOptions.map(option => (
-                  <button
-                    type="button"
-                    key={option}
-                    className={`chip ${form.scope.includes(option) ? 'is-active' : ''}`}
-                    onClick={() => toggleScope(option)}
-                    aria-pressed={form.scope.includes(option)}
-                  >
-                    <i>{form.scope.includes(option) ? <Check size={12} /> : '+'}</i>{option}
+        {step === 0 ? (
+          <motion.div className="form-stage" key="stage-project" initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease }}>
+            <label className="field">
+              <span>Temat projektu</span>
+              <input name="subject" value={form.subject} onChange={update} placeholder="Np. panel dla klientów albo autorski blog" />
+            </label>
+
+            {scopeOptions.length > 0 && (
+              <div className="field form-section">
+                <span>Czego potrzebujesz?</span>
+                <div className="chips scope-choices">
+                  {scopeOptions.map(option => (
+                    <button type="button" key={option} className={`chip ${form.scope.includes(option) ? 'is-active' : ''}`} onClick={() => toggleScope(option)} aria-pressed={form.scope.includes(option)}>
+                      <i>{form.scope.includes(option) ? <Check size={12} /> : '+'}</i><span>{option}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="field-row form-choice-row">
+              <div className="field form-section">
+                <span>Orientacyjny budżet</span>
+                <div className="chips compact-choices">
+                  {BUDGETS.map(option => (
+                    <button type="button" key={option} className={`chip ${form.budget === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, budget: current.budget === option ? '' : option }))}>{option}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="field form-section">
+                <span>Termin</span>
+                <div className="chips compact-choices">
+                  {TIMELINES.map(option => (
+                    <button type="button" key={option} className={`chip ${form.timeline === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, timeline: current.timeline === option ? '' : option }))}>{option}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <label className={`field ${touched && !stepOneValid ? 'has-error' : ''}`}>
+              <span>Najważniejsza informacja *</span>
+              <textarea name="message" value={form.message} onChange={update} rows="6" placeholder="Co dziś nie działa, czego potrzebują użytkownicy i jaki efekt chcesz osiągnąć?" />
+              {touched && !stepOneValid && <i className="field-error">Napisz kilka zdań — minimum 12 znaków.</i>}
+            </label>
+
+            <div className="form-nav">
+              <span className="form-hint">Odpowiedz tylko na tyle, ile wiesz na tym etapie.</span>
+              <button type="button" className="btn btn-primary" onClick={next}>Przejdź do kontaktu <ArrowRight size={17} /></button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div className="form-stage" key="stage-contact" initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease }}>
+            <div className="field-row">
+              <label className={`field ${touched && form.name.trim().length < 2 ? 'has-error' : ''}`}>
+                <span>Imię i nazwisko *</span>
+                <input name="name" value={form.name} onChange={update} autoComplete="name" placeholder="Jak mam się do Ciebie zwracać?" />
+              </label>
+              <label className="field">
+                <span>Firma</span>
+                <input name="company" value={form.company} onChange={update} autoComplete="organization" placeholder="Opcjonalnie" />
+              </label>
+            </div>
+
+            <div className="field-row">
+              <label className={`field ${touched && !isEmail(form.email) ? 'has-error' : ''}`}>
+                <span>E-mail *</span>
+                <input type="email" name="email" value={form.email} onChange={update} autoComplete="email" placeholder="Adres do odpowiedzi" />
+              </label>
+              <label className={`field ${touched && form.contactMethod === 'phone' && form.phone.trim().length < 6 ? 'has-error' : ''}`}>
+                <span>Telefon {form.contactMethod === 'phone' ? '*' : ''}</span>
+                <input type="tel" name="phone" value={form.phone} onChange={update} autoComplete="tel" placeholder="+48…" />
+              </label>
+            </div>
+
+            <div className="field form-section">
+              <span>Preferowany sposób odpowiedzi</span>
+              <div className="method-choice">
+                {[['email', 'Mailowo', Mail], ['phone', 'Telefonicznie', Phone]].map(([value, label, Icon]) => (
+                  <button type="button" key={value} className={form.contactMethod === value ? 'is-active' : ''} onClick={() => setForm(current => ({ ...current, contactMethod: value }))} aria-pressed={form.contactMethod === value}>
+                    <Icon size={15} />{label}
                   </button>
                 ))}
               </div>
             </div>
-          )}
 
-          <div className="field-row">
-            <div className="field">
-              <span>Orientacyjny budżet</span>
-              <div className="chips">
-                {BUDGETS.map(option => (
-                  <button
-                    type="button"
-                    key={option}
-                    className={`chip ${form.budget === option ? 'is-active' : ''}`}
-                    onClick={() => setForm(current => ({ ...current, budget: current.budget === option ? '' : option }))}
-                  >{option}</button>
-                ))}
-              </div>
+            <label className="honeypot" aria-hidden="true">
+              <span>Strona internetowa</span>
+              <input name="website" value={form.website} onChange={update} tabIndex="-1" autoComplete="off" />
+            </label>
+
+            <label className={`consent ${touched && !form.consent ? 'has-error' : ''}`}>
+              <input type="checkbox" name="consent" checked={form.consent} onChange={update} />
+              <span>Zgadzam się na kontakt w sprawie przesłanego zapytania.</span>
+            </label>
+
+            <div className="form-nav">
+              <button type="button" className="btn btn-ghost" onClick={() => setStep(0)}><ArrowLeft size={16} /> Wróć do projektu</button>
+              <button type="submit" className="btn btn-primary" disabled={state.status === 'loading'}>
+                {state.status === 'loading' ? <><LoaderCircle className="spin" size={18} /> Wysyłam</> : <>Wyślij wiadomość <Send size={17} /></>}
+              </button>
             </div>
-            <div className="field">
-              <span>Termin</span>
-              <div className="chips">
-                {TIMELINES.map(option => (
-                  <button
-                    type="button"
-                    key={option}
-                    className={`chip ${form.timeline === option ? 'is-active' : ''}`}
-                    onClick={() => setForm(current => ({ ...current, timeline: current.timeline === option ? '' : option }))}
-                  >{option}</button>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          <label className={`field ${touched && !stepOneValid ? 'has-error' : ''}`}>
-            <span>O czym myślisz? *</span>
-            <textarea
-              name="message"
-              value={form.message}
-              onChange={update}
-              rows="6"
-              placeholder="Opisz problem, pomysł albo proces, który warto usprawnić."
-            />
-            {touched && !stepOneValid && <i className="field-error">Napisz kilka zdań — minimum 12 znaków.</i>}
-          </label>
-
-          <div className="form-nav">
-            <span className="form-hint">Krok 1 z 2 — najpierw projekt, potem dane.</span>
-            <button type="button" className="btn btn-primary" onClick={next}>
-              Dalej <ArrowRight size={17} />
-            </button>
-          </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          className="form-stage"
-          key="stage-contact"
-          initial={{ opacity: 0, x: 14 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, ease }}
-        >
-          <div className="field-row">
-            <label className={`field ${touched && form.name.trim().length < 2 ? 'has-error' : ''}`}>
-              <span>Imię i nazwisko *</span>
-              <input name="name" value={form.name} onChange={update} autoComplete="name" placeholder="Jak mam się do Ciebie zwracać?" />
-            </label>
-            <label className="field">
-              <span>Firma</span>
-              <input name="company" value={form.company} onChange={update} autoComplete="organization" placeholder="Opcjonalnie" />
-            </label>
-          </div>
-
-          <div className="field-row">
-            <label className={`field ${touched && !isEmail(form.email) ? 'has-error' : ''}`}>
-              <span>E-mail *</span>
-              <input type="email" name="email" value={form.email} onChange={update} autoComplete="email" placeholder="Adres do odpowiedzi" />
-            </label>
-            <label className={`field ${touched && form.contactMethod === 'phone' && form.phone.trim().length < 6 ? 'has-error' : ''}`}>
-              <span>Telefon {form.contactMethod === 'phone' ? '*' : ''}</span>
-              <input type="tel" name="phone" value={form.phone} onChange={update} autoComplete="tel" placeholder="+48…" />
-            </label>
-          </div>
-
-          <div className="field">
-            <span>Jak mam odpowiedzieć?</span>
-            <div className="method-choice">
-              {[['email', 'Mailowo', Mail], ['phone', 'Telefonicznie', Phone]].map(([value, label, Icon]) => (
-                <button
-                  type="button"
-                  key={value}
-                  className={form.contactMethod === value ? 'is-active' : ''}
-                  onClick={() => setForm(current => ({ ...current, contactMethod: value }))}
-                  aria-pressed={form.contactMethod === value}
-                >
-                  <Icon size={15} />{label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <label className="honeypot" aria-hidden="true">
-            <span>Strona internetowa</span>
-            <input name="website" value={form.website} onChange={update} tabIndex="-1" autoComplete="off" />
-          </label>
-
-          <label className={`consent ${touched && !form.consent ? 'has-error' : ''}`}>
-            <input type="checkbox" name="consent" checked={form.consent} onChange={update} />
-            <span>Zgadzam się na kontakt w sprawie przesłanego zapytania.</span>
-          </label>
-
-          <div className="form-nav">
-            <button type="button" className="btn btn-ghost" onClick={() => setStep(0)}>
-              <ArrowLeft size={16} /> Wróć
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={state.status === 'loading'}>
-              {state.status === 'loading'
-                ? <><LoaderCircle className="spin" size={18} /> Wysyłam</>
-                : <>Wyślij wiadomość <Send size={17} /></>}
-            </button>
-          </div>
-
-          {touched && !stepTwoValid && <p className="form-error">Uzupełnij zaznaczone pola, żeby wysłać wiadomość.</p>}
-          {state.status === 'error' && <p className="form-error" role="alert">{state.message}</p>}
-        </motion.div>
-      )}
+            {touched && !stepTwoValid && <p className="form-error">Uzupełnij zaznaczone pola, żeby wysłać wiadomość.</p>}
+            {state.status === 'error' && <p className="form-error" role="alert">{state.message}</p>}
+          </motion.div>
+        )}
+      </div>
     </form>
   )
 }
