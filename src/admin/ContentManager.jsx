@@ -32,8 +32,8 @@ function Lines({ label, value = [], onChange, hint, rows = 4 }) {
 function ImageList({ label, value = [], onChange }) {
   const { busy, upload } = useMedia()
   return (
-    <div className="ad-image-list">
-      <span className="ad-field-label">{label}</span>
+    <div className="ap-image-list">
+      <span className="ap-field-label">{label}</span>
       <Dropzone
         compact
         busy={busy}
@@ -42,14 +42,14 @@ function ImageList({ label, value = [], onChange }) {
           onChange([...value, ...uploaded.map(file => file.url)])
         }}
       />
-      <div className="ad-image-strip">
+      <div className="ap-image-strip">
         {value.map((src, index) => (
           <figure key={`${src}-${index}`}>
             <img src={src} alt="" />
             <button type="button" onClick={() => onChange(value.filter((_, i) => i !== index))} aria-label="Usuń"><Trash2 size={12} /></button>
           </figure>
         ))}
-        {!value.length && <span className="ad-hint">Brak zrzutów ekranu.</span>}
+        {!value.length && <span className="ap-hint">Brak zrzutów ekranu.</span>}
       </div>
     </div>
   )
@@ -57,15 +57,15 @@ function ImageList({ label, value = [], onChange }) {
 
 function Section({ id, title, description, open, onToggle, children }) {
   return (
-    <section className={`ad-section ${open ? 'is-open' : ''}`}>
-      <button type="button" className="ad-section-head" onClick={() => onToggle(open ? '' : id)} aria-expanded={open}>
+    <section className={`ap-section ${open ? 'is-open' : ''}`}>
+      <button type="button" className="ap-section-head" onClick={() => onToggle(open ? '' : id)} aria-expanded={open}>
         <div>
           <h2>{title}</h2>
           <p>{description}</p>
         </div>
         <ChevronDown size={18} />
       </button>
-      {open && <div className="ad-section-body">{children}</div>}
+      {open && <div className="ap-section-body">{children}</div>}
     </section>
   )
 }
@@ -73,7 +73,7 @@ function Section({ id, title, description, open, onToggle, children }) {
 function HeadFields({ data, patch, withLead = true }) {
   return (
     <>
-      <div className="ad-grid-2">
+      <div className="ap-grid-2">
         <Text label="Nagłówek" value={data.title} onChange={title => patch({ title })} />
         <Text label="Nagłówek — część wyróżniona" value={data.accent} onChange={accent => patch({ accent })} />
       </div>
@@ -132,43 +132,43 @@ export default function ContentManager({ notify }) {
   }
 
   if (!draft) {
-    return <div className="ad-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję treści…</div>
+    return <div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję treści…</div>
   }
 
   const toggle = id => setOpen(id)
 
   return (
-    <div className="ad-content-editor">
+    <div className="ap-content-editor">
       {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
-      <div className="ad-content-intro">
+      <div className="ap-content-intro">
         <p>Wszystkie teksty widoczne na stronie głównej. Zmiany pojawiają się od razu po zapisaniu.</p>
-        <button className="ad-btn ad-btn-ghost" onClick={resetAll}><RotateCcw size={14} /> Przywróć domyślne</button>
+        <button className="ap-btn ap-btn-ghost" onClick={resetAll}><RotateCcw size={14} /> Przywróć domyślne</button>
       </div>
 
       <Section id="brand" title="Marka i dane kontaktowe" description="Nazwa, inicjały, podpis i dane widoczne w stopce." open={open === 'brand'} onToggle={toggle}>
-        <div className="ad-grid-3">
+        <div className="ap-grid-3">
           <Text label="Inicjały" value={draft.brand.initials} onChange={initials => patch('brand', { initials })} />
           <Text label="Imię i nazwisko" value={draft.brand.name} onChange={name => patch('brand', { name })} />
           <Text label="Podpis / rola" value={draft.brand.role} onChange={role => patch('brand', { role })} />
         </div>
-        <div className="ad-grid-2">
+        <div className="ap-grid-2">
           <Text label="Hasło (tagline)" value={draft.brand.tagline} onChange={tagline => patch('brand', { tagline })} />
           <Text label="Lokalizacja" value={draft.brand.location} onChange={location => patch('brand', { location })} />
         </div>
-        <div className="ad-grid-2">
+        <div className="ap-grid-2">
           <Text label="E-mail publiczny" value={draft.brand.email} onChange={email => patch('brand', { email })} hint="Puste = ukryte na stronie." />
           <Text label="Telefon publiczny" value={draft.brand.phone} onChange={phone => patch('brand', { phone })} hint="Puste = ukryte na stronie." />
         </div>
       </Section>
 
       <Section id="hero" title="Sekcja powitalna" description="Pierwszy ekran: nagłówek, wprowadzenie i pasek kompetencji." open={open === 'hero'} onToggle={toggle}>
-        <div className="ad-grid-2">
+        <div className="ap-grid-2">
           <Text label="Nagłówek" value={draft.hero.titleTop} onChange={titleTop => patch('hero', { titleTop })} />
           <Text label="Nagłówek — część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
         </div>
         <Area label="Wprowadzenie" value={draft.hero.lead} onChange={lead => patch('hero', { lead })} rows={3} />
-        <div className="ad-grid-2">
+        <div className="ap-grid-2">
           <Text label="Przycisk główny" value={draft.hero.primaryCta} onChange={primaryCta => patch('hero', { primaryCta })} />
           <Text label="Przycisk dodatkowy" value={draft.hero.secondaryCta} onChange={secondaryCta => patch('hero', { secondaryCta })} />
         </div>
@@ -190,7 +190,7 @@ export default function ContentManager({ notify }) {
           itemLabel={item => item.title || 'Usługa'}
           render={(item, update) => (
             <>
-              <div className="ad-grid-3">
+              <div className="ap-grid-3">
                 <Text label="Numer" value={item.no} onChange={no => update({ no })} />
                 <Text label="Nazwa" value={item.title} onChange={title => update({ title })} />
                 <Text label="Hasło" value={item.lead} onChange={lead => update({ lead })} />
@@ -211,7 +211,7 @@ export default function ContentManager({ notify }) {
           itemLabel={item => item.title || 'Karta'}
           render={(item, update) => (
             <>
-              <div className="ad-grid-2">
+              <div className="ap-grid-2">
                 <Text label="Etykieta" value={item.no} onChange={no => update({ no })} placeholder="01 / CZYTA" />
                 <Text label="Tytuł" value={item.title} onChange={title => update({ title })} />
               </div>
@@ -232,7 +232,7 @@ export default function ContentManager({ notify }) {
           itemLabel={item => item.name || 'Realizacja'}
           render={(item, update) => (
             <>
-              <div className="ad-grid-3">
+              <div className="ap-grid-3">
                 <Text label="Nazwa" value={item.name} onChange={name => update({ name })} />
                 <Text label="Adres" value={item.href} onChange={href => update({ href })} />
                 <Text label="Etykieta" value={item.label} onChange={label => update({ label })} />
@@ -256,7 +256,7 @@ export default function ContentManager({ notify }) {
           itemLabel={item => item.title || 'Etap'}
           render={(item, update) => (
             <>
-              <div className="ad-grid-2">
+              <div className="ap-grid-2">
                 <Text label="Numer" value={item.no} onChange={no => update({ no })} />
                 <Text label="Nazwa" value={item.title} onChange={title => update({ title })} />
               </div>

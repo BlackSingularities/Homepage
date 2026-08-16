@@ -19,7 +19,7 @@ export default function MediaManager({ notify }) {
   }
 
   return (
-    <div className="ad-media">
+    <div className="ap-media">
       {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
       <Dropzone busy={busy} onFiles={async files => {
@@ -27,15 +27,15 @@ export default function MediaManager({ notify }) {
         if (uploaded.length) notify(`Wgrano ${uploaded.length} ${uploaded.length === 1 ? 'plik' : 'pliki'}.`)
       }} />
 
-      <div className="ad-media-grid is-large">
+      <div className="ap-media-grid is-large">
         {items.map(item => (
           <figure key={item.name}>
-            <span className="ad-media-thumb"><img src={item.url} alt={item.name} loading="lazy" /></span>
+            <span className="ap-media-thumb"><img src={item.url} alt={item.name} loading="lazy" /></span>
             <figcaption>
               <span title={item.name}>{item.name}</span>
               <i>{formatSize(item.size)} · {formatDay(item.createdAt)}</i>
             </figcaption>
-            <div className="ad-media-actions">
+            <div className="ap-media-actions">
               <button type="button" onClick={() => copy(item.url)}>
                 {copied === item.url ? <><Check size={13} /> Skopiowano</> : <><Copy size={13} /> Kopiuj adres</>}
               </button>
