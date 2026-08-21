@@ -227,7 +227,7 @@ export default function ContentManager({ notify }) {
         <Repeater
           items={draft.work.items}
           onChange={items => patch('work', { items })}
-          create={() => ({ id: uid(), name: '', href: 'https://', label: '', statement: '', description: '', features: [], slides: [], hidden: false })}
+          create={() => ({ id: uid(), name: '', href: 'https://', label: '', statement: '', description: '', features: [], slides: [], hidden: false, linkHidden: false })}
           addLabel="Dodaj realizację"
           itemLabel={item => item.name || 'Realizacja'}
           render={(item, update) => (
@@ -244,6 +244,12 @@ export default function ContentManager({ notify }) {
                 hint="Wyłącz, aby zachować realizację w panelu bez ujawniania jej na stronie."
                 checked={item.hidden !== true}
                 onChange={visible => update({ hidden: !visible })}
+              />
+              <Toggle
+                label="Publiczny link"
+                hint="Wyłącz, aby pokazać realizację bez adresu i przycisku otwierającego."
+                checked={item.linkHidden !== true}
+                onChange={visible => update({ linkHidden: !visible })}
               />
               <Lines label="Funkcje" value={item.features} onChange={features => update({ features })} />
               <ImageList label="Zrzuty ekranu" value={item.slides} onChange={slides => update({ slides })} />

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowUpRight, Check, ChevronLeft, ChevronRight, GitBranch, Terminal } from 'lucide-react'
+import { ArrowUpRight, Check, ChevronLeft, ChevronRight, Eye, GitBranch, Terminal } from 'lucide-react'
 import { Reveal, ease, useTilt } from '../lib/ui'
 import SectionHead from './SectionHead'
 
@@ -27,8 +27,11 @@ export default function Work({ data }) {
   if (!project) return null
 
   const step = direction => setSlide(current => (current + direction + slides.length) % slides.length)
-  const external = project.href.startsWith('http')
-  const address = external ? project.href.replace(/^https?:\/\//, '') : `redzikowski.com${project.href}`
+  const linkAvailable = project.linkHidden !== true && Boolean(project.href)
+  const external = linkAvailable && project.href.startsWith('http')
+  const address = linkAvailable
+    ? (external ? project.href.replace(/^https?:\/\//, '') : `redzikowski.com${project.href}`)
+    : 'Prezentacja na życzenie'
 
   return (
     <section className="section work" id="realizacje">
@@ -141,11 +144,19 @@ export default function Work({ data }) {
               {(project.features || []).map(feature => <li key={feature}><Check size={13} />{feature}</li>)}
             </ul>
           </div>
-          <a className="work-open" href={project.href} target={external ? '_blank' : undefined} rel="noreferrer">
-            <span>Zobacz działający produkt</span>
-            <i>{address}</i>
-            <ArrowUpRight size={18} />
-          </a>
+          {linkAvailable ? (
+            <a className="work-open" href={project.href} target={external ? '_blank' : undefined} rel="noreferrer">
+              <span>Zobacz działający produkt</span>
+              <i>{address}</i>
+              <ArrowUpRight size={18} />
+            </a>
+          ) : (
+            <div className="work-open is-private">
+              <span>Prezentacja na życzenie</span>
+              <i>Adres nie jest publiczny</i>
+              <Eye size={18} />
+            </div>
+          )}
         </footer>
       </motion.div>
     </section>

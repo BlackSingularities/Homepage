@@ -320,7 +320,9 @@ function getPublicContent(content) {
     ...content,
     work: {
       ...content.work,
-      items: (content.work?.items || []).filter(item => item.hidden !== true),
+      items: (content.work?.items || [])
+        .filter(item => item.hidden !== true)
+        .map(item => (item.linkHidden === true ? { ...item, href: '' } : item)),
     },
   }
 }
