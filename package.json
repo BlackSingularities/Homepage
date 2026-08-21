@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:hidden-project": "node scripts/test-hidden-project.mjs",
     "images:optimize": "node scripts/optimize-portfolio-images.mjs"
   },
   "dependencies": {

@@ -5,7 +5,7 @@ import { Reveal, ease, useTilt } from '../lib/ui'
 import SectionHead from './SectionHead'
 
 export default function Work({ data }) {
-  const projects = data.items || []
+  const projects = (data.items || []).filter(item => item.hidden !== true)
   const [active, setActive] = useState(0)
   const [slide, setSlide] = useState(0)
   const [paused, setPaused] = useState(false)
