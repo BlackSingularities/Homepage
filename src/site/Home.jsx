@@ -3,7 +3,6 @@ import Hero from './Hero'
 import Manifesto from './Manifesto'
 import Services from './Services'
 import Intelligence from './Intelligence'
-import Work from './Work'
 import Process from './Process'
 import PagesGrid from './PagesGrid'
 import About from './About'
@@ -14,7 +13,6 @@ const RAIL = [
   ['start', 'Start'],
   ['uslugi', 'Zakres'],
   ['ai', 'AI'],
-  ['realizacje', 'Realizacje'],
   ['proces', 'Proces'],
   ['o-mnie', 'O mnie'],
   ['kontakt', 'Kontakt'],
@@ -27,11 +25,10 @@ export default function Home({ content, pages, onNavigate }) {
     <main>
       <PointerGlow />
       <SectionRail sections={RAIL} />
-      <Hero hero={content.hero} projects={content.work.items} />
+      <Hero hero={content.hero} projects={content.work.items} onNavigate={onNavigate} />
       <Manifesto data={content.manifesto} />
       <Services data={content.services} />
       <Intelligence data={content.intelligence} />
-      <Work data={content.work} />
       <Process data={content.process} />
       <PagesGrid data={content.pagesSection} pages={pages} onNavigate={onNavigate} />
       <About data={content.about} brand={content.brand} />

@@ -82,5 +82,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-private-podrozownik-v7.mjs
             docker compose exec -T homepage_api node server/migrate-home-infra-v8.mjs
             docker compose exec -T homepage_api node server/migrate-offer-pages-v9.mjs
+            docker compose exec -T homepage_api node server/migrate-work-to-offer-page-v10.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f

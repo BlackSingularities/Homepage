@@ -5,7 +5,6 @@ import { useActiveSection } from '../lib/ui'
 
 const NAV = [
   ['uslugi', 'Zakres'],
-  ['realizacje', 'Realizacje'],
   ['proces', 'Proces'],
   ['o-mnie', 'O mnie'],
 ]

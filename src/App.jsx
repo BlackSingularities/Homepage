@@ -54,7 +54,7 @@ export default function App() {
       <Header brand={content.brand} pages={pages} home={isHome} onNavigate={navigate} />
       {isHome
         ? <Home content={content} pages={pages} onNavigate={navigate} />
-        : <PageView slug={slug} onNavigate={navigate} />}
+        : <PageView slug={slug} onNavigate={navigate} work={content.work} />}
       <Footer brand={content.brand} pages={pages} home={isHome} onNavigate={navigate} />
     </div>
   )

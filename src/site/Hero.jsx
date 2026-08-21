@@ -63,7 +63,7 @@ function Showreel({ projects }) {
   )
 }
 
-export default function Hero({ hero, projects }) {
+export default function Hero({ hero, projects, onNavigate }) {
   return (
     <section className="hero" id="start">
       <div className="hero-inner">
@@ -93,7 +93,13 @@ export default function Hero({ hero, projects }) {
             transition={{ duration: 0.8, delay: 0.45, ease }}
           >
             <a className="btn btn-primary" href="#kontakt">{hero.primaryCta} <ArrowRight size={17} /></a>
-            <a className="btn btn-ghost" href="#realizacje">{hero.secondaryCta}</a>
+            <a
+              className="btn btn-ghost"
+              href="/p/strony-aplikacje-cms"
+              onClick={event => { if (onNavigate) { event.preventDefault(); onNavigate('/p/strony-aplikacje-cms') } }}
+            >
+              {hero.secondaryCta}
+            </a>
           </motion.div>
         </motion.div>
 
