@@ -15,7 +15,7 @@
     "lead": "Prowadzę projekty cyfrowe od analizy i koncepcji, przez grafikę, interfejs oraz wykonanie, aż po wdrożenie, utrzymanie i dalszy rozwój. Tworzę na zamówienie strony, aplikacje webowe i autorskie CMS-y, które mogą wykorzystywać dane oraz AI do realnego usprawniania pracy.",
     "primaryCta": "Porozmawiajmy",
     "secondaryCta": "Wybrane realizacje",
-    "marquee": ["Analiza i strategia", "Projektowanie", "Aplikacje webowe", "Autorskie CMS-y", "Dane i AI", "Opieka i rozwój"]
+    "marquee": ["Analiza i strategia", "Projektowanie", "Aplikacje webowe", "Autorskie CMS-y", "Dane i AI", "Infrastruktura i smart home", "Opieka i rozwój"]
   },
   "manifesto": {
     "label": "",
@@ -65,6 +65,13 @@
         "title": "Wdrożenie, opieka i rozwój",
         "lead": "Uruchomienie produktu nie kończy współpracy.",
         "detail": "Dbam o bezpieczne wdrożenie, konfigurację, monitoring i wygodną obsługę. Mogę dalej utrzymywać system, reagować na potrzeby użytkowników, rozwijać kolejne moduły i wspierać Cię w codziennej pracy z produktem."
+      },
+      {
+        "id": "svc-home",
+        "no": "06",
+        "title": "Infrastruktura domowa i smart home",
+        "lead": "Sieć, serwer i dom, które po prostu działają — bez przypadkowych ustawień i porzuconych po pół roku projektów.",
+        "detail": "Stawiam serwery domowe i self-hosting na Dockerze i Proxmoksie, konfiguruję NAS-y, sieć i kopie zapasowe, a do tego integruję smart home w Home Assistant — od pojedynczych automatyzacji po cały dom sterowany z jednego miejsca. Zajmuję się też DNS-em i prywatnością: AdGuard Home blokujący reklamy i śledzenie w całej sieci oraz bezpieczny zdalny dostęp przez VPN, bez wystawiania portów na świat."
       }
     ]
   },
@@ -226,7 +233,7 @@
     "accent": "I zostaję po wdrożeniu.",
     "lead": "Jestem analitykiem danych, projektantem i twórcą aplikacji webowych. Kocham podróże, lubię robić zdjęcia i czasami fotografuję także komercyjnie.",
     "text": "Łączę kompetencje, które w większych realizacjach często są rozdzielone pomiędzy kilka osób. Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje oraz wewnętrzne systemy zarządzania — zawsze od zera i pod konkretny sposób działania. Fotografia jest dla mnie drugim sposobem opowiadania o miejscach i ludziach; w galerii pokazuję najlepsze oraz najbardziej lubiane przeze mnie kadry. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
-    "strengths": ["Analityka danych i raportowanie", "Grafika i projektowanie interfejsów", "Aplikacje oraz systemy webowe", "Autorskie CMS-y i panele zarządzania", "Automatyzacja, AI i dalsza opieka"]
+    "strengths": ["Analityka danych i raportowanie", "Grafika i projektowanie interfejsów", "Aplikacje oraz systemy webowe", "Autorskie CMS-y i panele zarządzania", "Automatyzacja, AI i dalsza opieka", "Sieci, serwery domowe i smart home"]
   },
   "faq": {
     "kicker": "",
@@ -245,7 +252,8 @@
       { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu, dostępów oraz materiałów ustalamy jasno przed rozpoczęciem. Projekt nie powinien uzależniać klienta od jednej osoby przez brak dokumentacji lub dostępu do infrastruktury. Zakres przekazania dopasowuję do modelu współpracy i późniejszej opieki." },
       { "q": "Czy dbasz o wydajność, bezpieczeństwo i dostępność?", "a": "Tak — traktuję je jako część jakości produktu, a nie dodatki na ostatnią chwilę. Dobieram rozwiązania do ryzyka i charakteru danych, pilnuję szybkości działania, poprawnego zachowania na różnych urządzeniach oraz czytelnej obsługi. Przy bardziej wymagających systemach zakres zabezpieczeń i monitoringu ustalam osobno." },
       { "q": "Czy pracujesz tylko z klientami z Łodzi?", "a": "Nie. Jestem związany z Łodzią i chętnie spotykam się lokalnie, ale cały proces może przebiegać zdalnie. Najważniejsze są sprawna komunikacja, dostęp do osób decyzyjnych i regularne zatwierdzanie kolejnych etapów." },
-      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." }
+      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." },
+      { "q": "Czy zajmujesz się też siecią, serwerem domowym albo smart home?", "a": "Tak — to naturalne rozszerzenie tego, czym się zajmuję. Stawiam serwery domowe i self-hosting (Docker, Proxmox, NAS), konfiguruję sieć i DNS z AdGuard Home, integruję smart home w Home Assistant oraz zapewniam bezpieczny zdalny dostęp przez VPN. Jeśli aplikacja albo CMS mają w końcu działać na czymś konkretnym — mogę przygotować i to zaplecze." }
     ]
   },
   "pagesSection": {
