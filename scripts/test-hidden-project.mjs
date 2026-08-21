@@ -51,10 +51,14 @@ try {
   const migration = path.join(root, 'server/migrate-hide-podrozownik-v6.mjs')
   await run(migration, { DATA_DIR: dataDir })
   await run(migration, { DATA_DIR: dataDir })
+  const privateMigration = path.join(root, 'server/migrate-private-podrozownik-v7.mjs')
+  await run(privateMigration, { DATA_DIR: dataDir })
+  await run(privateMigration, { DATA_DIR: dataDir })
 
   const migrated = JSON.parse(await fs.readFile(path.join(dataDir, 'content.json'), 'utf8'))
   const privateProject = migrated.work.items.find(item => item.id === 'prj-podrozownik')
-  assert.equal(privateProject?.hidden, true)
+  assert.equal(privateProject?.hidden, false)
+  assert.equal(privateProject?.linkHidden, true)
 
   const port = await freePort()
   server = spawn(process.execPath, ['server/index.mjs'], {
@@ -74,10 +78,11 @@ try {
   const response = await fetch(`http://127.0.0.1:${port}/api/content`)
   assert.equal(response.ok, true)
   const publicData = await response.json()
-  const leaked = publicData.content.work.items.filter(item => (
-    item.id === 'prj-podrozownik' || item.href === '/travels' || item.name === 'Podróżownik'
-  ))
-  assert.equal(leaked.length, 0)
+  const publicProject = publicData.content.work.items.find(item => item.id === 'prj-podrozownik')
+  assert.equal(publicProject?.name, 'Podróżownik')
+  assert.equal(publicProject?.href, '')
+  assert.equal(publicProject?.linkHidden, true)
+  assert.equal(JSON.stringify(publicData).includes('/travels'), false)
   console.log('hidden project migration and public API filtering: OK')
 } finally {
   server?.kill()

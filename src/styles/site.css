@@ -938,6 +938,8 @@
 
 .work-open svg { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--gold); }
 .work-open:hover { transform: translateY(-3px); background: linear-gradient(135deg, rgba(231, 198, 138, .16), rgba(231, 198, 138, .04)); }
+.work-open.is-private { cursor: default; }
+.work-open.is-private:hover { transform: none; background: rgba(255, 255, 255, .025); }
 
 .work-viewport {
   cursor: grab;
