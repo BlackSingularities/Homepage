@@ -5,7 +5,12 @@ export default function SectionHead({ title, accent, lead, align = 'split' }) {
     <Reveal className={`section-head is-${align}`}>
       <div className="section-head-main">
         <h2>{title} {accent && <em className="accent">{accent}</em>}</h2>
-        {lead && <p>{lead}</p>}
+        {lead && (
+          <div className="section-head-lead">
+            <i aria-hidden="true" />
+            <p>{lead}</p>
+          </div>
+        )}
       </div>
     </Reveal>
   )
