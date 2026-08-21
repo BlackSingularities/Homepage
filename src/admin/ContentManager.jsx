@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, LoaderCircle, RotateCcw, Trash2 } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
-import { Area, Dropzone, Field, Notice, Repeater, SaveBar, Text, useMedia } from './parts'
+import { Area, Dropzone, Field, Notice, Repeater, SaveBar, Text, Toggle, useMedia } from './parts'
 
 /**
  * Newline-separated editor for arrays of plain strings. The textarea keeps its
@@ -227,7 +227,7 @@ export default function ContentManager({ notify }) {
         <Repeater
           items={draft.work.items}
           onChange={items => patch('work', { items })}
-          create={() => ({ id: uid(), name: '', href: 'https://', label: '', statement: '', description: '', features: [], slides: [] })}
+          create={() => ({ id: uid(), name: '', href: 'https://', label: '', statement: '', description: '', features: [], slides: [], hidden: false })}
           addLabel="Dodaj realizację"
           itemLabel={item => item.name || 'Realizacja'}
           render={(item, update) => (
@@ -239,6 +239,12 @@ export default function ContentManager({ notify }) {
               </div>
               <Text label="Zdanie przewodnie" value={item.statement} onChange={statement => update({ statement })} wide />
               <Area label="Opis" value={item.description} onChange={description => update({ description })} rows={3} />
+              <Toggle
+                label="Widoczna publicznie"
+                hint="Wyłącz, aby zachować realizację w panelu bez ujawniania jej na stronie."
+                checked={item.hidden !== true}
+                onChange={visible => update({ hidden: !visible })}
+              />
               <Lines label="Funkcje" value={item.features} onChange={features => update({ features })} />
               <ImageList label="Zrzuty ekranu" value={item.slides} onChange={slides => update({ slides })} />
             </>

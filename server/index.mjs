@@ -315,6 +315,16 @@ async function getContent() {
   return mergeContent(await readJson(CONTENT_FILE, {}))
 }
 
+function getPublicContent(content) {
+  return {
+    ...content,
+    work: {
+      ...content.work,
+      items: (content.work?.items || []).filter(item => item.hidden !== true),
+    },
+  }
+}
+
 /* ── pages (CMS subpages) ────────────────────────────────────────────── */
 
 const BLOCK_BUILDERS = {
@@ -607,7 +617,7 @@ app.get('/api/content', async (_req, res) => {
   const [content, pages] = await Promise.all([getContent(), readJson(PAGES_FILE, [])])
   res.set('Cache-Control', 'no-cache')
   res.json({
-    content,
+    content: getPublicContent(content),
     pages: pages.filter(page => page.published !== false).sort(byOrder).map(publicPageSummary),
   })
 })
