@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { ease } from '../lib/ui'
+import TextBreak from './TextBreak'
 
 export default function Manifesto({ data }) {
   const reduce = useReducedMotion()
@@ -17,7 +18,7 @@ export default function Manifesto({ data }) {
             viewport={{ once: true, amount: 0.65 }}
             transition={{ duration: 0.8, delay: index * 0.12, ease }}
           >
-            {line}
+            <TextBreak text={line} before={index === lines.length - 1 ? 'sposobu pracy.' : undefined} />
           </motion.p>
         ))}
       </div>

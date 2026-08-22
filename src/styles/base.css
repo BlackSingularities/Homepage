@@ -111,6 +111,9 @@ em.accent,
   padding-right: .06em;
 }
 
+.text-new-line,
+.section-head .accent.is-new-line { display: block; }
+
 .kinetic-word { display: inline-block; white-space: pre; }
 
 /* ── page furniture ─────────────────────────────────────────────── */

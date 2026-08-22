@@ -1,4 +1,5 @@
 import { Reveal } from '../lib/ui'
+import TextBreak from './TextBreak'
 
 export default function About({ data, brand }) {
   return (
@@ -6,7 +7,10 @@ export default function About({ data, brand }) {
       <div className="about-body">
         <div className="about-content">
           <div className="about-intro">
-            <Reveal as="h2" className="about-title">{data.title} <em className="accent">{data.accent}</em></Reveal>
+            <Reveal as="h2" className="about-title">
+              {data.title}{' '}
+              <em className="accent"><TextBreak text={data.accent} before="po wdrożeniu." /></em>
+            </Reveal>
             <Reveal className="about-visual" delay={0.08} y={18}>
               <img
                 src="/assets/brand/about-system-web.png"

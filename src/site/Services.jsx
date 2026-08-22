@@ -34,7 +34,7 @@ export default function Services({ data }) {
 
   return (
     <section className="section services" id="uslugi">
-      <SectionHead title={data.title} accent={data.accent} lead={data.lead} />
+      <SectionHead title={data.title} accent={data.accent} lead={data.lead} accentOnNewLine />
 
       {/* Selector on wide screens, accordion on narrow ones — CSS picks one. */}
       <Reveal className="svc-layout">
