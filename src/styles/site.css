@@ -525,14 +525,15 @@
   font-weight: 800;
   letter-spacing: -.045em;
   color: var(--gold);
+  background-color: #a77a3e;
   background-image:
-    linear-gradient(rgba(239, 225, 196, .7), rgba(192, 145, 65, .68)),
-    url('/assets/brand/ticker-pattern.png');
-  background-position: center;
+    linear-gradient(rgba(22, 14, 5, .12), rgba(22, 14, 5, .12)),
+    url('/assets/brand/ticker-text-pattern-imagegen.webp');
+  background-position: 0 0;
   background-size: auto, 360px 360px;
   background-repeat: repeat;
   background-attachment: fixed;
-  background-blend-mode: screen;
+  background-blend-mode: multiply, normal;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
