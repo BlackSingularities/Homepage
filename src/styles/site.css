@@ -318,7 +318,7 @@
 
 .hero-inner {
   display: grid;
-  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(0, .96fr) minmax(0, 1.04fr);
   gap: clamp(20px, 2.4vw, 36px);
   align-items: center;
   padding: clamp(30px, 5vw, 70px) 0 clamp(24px, 3vw, 44px);
