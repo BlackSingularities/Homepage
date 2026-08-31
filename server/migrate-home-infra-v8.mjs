@@ -85,7 +85,7 @@ if (!pages.some(page => page.slug === slug)) {
     kicker: 'Poza aplikacjami',
     excerpt: 'Serwery domowe, sieć, DNS i smart home — zaplecze, na którym Twoje projekty i dom działają bez przypadkowych ustawień.',
     lead: 'Poza pisaniem aplikacji stawiam też fizyczne i sieciowe zaplecze, na którym te aplikacje — i cały dom — mogą działać. Serwer, sieć, automatyzacje i prywatność, poukładane raz, a dobrze.',
-    cover: '',
+    cover: '/assets/brand/home-infrastructure.webp',
     seoDescription: 'Serwery domowe, self-hosting, smart home w Home Assistant, AdGuard Home i VPN — infrastruktura, którą projektuję i stawiam poza aplikacjami webowymi.',
     accent: 'mint',
     published: true,

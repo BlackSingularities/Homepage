@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, Camera, FileStack, Files, Image, Inbox, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toggle } from './parts'
 import PagesManager from './PagesManager'
 import ContentManager from './ContentManager'
-import MediaManager from './MediaManager'
 import '../styles/admin.css'
 
 const TABS = [
@@ -16,7 +15,6 @@ const TABS = [
   ['submissions', 'Zgłoszenia', MessageSquareText],
   ['pages', 'Podstrony', Files],
   ['content', 'Treści strony', FileStack],
-  ['media', 'Zdjęcia', Image],
   ['gallery', 'Galeria', Camera],
   ['inbox', 'Odebrane', Inbox],
   ['outbox', 'Wysłane', MailCheck],
@@ -329,12 +327,6 @@ function AuthScreen({ mode, onAuthenticated }) {
 function GalleryManager() {
   return (
     <div className="ap-gallery-manager">
-      <div className="ap-gallery-toolbar">
-        <p>Portfolio, albumy klientów, upload i metadane zdjęć — dostępne w tej samej sesji administratora.</p>
-        <a className="ap-btn ap-btn-ghost" href="/galeria/admin" target="_blank" rel="noreferrer">
-          Otwórz pełny widok <ArrowUpRight size={14} />
-        </a>
-      </div>
       <iframe className="ap-gallery-frame" title="Zarządzanie galerią" src="/galeria/admin?embedded=1" />
     </div>
   )
@@ -449,8 +441,8 @@ function AdminPanel({ admin, onLogout }) {
         <a className="ap-back" href="/"><ArrowLeft size={15} /> <span>Wróć na stronę</span></a>
       </aside>
 
-      <main className="ap-main">
-        <header className="ap-header">
+      <main className={`ap-main ${tab === 'gallery' ? 'is-gallery' : ''}`}>
+        {tab !== 'gallery' && <header className="ap-header">
           <div>
             <span>redzikowski.com / {admin.username}</span>
             <h1>{active?.[1]}</h1>
@@ -466,14 +458,14 @@ function AdminPanel({ admin, onLogout }) {
               <LogOut size={14} /> Wyloguj
             </button>
           </div>
-        </header>
+        </header>}
 
         <AnimatePresence>
           {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
           {notice && <Notice tone="success" onClose={() => setNotice('')}>{notice}</Notice>}
         </AnimatePresence>
 
-        <motion.div className="ap-body" key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+        <motion.div className={`ap-body ${tab === 'gallery' ? 'is-gallery' : ''}`} key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
 
           {tab === 'submissions' && (
@@ -483,8 +475,6 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'pages' && <PagesManager notify={notify} />}
 
           {tab === 'content' && <ContentManager notify={notify} />}
-
-          {tab === 'media' && <MediaManager notify={notify} />}
 
           {tab === 'gallery' && <GalleryManager />}
 

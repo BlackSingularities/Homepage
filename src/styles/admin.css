@@ -543,15 +543,11 @@
 .ap-dropzone b { font-size: 13px; }
 .ap-dropzone span { font-size: 11.5px; color: var(--ink-4); }
 
-.ap-media { display: grid; gap: 16px; }
-
 .ap-media-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
 }
-
-.ap-media-grid.is-large { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 
 .ap-media-grid figure {
   margin: 0;
@@ -561,8 +557,7 @@
   background: #0b0b0f;
 }
 
-.ap-media-grid figure > button,
-.ap-media-thumb {
+.ap-media-grid figure > button {
   display: block;
   width: 100%;
   padding: 0;
@@ -601,31 +596,6 @@
 }
 
 .ap-media-grid figcaption button:hover { color: #ff9d88; }
-
-.ap-media-actions {
-  display: flex;
-  gap: 6px;
-  padding: 0 11px 11px;
-}
-
-.ap-media-actions button {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 7px;
-  border: 1px solid var(--ap-line);
-  border-radius: 9px;
-  background: transparent;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--ink-3);
-  transition: .2s;
-}
-
-.ap-media-actions button:hover { color: var(--ink); border-color: var(--ap-line-strong); }
-.ap-media-actions .is-danger:hover { color: #ff9d88; border-color: rgba(255, 138, 116, .5); }
 
 .ap-image-picker { display: grid; gap: 7px; }
 
@@ -1299,33 +1269,21 @@
   .ap-savebar { left: 12px; right: 12px; translate: none; justify-content: space-between; border-radius: 18px; padding: 12px 14px; }
 }
 .ap-gallery-manager {
-  display: grid;
-  gap: 16px;
   min-width: 0;
+  height: 100vh;
 }
 
-.ap-gallery-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.ap-gallery-toolbar p {
-  color: var(--ink-3);
-  line-height: 1.6;
-}
+.ap-main.is-gallery { padding: 0; overflow: hidden; }
+.ap-body.is-gallery { display: block; height: 100vh; }
 
 .ap-gallery-frame {
+  display: block;
   width: 100%;
-  min-height: 760px;
-  height: calc(100vh - 210px);
-  border: 1px solid var(--ap-line);
-  border-radius: 18px;
+  height: 100%;
+  border: 0;
   background: #08080c;
 }
 
 @media (max-width: 800px) {
-  .ap-gallery-toolbar { align-items: flex-start; flex-direction: column; }
-  .ap-gallery-frame { min-height: 680px; height: calc(100vh - 250px); }
+  .ap-gallery-manager, .ap-body.is-gallery { height: calc(100vh - 59px); }
 }

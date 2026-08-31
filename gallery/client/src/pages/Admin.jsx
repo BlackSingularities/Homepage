@@ -789,15 +789,17 @@ export default function Admin() {
 
       <div className="admin-wrap">
         <aside className="admin-side">
-          <p className="admin-side-title">Zarządzanie</p>
+          <p className="admin-side-title">{embedded ? 'Galeria' : 'Zarządzanie'}</p>
           {tabs.map(t => (
             <button key={t.id} className={`admin-nav-link ${tab === t.id ? 'active' : ''}`}
               onClick={() => navigate(t.id)}>
               {t.icon} {t.label}
             </button>
           ))}
-          <div className="admin-nav-sep" />
-          <a className="admin-nav-link" style={{ color:'var(--text-3)' }} href="/admin" target={embedded ? '_top' : undefined}>Panel główny</a>
+          {!embedded && <>
+            <div className="admin-nav-sep" />
+            <a className="admin-nav-link" style={{ color:'var(--text-3)' }} href="/admin">Panel główny</a>
+          </>}
         </aside>
 
         <main className="admin-main">
