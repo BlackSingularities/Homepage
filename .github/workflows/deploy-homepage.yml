@@ -73,6 +73,7 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-playmaster.mjs
             docker compose exec -T homepage_api node server/migrate-arcadia.mjs
             docker compose exec -T homepage_api node server/migrate-blinkbeam.mjs
+            docker compose exec -T homepage_api node server/migrate-traffic-timeline.mjs
             docker compose exec -T homepage_api node server/migrate-personal-brand-v2.mjs
             docker compose exec -T homepage_api node server/migrate-expanded-faq-v3.mjs
             docker compose exec -T homepage_api node server/migrate-gallery-integration.mjs

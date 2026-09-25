@@ -201,6 +201,18 @@
         "slides": ["/assets/portfolio/blinkbeam-1.png"]
       },
       {
+        "id": "prj-traffic-timeline",
+        "name": "Traffic Timeline",
+        "href": "/komunikacja/",
+        "hidden": false,
+        "linkHidden": false,
+        "label": "Transport publiczny / mapy",
+        "statement": "Cała doba komunikacji publicznej w Polsce, odtworzona z rozkładów jazdy na żywej mapie.",
+        "description": "Oficjalne rozkłady GTFS z kilkunastu miast i całej sieci kolejowej przeliczone na ruch pojazdów w czasie. Każde źródło to osobna warstwa: tramwaje, autobusy, metro i pociągi wszystkich przewoźników.",
+        "features": ["animacja kursów w ciągu doby", "warstwy miast i przewoźników kolejowych", "sieć tras i obciążenie przystanków", "linki do konkretnego widoku i godziny"],
+        "slides": ["/assets/portfolio/traffic-timeline-1.png"]
+      },
+      {
         "id": "prj-gallery",
         "name": "Galeria fotograficzna",
         "href": "/galeria/",
