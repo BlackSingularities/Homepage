@@ -225,6 +225,18 @@
         "slides": ["/assets/portfolio/eastflanker-1.png"]
       },
       {
+        "id": "prj-ukladokresowy",
+        "name": "Układ Okresowy",
+        "href": "/ukladokresowy/",
+        "hidden": false,
+        "linkHidden": false,
+        "label": "Edukacja / wizualizacja danych",
+        "statement": "Interaktywny atlas 118 pierwiastków z własnym panelem redakcyjnym.",
+        "description": "Tablica Mendelejewa jako narzędzie, nie plakat: mapy cieplne właściwości, stan skupienia w dowolnej temperaturze, porównywarka i kalkulator masy molowej. Dane bazowe synchronizowane z otwartego źródła, polskie treści redagowane w CMS z pełną historią zmian.",
+        "features": ["mapy cieplne 8 właściwości", "stan skupienia od 0 do 6000 K", "porównywarka i kalkulator masy molowej", "CMS z historią zmian i synchronizacją API"],
+        "slides": ["/assets/portfolio/ukladokresowy-1.png", "/assets/portfolio/ukladokresowy-2.png", "/assets/portfolio/ukladokresowy-3.png"]
+      },
+      {
         "id": "prj-gallery",
         "name": "Galeria fotograficzna",
         "href": "/galeria/",
