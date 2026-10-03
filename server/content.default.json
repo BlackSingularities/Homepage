@@ -213,6 +213,18 @@
         "slides": ["/assets/portfolio/traffic-timeline-1.png"]
       },
       {
+        "id": "prj-eastflanker",
+        "name": "East Flanker",
+        "href": "/eastflanker/",
+        "hidden": false,
+        "linkHidden": false,
+        "label": "OSINT / analiza danych",
+        "statement": "Obraz sytuacji na wschodniej flance NATO, złożony na żywo z kilkudziesięciu otwartych źródeł.",
+        "description": "Ruch lotniczy i morski, zakłócenia GNSS, infrastruktura podmorska, łączność, sejsmika i doniesienia medialne na jednej mapie. System wykrywa anomalie, łączy zdarzenia z różnych dziedzin w zbieżności i przygotowuje raport dnia.",
+        "features": ["ADS-B i AIS w czasie rzeczywistym", "mapa zakłóceń GNSS z przedziałami ufności", "anomalie statków nad kablami i rurociągami", "zbieżności zdarzeń i raport dnia"],
+        "slides": ["/assets/portfolio/eastflanker-1.png"]
+      },
+      {
         "id": "prj-gallery",
         "name": "Galeria fotograficzna",
         "href": "/galeria/",
