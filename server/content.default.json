@@ -237,6 +237,18 @@
         "slides": ["/assets/portfolio/ukladokresowy-1.png", "/assets/portfolio/ukladokresowy-2.png", "/assets/portfolio/ukladokresowy-3.png"]
       },
       {
+        "id": "prj-photostar",
+        "name": "PhotoStar",
+        "href": "/photostar/",
+        "hidden": false,
+        "linkHidden": false,
+        "label": "Astronomia / analiza obrazu",
+        "statement": "Rozpoznaje gwiazdy na zdjęciu nieba i pokazuje, na jaki fragment nieba patrzysz.",
+        "description": "Własny serwer z astrometry.net dopasowuje wykryte gwiazdy do katalogu Tycho-2 bez żadnych podpowiedzi, a potem nakłada na zdjęcie gwiazdozbiory, 41 tys. gwiazd, 15 tys. mgławic i galaktyk, planety oraz horyzont. Do tego aparat z celownikiem AR i trybem nocnym oraz eksport plakatu. Prywatnie: wynik widzi tylko autor, a serwer kasuje zdjęcia po dobie. Za darmo, bez kont i limitów.",
+        "features": ["rozwiązanie astrometryczne bez podpowiedzi", "warstwy: gwiazdozbiory, obiekty, planety, horyzont", "aparat z celownikiem AR i składaniem klatek", "eksport plakatu, CSV i nagłówka WCS"],
+        "slides": ["/assets/portfolio/photostar-1.png", "/assets/portfolio/photostar-2.png", "/assets/portfolio/photostar-3.png"]
+      },
+      {
         "id": "prj-gallery",
         "name": "Galeria fotograficzna",
         "href": "/galeria/",
