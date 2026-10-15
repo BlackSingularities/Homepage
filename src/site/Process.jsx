@@ -10,7 +10,7 @@ export default function Process({ data }) {
 
   return (
     <section className="section process" id="proces">
-      <SectionHead title={data.title} accent={data.accent} lead={data.lead} accentOnNewLine />
+      <SectionHead title={data.title} accent={data.accent} lead={data.lead} />
       <div className="proc-track" ref={ref}>
         <div className="proc-line" aria-hidden="true"><motion.i style={{ scaleX: line }} /></div>
         <div className="proc-steps">

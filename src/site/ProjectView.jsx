@@ -1,0 +1,267 @@
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
+import {
+  CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL,
+  formatBytes, formatReleaseDate, hostOf,
+} from '../lib/projects'
+import { Reveal, ease } from '../lib/ui'
+
+function Paragraphs({ text }) {
+  return String(text || '')
+    .split(/\n{2,}/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph, index) => <p key={index}>{paragraph}</p>)
+}
+
+/**
+ * Pliki do pobrania. Jedna pozycja na platformę w kolejności ustalonej na
+ * serwerze, obok rozmiar i wersja — to dane, więc idą fontem monospace.
+ * Pliki z prywatnych repozytoriów lecą przez proxy API, więc adres jest
+ * zawsze względny i nie ujawnia tokenu.
+ */
+function Downloads({ project }) {
+  if (!project.downloads.length) {
+    if (project.kind !== 'app') return null
+    return (
+      <div className="pv-downloads is-empty">
+        <p>Wydanie publiczne jeszcze nie jest gotowe. Napisz, jeśli chcesz zobaczyć wersję roboczą.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pv-downloads">
+      <div className="pv-downloads-head">
+        <h2>Do pobrania</h2>
+        {project.release && (
+          <p className="pv-release">
+            <span className="mono">{project.release.tag}</span>
+            {project.release.publishedAt && <> · wydane {formatReleaseDate(project.release.publishedAt)}</>}
+            {project.release.url && (
+              <> · <a href={project.release.url} target="_blank" rel="noreferrer">historia wydań</a></>
+            )}
+          </p>
+        )}
+      </div>
+
+      <ul className="pv-files">
+        {project.downloads.map(file => {
+          const Icon = PLATFORM_ICON[file.platform] || PLATFORM_ICON.other
+          return (
+            <li key={file.id}>
+              <a href={file.url} download>
+                <Icon size={18} aria-hidden="true" />
+                <span className="pv-file-main">
+                  <strong>{PLATFORM_LABEL[file.platform] || file.platform}</strong>
+                  {file.label && <span className="mono">{file.label}</span>}
+                </span>
+                <span className="pv-file-meta mono">
+                  {file.version && <i>{file.version}</i>}
+                  {formatBytes(file.size) && <i>{formatBytes(file.size)}</i>}
+                </span>
+                <Download size={17} aria-hidden="true" />
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+function Gallery({ shots, name, onZoom }) {
+  if (!shots.length) return null
+  return (
+    <Reveal className={`pv-gallery ${shots.length === 1 ? 'is-single' : ''}`} amount={0.1}>
+      {shots.map((shot, index) => (
+        <button type="button" key={shot.src} onClick={() => onZoom(shot.src)}>
+          <img
+            src={shot.src}
+            alt={shot.alt || `${name} — ekran ${index + 1}`}
+            loading={index === 0 ? 'eager' : 'lazy'}
+          />
+        </button>
+      ))}
+    </Reveal>
+  )
+}
+
+export default function ProjectView({ slug, onNavigate }) {
+  const [data, setData] = useState(null)
+  const [status, setStatus] = useState('loading')
+  const [zoom, setZoom] = useState('')
+
+  useEffect(() => {
+    let active = true
+    setStatus('loading')
+    fetch(`/api/projects/${encodeURIComponent(slug)}`)
+      .then(response => (response.ok ? response.json() : Promise.reject(new Error('404'))))
+      .then(payload => { if (active) { setData(payload); setStatus('ready') } })
+      .catch(() => active && setStatus('missing'))
+    return () => { active = false }
+  }, [slug])
+
+  useEffect(() => {
+    if (data?.project) document.title = `${data.project.name} — Adam Rędzikowski`
+  }, [data])
+
+  useEffect(() => {
+    const onKey = event => event.key === 'Escape' && setZoom('')
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  if (status === 'loading') {
+    return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>Wczytuję realizację…</span></main>
+  }
+
+  if (status === 'missing') {
+    return (
+      <main className="page-state">
+        <h1>404</h1>
+        <p>Tej realizacji nie ma w rejestrze albo nie jest opublikowana.</p>
+        <a
+          className="btn btn-primary"
+          href={CATALOG_PATH}
+          onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
+        >
+          Wróć do rejestru
+        </a>
+      </main>
+    )
+  }
+
+  const { project, previous, next } = data
+  const external = project.siteUrl?.startsWith('http')
+
+  return (
+    <main className="project-view">
+      <div className="section">
+        <a
+          className="pv-back"
+          href={CATALOG_PATH}
+          onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
+        >
+          <ArrowLeft size={15} /> Rejestr realizacji
+        </a>
+
+        <header className="pv-head">
+          <div className="pv-head-main">
+            <span className="pv-tags">
+              <span className="reg-kind" data-kind={project.kind}>{KIND_LABEL[project.kind] || project.kind}</span>
+              {project.label && <span className="reg-label">{project.label}</span>}
+              {project.year && <span className="reg-year mono">{project.year}</span>}
+            </span>
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>
+              {project.name}
+            </motion.h1>
+            {project.tagline && <p className="pv-tagline">{project.tagline}</p>}
+          </div>
+
+          <div className="pv-head-side">
+            {project.siteUrl && (
+              <a className="btn btn-primary" href={project.siteUrl} target={external ? '_blank' : undefined} rel="noreferrer">
+                Otwórz {project.kind === 'app' ? 'stronę' : 'serwis'} <ExternalLink size={16} />
+              </a>
+            )}
+            {project.siteUrl && <span className="pv-host mono">{hostOf(project.siteUrl)}</span>}
+            {!project.siteUrl && project.kind === 'web' && (
+              <span className="pv-host mono is-quiet">Adres nie jest publiczny — prezentacja na życzenie.</span>
+            )}
+            {project.repo && (
+              <a className="pv-repo mono" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">
+                github.com/{project.repo}
+              </a>
+            )}
+          </div>
+        </header>
+
+        <Gallery shots={project.shots} name={project.name} onZoom={setZoom} />
+
+        <div className="pv-body">
+          <div className="pv-copy">
+            {project.summary && <p className="pv-summary">{project.summary}</p>}
+            <Paragraphs text={project.body} />
+          </div>
+
+          <aside className="pv-side">
+            {project.features.length > 0 && (
+              <div className="pv-panel">
+                <h2>Co potrafi</h2>
+                <ul className="pv-features">
+                  {project.features.map(feature => (
+                    <li key={feature}><Check size={13} aria-hidden="true" />{feature}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {project.stack.length > 0 && (
+              <div className="pv-panel">
+                <h2>Technologie</h2>
+                <ul className="pv-stack">
+                  {project.stack.map(item => <li className="mono" key={item}>{item}</li>)}
+                </ul>
+              </div>
+            )}
+            {project.role && (
+              <div className="pv-panel">
+                <h2>Mój udział</h2>
+                <p>{project.role}</p>
+              </div>
+            )}
+          </aside>
+        </div>
+
+        <Downloads project={project} />
+
+        {(previous || next) && (
+          <nav className="pv-nav" aria-label="Inne realizacje">
+            {previous && (
+              <a
+                href={`${CATALOG_PATH}/${previous.slug}`}
+                onClick={event => { event.preventDefault(); onNavigate(`${CATALOG_PATH}/${previous.slug}`) }}
+              >
+                <ArrowLeft size={15} />
+                <span>Poprzednia<strong>{previous.name}</strong></span>
+              </a>
+            )}
+            {next && (
+              <a
+                className="is-next"
+                href={`${CATALOG_PATH}/${next.slug}`}
+                onClick={event => { event.preventDefault(); onNavigate(`${CATALOG_PATH}/${next.slug}`) }}
+              >
+                <span>Następna<strong>{next.name}</strong></span>
+                <ArrowRight size={15} />
+              </a>
+            )}
+          </nav>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {zoom && (
+          <motion.div
+            className="lightbox"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setZoom('')}
+          >
+            <button aria-label="Zamknij"><X size={20} /></button>
+            <motion.img
+              src={zoom}
+              alt=""
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.97, opacity: 0 }}
+              transition={{ duration: 0.28, ease }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
+  )
+}

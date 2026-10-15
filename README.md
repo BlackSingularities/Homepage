@@ -1,7 +1,12 @@
 # redzikowski.com — strona ofertowa + panel
 
-Strona ofertowa (React + Vite) i lekki CMS na Node/Express. Wszystkie treści strony
-głównej oraz dowolna liczba podstron są edytowalne z panelu `/admin`.
+Strona ofertowa (React + Vite) i lekki CMS na Node/Express. Treści strony głównej,
+rejestr realizacji i dowolna liczba podstron są edytowalne z panelu `/admin`.
+
+Oprawa wizualna jest wspólna z Arcadią: tło `GlyphField` (siatka znaków z falami po
+kliknięciu), chłodna paleta z niebieskim akcentem i fonty Space Grotesk / Inter Tight /
+JetBrains Mono. Font monospace niesie wyłącznie dane techniczne — wersje, rozmiary
+plików, platformy i daty wydań.
 
 ## Uruchomienie lokalne
 
@@ -53,8 +58,9 @@ drugiego logowania i bez osobnego hasła galerii.
 | --- | --- |
 | Pulpit | Liczby, ostatnie zgłoszenia, skróty |
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
+| Realizacje | Rejestr portfolio: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
-| Treści strony | Wszystkie teksty strony głównej — hero, usługi, realizacje, proces, FAQ, kontakt |
+| Treści strony | Teksty strony głównej i katalogu — hero, nagłówki sekcji, zakres, proces, FAQ, kontakt |
 | Zdjęcia | Biblioteka mediów: upload przeciągnięciem, kopiowanie adresu, usuwanie |
 | Galeria | Portfolio fotograficzne, albumy klientów, metadane i upload zdjęć |
 | Odebrane / Wysłane | Podgląd skrzynki IMAP i historia wysyłek |
@@ -66,6 +72,38 @@ drugiego logowania i bez osobnego hasła galerii.
 Bloki można dowolnie dodawać, przestawiać i usuwać. Opublikowana strona jest dostępna
 pod `/p/<adres>` i pojawia się w menu, w sekcji oferty na stronie głównej oraz w stopce.
 
+## Realizacje
+
+Portfolio jest osobnym zbiorem danych (`projects.json`), a nie częścią treści strony.
+Każda pozycja jest jednego z dwóch rodzajów:
+
+- **strona** — dowodem jest działający adres; można go ukryć, wtedy strona pisze,
+  że prezentacja jest na życzenie,
+- **aplikacja** — dowodem są pliki do pobrania; opcjonalnie ma też własną stronę.
+
+Pliki aplikacji biorą się z jednego z trzech źródeł (`releaseSource`):
+
+| Źródło | Zachowanie |
+| --- | --- |
+| `github` | Serwer pobiera najnowsze wydanie z `owner/nazwa` i sam rozpoznaje platformy po nazwach plików |
+| `manual` | Lista wpisana ręcznie w panelu: platforma, wersja, rozmiar, adres |
+| `none` | Bez sekcji pobierania |
+
+Strona główna pokazuje do pięciu pozycji zaznaczonych jako wybrane; pełny rejestr
+stoi pod `/realizacje`, a każda pozycja ma własny adres `/realizacje/<slug>`.
+
+### Wydania z GitHuba
+
+Bez tokenu serwer czyta tylko repozytoria publiczne i linkuje wprost do plików na
+GitHubie. Token wpisany w panelu (zakładka Realizacje) otwiera także repozytoria
+prywatne — ich pliki idą wtedy przez `/api/projects/:slug/asset/:id`, bo adresy
+`browser_download_url` wymagają autoryzacji. Token jest szyfrowany AES-256-GCM tym
+samym kluczem co hasło poczty i nigdy nie opuszcza serwera.
+
+Odpowiedzi GitHuba lądują w `releases.json` z czasem życia 30 minut, więc strona nie
+odpytuje API przy każdym wejściu. Gdy odświeżenie się nie powiedzie, serwer podaje
+ostatni udany wynik, a panel pokazuje powód błędu przy realizacji.
+
 ## Dane
 
 Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
@@ -74,6 +112,9 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 | --- | --- |
 | `content.json` | Treści strony głównej (braki uzupełnia `server/content.default.json`) |
 | `pages.json` | Podstrony CMS |
+| `projects.json` | Rejestr realizacji |
+| `releases.json` | Cache wydań z GitHuba |
+| `integrations.json` | Token GitHuba (zaszyfrowany) |
 | `submissions.json` | Zgłoszenia z formularza |
 | `outbox.json` | Historia wysłanych powiadomień |
 | `mail-settings.json` | Konfiguracja poczty (hasło zaszyfrowane) |
@@ -82,6 +123,8 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 
 ## API
 
-Publiczne: `GET /api/content`, `GET /api/pages/:slug`, `POST /api/contact`.
+Publiczne: `GET /api/content`, `GET /api/pages/:slug`, `GET /api/projects/:slug`,
+`GET /api/projects/:slug/asset/:id`, `POST /api/contact`.
 Uwierzytelnianie: `/api/auth/status`, `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout`.
-Administracyjne (za sesją): `/api/admin/*` — zgłoszenia, treści, podstrony, media, poczta.
+Administracyjne (za sesją): `/api/admin/*` — zgłoszenia, treści, realizacje, podstrony,
+media, poczta i token GitHuba.

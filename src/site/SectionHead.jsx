@@ -1,24 +1,20 @@
 import { Reveal } from '../lib/ui'
-import TextBreak from './TextBreak'
 
-export default function SectionHead({ title, accent, lead, align = 'split', accentOnNewLine = false, accentBreakBefore }) {
+/**
+ * Nagłówek sekcji: tytuł, wprowadzenie i — gdy jest czym — licznik pozycji.
+ * Licznik stoi przy wprowadzeniu, bo mówi, ile rzeczy czeka niżej.
+ */
+export default function SectionHead({ id, title, accent, lead, count, action }) {
   return (
-    <Reveal className={`section-head is-${align}`}>
-      <div className="section-head-main">
-        <h2>
-          {title}{' '}
-          {accent && (
-            <em className={`accent${accentOnNewLine ? ' is-new-line' : ''}`}>
-              <TextBreak text={accent} before={accentBreakBefore} />
-            </em>
-          )}
-        </h2>
-        {lead && (
-          <div className="section-head-lead">
-            <i aria-hidden="true" />
-            <p>{lead}</p>
-          </div>
-        )}
+    <Reveal className="section-head" id={id}>
+      <h2>
+        {title}
+        {accent && <> <em className="accent">{accent}</em></>}
+      </h2>
+      <div>
+        {lead && <p className="section-head-lead">{lead}</p>}
+        {count && <span className="section-head-count">{count}</span>}
+        {action}
       </div>
     </Reveal>
   )

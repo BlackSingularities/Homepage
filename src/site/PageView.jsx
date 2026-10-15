@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, LoaderCircle, Quote, X } from 'lucide-react'
 import { Reveal, ease } from '../lib/ui'
-import Work from './Work'
-
-const REALIZATIONS_PAGE_SLUG = 'strony-aplikacje-cms'
 
 function Paragraphs({ text }) {
   return String(text || '')
@@ -103,7 +100,7 @@ function Block({ block, onZoom }) {
   }
 }
 
-export default function PageView({ slug, onNavigate, work }) {
+export default function PageView({ slug, onNavigate }) {
   const [page, setPage] = useState(null)
   const [status, setStatus] = useState('loading')
   const [zoom, setZoom] = useState('')
@@ -173,8 +170,6 @@ export default function PageView({ slug, onNavigate, work }) {
       <div className="page-blocks">
         {page.blocks.map(block => <Block key={block.id} block={block} onZoom={setZoom} />)}
       </div>
-
-      {slug === REALIZATIONS_PAGE_SLUG && work && <Work data={work} />}
 
       <Reveal className="page-foot">
         <div>

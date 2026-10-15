@@ -1,9 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
+import GlyphField from './site/GlyphField'
 import Header from './site/Header'
 import Footer from './site/Footer'
 import Home from './site/Home'
+import Catalog from './site/Catalog'
+import ProjectView from './site/ProjectView'
 import PageView from './site/PageView'
+import { CATALOG_PATH } from './lib/projects'
 import { useSiteData } from './lib/useSiteData'
 
 const Admin = lazy(() => import('./admin/Admin'))
@@ -18,9 +22,20 @@ function usePath() {
   return [path, setPath]
 }
 
+/** Rozkłada adres na widok: strona główna, katalog, realizacja albo podstrona. */
+function routeOf(path) {
+  const clean = path.replace(/\/+$/, '') || '/'
+  if (clean === CATALOG_PATH) return { view: 'catalog' }
+  if (clean.startsWith(`${CATALOG_PATH}/`)) {
+    return { view: 'project', slug: decodeURIComponent(clean.slice(CATALOG_PATH.length + 1)) }
+  }
+  if (clean.startsWith('/p/')) return { view: 'page', slug: decodeURIComponent(clean.slice(3)) }
+  return { view: 'home' }
+}
+
 export default function App() {
   const [path, setPath] = usePath()
-  const { content, pages } = useSiteData()
+  const { content, pages, projects } = useSiteData()
 
   const navigate = useCallback(target => {
     const [pathname, hash] = target.split('#')
@@ -45,17 +60,17 @@ export default function App() {
     )
   }
 
-  const slug = path.startsWith('/p/') ? decodeURIComponent(path.slice(3).replace(/\/$/, '')) : ''
-  const isHome = !slug
+  const route = routeOf(path)
 
   return (
     <div className="site">
-      <div className="grain" aria-hidden="true" />
-      <Header brand={content.brand} pages={pages} home={isHome} onNavigate={navigate} />
-      {isHome
-        ? <Home content={content} pages={pages} onNavigate={navigate} />
-        : <PageView slug={slug} onNavigate={navigate} work={content.work} />}
-      <Footer brand={content.brand} pages={pages} home={isHome} onNavigate={navigate} />
+      <GlyphField />
+      <Header brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
+      {route.view === 'home' && <Home content={content} pages={pages} projects={projects} onNavigate={navigate} />}
+      {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
+      {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
+      {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
+      <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
     </div>
   )
 }

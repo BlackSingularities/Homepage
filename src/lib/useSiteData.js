@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import defaultContent from '../../server/content.default.json'
 
 /**
- * Content lives in the admin panel, but the bundled defaults keep the site
- * complete on first paint and whenever the API is unreachable.
+ * Treści i rejestr realizacji przychodzą z panelu, ale dołączone wartości
+ * domyślne trzymają stronę w całości przy pierwszym rysowaniu i wtedy, gdy API
+ * jest nieosiągalne. Rejestr startuje pusty — realizacje dodaje się w panelu.
  */
 export function useSiteData() {
-  const [data, setData] = useState({ content: defaultContent, pages: [], ready: false })
+  const [data, setData] = useState({ content: defaultContent, pages: [], projects: [], ready: false })
 
   useEffect(() => {
     let active = true
@@ -17,6 +18,7 @@ export function useSiteData() {
         setData({
           content: payload.content || defaultContent,
           pages: Array.isArray(payload.pages) ? payload.pages : [],
+          projects: Array.isArray(payload.projects) ? payload.projects : [],
           ready: true,
         })
       })

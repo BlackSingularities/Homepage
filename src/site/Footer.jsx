@@ -1,8 +1,17 @@
 import { ArrowUp } from 'lucide-react'
+import { CATALOG_PATH } from '../lib/projects'
 
 export default function Footer({ brand, pages = [], onNavigate, home = true }) {
   const href = id => (home ? `#${id}` : `/#${id}`)
   const year = new Date().getFullYear()
+
+  const go = event => {
+    const target = event.currentTarget.getAttribute('href')
+    if (onNavigate && target && !target.startsWith('#')) {
+      event.preventDefault()
+      onNavigate(target)
+    }
+  }
 
   return (
     <footer className="site-footer">
@@ -15,26 +24,23 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
 
         <nav className="footer-nav">
           <div>
-            <span>Nawigacja</span>
-            <a href={href('uslugi')}>Zakres</a>
-            <a href={href('proces')}>Proces</a>
-            <a href={href('o-mnie')}>O mnie</a>
+            <span>Strona</span>
+            <a href={CATALOG_PATH} onClick={go}>Realizacje</a>
+            <a href={href('zakres')} onClick={go}>Zakres</a>
+            <a href={href('proces')} onClick={go}>Proces</a>
+            <a href={href('o-mnie')} onClick={go}>O mnie</a>
           </div>
           {pages.length > 0 && (
             <div>
               <span>Oferta</span>
               {pages.slice(0, 6).map(page => (
-                <a
-                  key={page.id}
-                  href={`/p/${page.slug}`}
-                  onClick={event => { event.preventDefault(); onNavigate(`/p/${page.slug}`) }}
-                >{page.title}</a>
+                <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>
               ))}
             </div>
           )}
           <div>
             <span>Kontakt</span>
-            <a href={href('kontakt')}>Formularz projektowy</a>
+            <a href={href('kontakt')} onClick={go}>Formularz projektowy</a>
             {brand.email && <a href={`mailto:${brand.email}`}>{brand.email}</a>}
             {brand.phone && <a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a>}
             <span className="footer-place">{brand.location}</span>

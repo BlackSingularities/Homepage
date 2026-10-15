@@ -2,318 +2,126 @@
   "brand": {
     "initials": "AR",
     "name": "Adam Rędzikowski",
-    "role": "Projekty cyfrowe na zamówienie",
-    "tagline": "Analiza · projektowanie · aplikacje · dane · AI",
+    "role": "Strony i aplikacje na zamówienie",
+    "tagline": "Analiza, projekt, kod, wdrożenie — u jednej osoby.",
     "location": "Łódź · współpraca zdalna",
     "email": "",
     "phone": ""
   },
   "hero": {
-    "badges": [],
-    "titleTop": "Od pomysłu do produktu.",
-    "titleAccent": "I dalej.",
-    "lead": "Prowadzę projekty cyfrowe od analizy i koncepcji, przez grafikę, interfejs oraz wykonanie, aż po wdrożenie, utrzymanie i dalszy rozwój. Tworzę na zamówienie strony, aplikacje webowe i autorskie CMS-y, które mogą wykorzystywać dane oraz AI do realnego usprawniania pracy.",
-    "primaryCta": "Porozmawiajmy",
-    "secondaryCta": "Wybrane realizacje",
-    "marquee": ["Analiza i strategia", "Projektowanie", "Aplikacje webowe", "Autorskie CMS-y", "Dane i AI", "Infrastruktura i smart home", "Opieka i rozwój"]
+    "titleTop": "Jedna osoba",
+    "titleAccent": "od analizy do wdrożenia.",
+    "lead": "Projektuję i buduję strony oraz aplikacje na zamówienie. Zaczynam od problemu i sposobu pracy, potem odpowiadam za interfejs, kod, uruchomienie i dalszy rozwój. Niżej jest rejestr tego, co z tego wyszło — każdą rzecz można otworzyć albo pobrać.",
+    "primaryCta": "Napisz, czego potrzebujesz",
+    "secondaryCta": "Przejdź do rejestru",
+    "note": "Pracuję z Łodzi, cały proces może przebiegać zdalnie."
   },
-  "manifesto": {
-    "label": "",
-    "lines": [
-      "Nie zaczynam od szablonu.",
-      "Zaczynam od Twojego sposobu pracy."
-    ],
-    "note": "Najpierw porządkuję cel, użytkowników i proces. Później odpowiadam za projekt, technologię, wdrożenie i rozwój. Nie przekazuję Cię między działami — prowadzę całość osobiście."
+  "projects": {
+    "title": "Rejestr zbudowanych",
+    "accent": "systemów.",
+    "lead": "Każda pozycja ma własną architekturę, interfejs i zaplecze. Żadna nie powstała na gotowym motywie.",
+    "catalogCta": "Pełny rejestr",
+    "empty": "Rejestr jest jeszcze pusty."
   },
-  "services": {
-    "kicker": "",
-    "title": "Cały produkt.",
-    "accent": "Jeden spójny proces.",
-    "lead": "Zakres wynika z celu, a nie z gotowego pakietu. Mogę zaprojektować osobny serwis, bardzo spersonalizowany blog, aplikację dla klientów albo system, który porządkuje codzienną pracę firmy.",
+  "catalog": {
+    "title": "Wszystko, co zbudowałem",
+    "accent": "i nadal utrzymuję.",
+    "lead": "Serwisy, które da się otworzyć w przeglądarce, i aplikacje, które da się pobrać. Pliki aplikacji pochodzą wprost z najnowszych wydań — nie z ręcznie aktualizowanej listy.",
+    "filterAll": "Wszystko",
+    "filterWeb": "Strony i serwisy",
+    "filterApp": "Aplikacje"
+  },
+  "scope": {
+    "title": "Co dokładnie",
+    "accent": "mogę zrobić.",
+    "lead": "Zakres wynika z celu, nie z gotowego pakietu. Czasem to jeden serwis, czasem system, który porządkuje codzienną pracę firmy.",
     "items": [
       {
-        "id": "svc-www",
-        "no": "01",
-        "title": "Strony, marki i publikacje",
-        "lead": "Indywidualny projekt, który ma własny charakter i konkretną funkcję.",
-        "detail": "Tworzę od zera serwisy firmowe, portfolia, sklepy, magazyny i rozbudowane blogi. Łączę architekturę informacji, grafikę, treść, projekt interfejsu, analitykę, SEO oraz wdrożenie — bez ograniczeń narzuconych przez gotowy motyw."
+        "id": "sc-web",
+        "title": "Strony i serwisy",
+        "lead": "Projekt z własnym charakterem i konkretną funkcją.",
+        "detail": "Serwisy firmowe, portfolia, sklepy, magazyny i rozbudowane blogi. Architektura informacji, grafika, treść, interfejs, analityka, SEO i wdrożenie — bez ograniczeń narzuconych przez gotowy motyw."
       },
       {
-        "id": "svc-systems",
-        "no": "02",
+        "id": "sc-apps",
         "title": "Aplikacje webowe i CMS-y",
         "lead": "Oprogramowanie ułożone pod Twój sposób pracy, nie odwrotnie.",
-        "detail": "Buduję aplikacje, portale klienta i autorskie systemy CMS z dokładnie takim zakresem, jakiego potrzebuje projekt: rolami użytkowników, obiegiem zleceń, dokumentami, raportami, bazą danych, integracjami i wygodnym panelem obsługi."
+        "detail": "Aplikacje, portale klienta i autorskie panele z dokładnie takim zakresem, jakiego wymaga projekt: role użytkowników, obieg zleceń, dokumenty, raporty, baza danych, integracje i wygodna obsługa."
       },
       {
-        "id": "svc-ai",
-        "no": "03",
-        "title": "Dane i analityka",
-        "lead": "Informacje, które pomagają podjąć decyzję, zamiast tylko zajmować miejsce.",
-        "detail": "Jako analityk danych porządkuję źródła, definiuję właściwe wskaźniki i projektuję czytelne raporty oraz pulpity. Łączę dane z różnych systemów, automatyzuję ich przepływ i przekładam liczby na praktyczne wnioski."
+        "id": "sc-desktop",
+        "title": "Programy na komputer i telefon",
+        "lead": "Aplikacje, które się instaluje, a nie tylko otwiera.",
+        "detail": "Wydaję narzędzia na Windows, Androida i macOS — z instalatorami, wersjami i aktualizacjami. Część z nich stoi otwarcie na GitHubie, razem z historią wydań i kodem."
       },
       {
-        "id": "svc-data",
-        "no": "04",
+        "id": "sc-data",
+        "title": "Dane i raportowanie",
+        "lead": "Informacje, które prowadzą do decyzji, zamiast zajmować miejsce.",
+        "detail": "Porządkuję źródła, definiuję właściwe wskaźniki i projektuję czytelne pulpity oraz raporty. Łączę dane z różnych systemów i automatyzuję ich przepływ."
+      },
+      {
+        "id": "sc-ai",
         "title": "Automatyzacja i AI",
-        "lead": "Sztuczna inteligencja użyta tam, gdzie naprawdę skraca pracę lub poprawia jakość.",
-        "detail": "Włączam AI do aplikacji i CMS-ów wtedy, gdy daje mierzalną wartość: pomaga opracowywać i porządkować treści, analizować dokumenty, wyszukiwać wiedzę, klasyfikować sprawy, przygotowywać odpowiedzi albo wykonywać konkretne czynności w systemie."
+        "lead": "AI tam, gdzie naprawdę skraca pracę.",
+        "detail": "Włączam ją wtedy, gdy daje mierzalną wartość: pomaga opracować i uporządkować treści, przeanalizować dokumenty, odnaleźć wiedzę, zaklasyfikować sprawę albo wykonać konkretną czynność w systemie. Jeśli wystarczy prostsza automatyzacja, proponuję ją."
       },
       {
-        "id": "svc-care",
-        "no": "05",
-        "title": "Wdrożenie, opieka i rozwój",
-        "lead": "Uruchomienie produktu nie kończy współpracy.",
-        "detail": "Dbam o bezpieczne wdrożenie, konfigurację, monitoring i wygodną obsługę. Mogę dalej utrzymywać system, reagować na potrzeby użytkowników, rozwijać kolejne moduły i wspierać Cię w codziennej pracy z produktem."
-      },
-      {
-        "id": "svc-home",
-        "no": "06",
-        "title": "Infrastruktura domowa i smart home",
-        "lead": "Sieć, serwer i dom, które po prostu działają — bez przypadkowych ustawień i porzuconych po pół roku projektów.",
-        "detail": "Stawiam serwery domowe i self-hosting na Dockerze i Proxmoksie, konfiguruję NAS-y, sieć i kopie zapasowe, a do tego integruję smart home w Home Assistant — od pojedynczych automatyzacji po cały dom sterowany z jednego miejsca. Zajmuję się też DNS-em i prywatnością: AdGuard Home blokujący reklamy i śledzenie w całej sieci oraz bezpieczny zdalny dostęp przez VPN, bez wystawiania portów na świat."
-      }
-    ]
-  },
-  "intelligence": {
-    "kicker": "",
-    "title": "Analiza, projekt i technologia.",
-    "accent": "Połączone w całość.",
-    "cards": [
-      {
-        "no": "01 / ANALIZA",
-        "title": "Dane, które prowadzą do decyzji",
-        "text": "Porządkuję informacje, znajduję zależności i projektuję wskaźniki, raporty oraz narzędzia potrzebne do świadomego działania."
-      },
-      {
-        "no": "02 / PROJEKT",
-        "title": "Grafika i interfejsy z konkretnym celem",
-        "text": "Dbam o identyfikację wizualną, hierarchię, typografię i doświadczenie użytkownika. Forma wynika z treści, marki i sposobu użycia."
-      },
-      {
-        "no": "03 / WYKONANIE",
-        "title": "Aplikacje, CMS-y i celowe wykorzystanie AI",
-        "text": "Buduję dopasowane systemy i wyposażam je w automatyzacje lub AI tylko wtedy, gdy rozwiązują konkretny problem i ułatwiają obsługę."
-      }
-    ],
-    "chain": ["potrzeba", "analiza", "projekt", "wdrożenie", "rozwój"]
-  },
-  "work": {
-    "kicker": "",
-    "title": "Nie obietnice.",
-    "accent": "Działające realizacje.",
-    "lead": "Każdy z tych produktów rozwiązuje inny problem — własna architektura, interfejs i zaplecze, dopasowane do skali i celu. Łączy je jedno: powstały pod konkretny sposób pracy, nie pod gotowy szablon.",
-    "items": [
-      {
-        "id": "prj-travel",
-        "name": "Project Travel",
-        "href": "https://projecttravel.pl",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Sprzedaż podróży / zaplecze operacyjne",
-        "statement": "Serwis sprzedażowy i kompletny system operacyjny biura podróży.",
-        "description": "Oferty, terminy, rezerwacje, formularze, korespondencja, blog, galerie i panel administracyjny spięte w jeden produkt.",
-        "features": ["panel administracyjny", "zarządzanie ofertami", "rezerwacje i terminy", "automatyzacja e-mail"],
-        "slides": ["/assets/portfolio/travel-1.png", "/assets/portfolio/travel-2.png", "/assets/portfolio/travel-3.png", "/assets/portfolio/travel-4.png"]
-      },
-      {
-        "id": "prj-strefa",
-        "name": "Strefa Milczenia",
-        "href": "https://strefamilczenia.pl",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "System wydawniczy / AI",
-        "statement": "Autorski warsztat redakcyjny, który prowadzi tekst od pomysłu do publikacji.",
-        "description": "Rozbudowany CMS z planowaniem tematów, researchem, pocztą, komentarzami, analityką i narzędziami AI wspierającymi cały proces.",
-        "features": ["zaawansowany CMS", "planowanie publikacji", "poczta i społeczność", "narzędzia redakcyjne AI"],
-        "slides": ["/assets/portfolio/strefa-1.png", "/assets/portfolio/strefa-2.png", "/assets/portfolio/strefa-3.png", "/assets/portfolio/strefa-4.png"]
-      },
-      {
-        "id": "prj-kompendium",
-        "name": "Kompendium Podróży",
-        "href": "https://kompendium-podrozy.pl",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Portal wiedzy / dane",
-        "statement": "Tysiące informacji o świecie podane jak dopracowany magazyn.",
-        "description": "Profile krajów i miast, mapy, galerie, pogoda, klimat, demografia i rozbudowane dane zamienione w czytelne doświadczenie.",
-        "features": ["profile krajów i miast", "interaktywne dane", "mapy i galerie", "własny panel treści"],
-        "slides": ["/assets/portfolio/kompendium-1.png", "/assets/portfolio/kompendium-2.png", "/assets/portfolio/kompendium-3.png", "/assets/portfolio/kompendium-4.png"]
-      },
-      {
-        "id": "prj-podrozownik",
-        "name": "Podróżownik",
-        "href": "/travels",
-        "hidden": false,
-        "linkHidden": true,
-        "label": "Prywatny system operacyjny",
-        "statement": "Prywatne centrum wszystkich podróży — na mapie, w liczbach i wspomnieniach.",
-        "description": "Trasy, loty, noclegi, aktywności, zakupy, koszty, zdjęcia i statystyki połączone w osobisty system podróżniczy.",
-        "features": ["mapa wszystkich tras", "transport i noclegi", "budżet i wydatki", "zdjęcia i statystyki"],
-        "slides": ["/assets/portfolio/podrozownik-1.png", "/assets/portfolio/podrozownik-2.png", "/assets/portfolio/podrozownik-3.png"]
-      },
-      {
-        "id": "prj-navigator",
-        "name": "Nawigator",
-        "href": "/navigator",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Analiza GPX / mapy",
-        "statement": "Surowe dane GPS zamienione w precyzyjną analizę ruchu.",
-        "description": "Import i porównywanie tras GPX, heatmapy, profile wysokości, tempo, prędkość, postoje i rozbudowana galeria aktywności.",
-        "features": ["import plików GPX", "heatmapy przejazdów", "wykresy i statystyki", "porównywanie tras"],
-        "slides": ["/assets/portfolio/navigator-1.png", "/assets/portfolio/navigator-2.png", "/assets/portfolio/navigator-3.png", "/assets/portfolio/navigator-4.png"]
-      },
-      {
-        "id": "prj-playmaster",
-        "name": "PlayMaster",
-        "href": "/PlayMaster/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Nauka muzyki / MIDI",
-        "statement": "Interaktywna nauka gry, w której nuty spotykają się z klawiaturą dokładnie we właściwym momencie.",
-        "description": "Wodospad nut, klasyczna notacja, wejście MIDI, trzy tryby pracy, biblioteka utworów oraz konta użytkowników połączone w jedno narzędzie do świadomego ćwiczenia.",
-        "features": ["wizualizacja MIDI w czasie rzeczywistym", "tryby słuchania, ćwiczenia i występu", "128 brzmień General MIDI", "biblioteka i konta użytkowników"],
-        "slides": ["/assets/portfolio/playmaster-1.png"]
-      },
-      {
-        "id": "prj-arcadia",
-        "name": "Arcadia",
-        "href": "/Arcadia/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Galeria gier / aplikacja webowa",
-        "statement": "Wspólna przestrzeń dla dopracowanych gier przeglądarkowych — od klasyki po symulację lądowania na Księżycu.",
-        "description": "Modułowa galeria z Tetrisem, Bubble Burst i LUNARIS, pełnoekranową rozgrywką, wspólnym rankingiem serwerowym oraz oprawą inspirowaną aparaturą misji Apollo.",
-        "features": ["trzy rozbudowane gry", "osobne rankingi i rekordy", "pełnoekranowa rozgrywka bez przewijania", "responsywny interfejs i obsługa dotykowa"],
-        "slides": ["/assets/portfolio/arcadia-1.png"]
-      },
-      {
-        "id": "prj-blinkbeam",
-        "name": "Blinkbeam",
-        "href": "/Blinkbeam/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Transfer optyczny / prywatność",
-        "statement": "Pliki przesyłane światłem — bez sieci, serwera i konta.",
-        "description": "Przeglądarkowa aplikacja dzieli plik na strumień kodów QR odporny na zgubione ramki. Drugi telefon składa dane aparatem i udostępnia plik dopiero po kryptograficznej weryfikacji całości.",
-        "features": ["transfer ekran → aparat", "brak wysyłki na serwer", "automatyczna optymalizacja tempa", "weryfikacja integralności SHA-256"],
-        "slides": ["/assets/portfolio/blinkbeam-1.png"]
-      },
-      {
-        "id": "prj-traffic-timeline",
-        "name": "Traffic Timeline",
-        "href": "/komunikacja/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Transport publiczny / mapy",
-        "statement": "Cała doba komunikacji publicznej w Polsce, odtworzona z rozkładów jazdy na żywej mapie.",
-        "description": "Oficjalne rozkłady GTFS z kilkunastu miast i całej sieci kolejowej przeliczone na ruch pojazdów w czasie. Każde źródło to osobna warstwa: tramwaje, autobusy, metro i pociągi wszystkich przewoźników.",
-        "features": ["animacja kursów w ciągu doby", "warstwy miast i przewoźników kolejowych", "sieć tras i obciążenie przystanków", "linki do konkretnego widoku i godziny"],
-        "slides": ["/assets/portfolio/traffic-timeline-1.png"]
-      },
-      {
-        "id": "prj-eastflanker",
-        "name": "East Flanker",
-        "href": "/eastflanker/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "OSINT / analiza danych",
-        "statement": "Obraz sytuacji na wschodniej flance NATO, złożony na żywo z kilkudziesięciu otwartych źródeł.",
-        "description": "Ruch lotniczy i morski, zakłócenia GNSS, infrastruktura podmorska, łączność, sejsmika i doniesienia medialne na jednej mapie. System wykrywa anomalie, łączy zdarzenia z różnych dziedzin w zbieżności i przygotowuje raport dnia.",
-        "features": ["ADS-B i AIS w czasie rzeczywistym", "mapa zakłóceń GNSS z przedziałami ufności", "anomalie statków nad kablami i rurociągami", "zbieżności zdarzeń i raport dnia"],
-        "slides": ["/assets/portfolio/eastflanker-1.png"]
-      },
-      {
-        "id": "prj-ukladokresowy",
-        "name": "Układ Okresowy",
-        "href": "/ukladokresowy/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Edukacja / wizualizacja danych",
-        "statement": "Interaktywny atlas 118 pierwiastków z własnym panelem redakcyjnym.",
-        "description": "Tablica Mendelejewa jako narzędzie, nie plakat: mapy cieplne właściwości, stan skupienia w dowolnej temperaturze, porównywarka i kalkulator masy molowej. Dane bazowe synchronizowane z otwartego źródła, polskie treści redagowane w CMS z pełną historią zmian.",
-        "features": ["mapy cieplne 8 właściwości", "stan skupienia od 0 do 6000 K", "porównywarka i kalkulator masy molowej", "CMS z historią zmian i synchronizacją API"],
-        "slides": ["/assets/portfolio/ukladokresowy-1.png", "/assets/portfolio/ukladokresowy-2.png", "/assets/portfolio/ukladokresowy-3.png"]
-      },
-      {
-        "id": "prj-photostar",
-        "name": "PhotoStar",
-        "href": "/photostar/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Astronomia / analiza obrazu",
-        "statement": "Rozpoznaje gwiazdy na zdjęciu nieba i pokazuje, na jaki fragment nieba patrzysz.",
-        "description": "Własny serwer z astrometry.net dopasowuje wykryte gwiazdy do katalogu Tycho-2 bez żadnych podpowiedzi, a potem nakłada na zdjęcie gwiazdozbiory, 41 tys. gwiazd, 15 tys. mgławic i galaktyk, planety oraz horyzont. Do tego aparat z celownikiem AR i trybem nocnym oraz eksport plakatu. Prywatnie: wynik widzi tylko autor, a serwer kasuje zdjęcia po dobie. Za darmo, bez kont i limitów.",
-        "features": ["rozwiązanie astrometryczne bez podpowiedzi", "warstwy: gwiazdozbiory, obiekty, planety, horyzont", "aparat z celownikiem AR i składaniem klatek", "eksport plakatu, CSV i nagłówka WCS"],
-        "slides": ["/assets/portfolio/photostar-1.png", "/assets/portfolio/photostar-2.png", "/assets/portfolio/photostar-3.png"]
-      },
-      {
-        "id": "prj-gallery",
-        "name": "Galeria fotograficzna",
-        "href": "/galeria/",
-        "hidden": false,
-        "linkHidden": false,
-        "label": "Fotografia / podróże / sesje",
-        "statement": "Kocham podróże i lubię zatrzymywać ich światło, miejsca oraz ludzi w kadrach.",
-        "description": "Fotografuję przede wszystkim dla przyjemności, a czasami także komercyjnie. Tutaj zebrałem galerię moich najlepszych i ulubionych zdjęć.",
-        "features": ["fotografia podróżnicza", "ulubione kadry", "wybrane realizacje komercyjne", "pełnoekranowa galeria"],
-        "slides": ["/assets/projects/galeria.png"]
+        "id": "sc-infra",
+        "title": "Infrastruktura i smart home",
+        "lead": "Sieć, serwer i dom, które po prostu działają.",
+        "detail": "Serwery domowe i self-hosting na Dockerze oraz Proxmoksie, NAS-y, kopie zapasowe, DNS z AdGuard Home blokującym reklamy w całej sieci, smart home w Home Assistant i bezpieczny dostęp przez VPN — bez wystawiania portów na świat."
       }
     ]
   },
   "process": {
-    "kicker": "",
     "title": "Od pierwszej rozmowy",
     "accent": "po stałą opiekę.",
-    "lead": "Prowadzę cały proces osobiście. Łączę decyzje biznesowe, projektowe i techniczne, dzięki czemu produkt zachowuje spójność od pierwszego szkicu po codzienną obsługę.",
+    "lead": "Prowadzę cały proces osobiście, więc decyzje biznesowe, projektowe i techniczne nie rozjeżdżają się między działami.",
     "items": [
       { "no": "01", "title": "Rozpoznanie", "text": "Poznaję cel, użytkowników, dane i sposób pracy. Ustalamy, co naprawdę warto zbudować." },
-      { "no": "02", "title": "Koncepcja", "text": "Projektuję architekturę, funkcje, przepływy oraz kierunek wizualny rozwiązania." },
-      { "no": "03", "title": "Budowa", "text": "Tworzę działającą wersję i rozwijam ją na podstawie realnych scenariuszy, nie domysłów." },
+      { "no": "02", "title": "Koncepcja", "text": "Projektuję architekturę, funkcje, przepływy i kierunek wizualny. Zanim powstanie kod, wiadomo, co i po co budujemy." },
+      { "no": "03", "title": "Budowa", "text": "Tworzę działającą wersję i rozwijam ją na realnych scenariuszach, nie na domysłach." },
       { "no": "04", "title": "Wdrożenie", "text": "Uruchamiam produkt, konfiguruję środowisko, zabezpieczenia, pomiary i sposób obsługi." },
       { "no": "05", "title": "Opieka", "text": "Monitoruję, wspieram użytkowników i rozwijam system wraz z nowymi potrzebami." }
     ]
   },
   "about": {
-    "kicker": "",
-    "title": "Prowadzę cały projekt.",
-    "accent": "I zostaję po wdrożeniu.",
-    "lead": "Jestem analitykiem danych, projektantem i twórcą aplikacji webowych. Kocham podróże, lubię robić zdjęcia i czasami fotografuję także komercyjnie.",
-    "text": "Łączę kompetencje, które w większych realizacjach często są rozdzielone pomiędzy kilka osób. Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje oraz wewnętrzne systemy zarządzania — zawsze od zera i pod konkretny sposób działania. Fotografia jest dla mnie drugim sposobem opowiadania o miejscach i ludziach; w galerii pokazuję najlepsze oraz najbardziej lubiane przeze mnie kadry. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
-    "strengths": ["Analityka danych i raportowanie", "Grafika i projektowanie interfejsów", "Aplikacje oraz systemy webowe", "Autorskie CMS-y i panele zarządzania", "Automatyzacja, AI i dalsza opieka", "Sieci, serwery domowe i smart home"]
-  },
-  "faq": {
-    "kicker": "",
-    "title": "Zanim",
-    "accent": "zaczniemy.",
-    "items": [
-      { "q": "Czy korzystasz z gotowych szablonów?", "a": "Nie buduję projektu wokół gotowego motywu. Każde rozwiązanie otrzymuje własną architekturę, język wizualny i funkcje dopasowane do celu — niezależnie od tego, czy jest to blog, strona marki, CMS czy rozbudowana aplikacja." },
-      { "q": "Czy muszę mieć gotową specyfikację?", "a": "Nie. Wystarczy problem, pomysł albo proces, który dziś nie działa tak, jak powinien. Pomogę uporządkować potrzeby, ustalić priorytety i zamienić je w konkretny plan." },
-      { "q": "Jak zaczyna się współpraca?", "a": "Od rozmowy o celu, odbiorcach i obecnym sposobie pracy. Na tej podstawie porządkuję zakres, wskazuję najważniejsze decyzje i proponuję kierunek realizacji. Zanim powstanie interfejs lub kod, obie strony wiedzą, co budujemy, po co i według jakich kryteriów ocenimy efekt." },
-      { "q": "Ile trwa realizacja?", "a": "Termin zależy od skali i liczby zależności. Skupiona strona lub blog mogą powstać w kilka tygodni, natomiast aplikacja, autorski CMS albo system z integracjami wymagają zwykle pracy etapowej. Po krótkiej analizie przedstawiam realistyczny harmonogram, bez obiecywania terminu oderwanego od zakresu." },
-      { "q": "Jak wygląda wycena projektu?", "a": "Wyceniam konkretny zakres, odpowiedzialność i oczekiwany rezultat, a nie samą liczbę ekranów. Przed rozpoczęciem otrzymujesz przejrzysty opis prac, etapów oraz kosztów. Jeśli projekt warto podzielić na wersję podstawową i dalszy rozwój, pokażę to wprost, aby można było świadomie zarządzać budżetem." },
-      { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak, jeśli projekt tego potrzebuje. Panel projektuję pod rzeczywiste zadania użytkowników: publikowanie, zarządzanie danymi, obsługę klientów, raportowanie albo sterowanie procesem. Nie dokładam dziesiątek przypadkowych funkcji tylko dlatego, że znajdują się w gotowym CMS-ie." },
-      { "q": "Czy wszystko musi wykorzystywać AI?", "a": "Nie. AI ma rozwiązywać problem, a nie dekorować ofertę. Stosuję je tam, gdzie może analizować dane, pomagać w obsłudze CMS-u, porządkować wiedzę lub wykonywać konkretne zadania. Jeśli prostsza automatyzacja będzie lepsza, właśnie ją zaproponuję." },
-      { "q": "Czy system może współpracować z narzędziami, których już używam?", "a": "Tak. Mogę połączyć rozwiązanie z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą, systemem CRM lub innymi usługami wykorzystywanymi w firmie. Najpierw sprawdzam jakość i ograniczenia integracji, żeby nie budować kluczowego procesu na niestabilnym założeniu." },
-      { "q": "Czy możesz rozwinąć albo uporządkować istniejący produkt?", "a": "Tak, po wcześniejszym audycie kodu, danych i sposobu wdrożenia. Oceniam, co warto zachować, co wymaga przebudowy i czy bezpieczniej będzie rozwijać obecną bazę, czy stworzyć nowy fundament. Rekomendację uzasadniam technicznie i biznesowo — bez przepisywania wszystkiego dla samego przepisywania." },
-      { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu, dostępów oraz materiałów ustalamy jasno przed rozpoczęciem. Projekt nie powinien uzależniać klienta od jednej osoby przez brak dokumentacji lub dostępu do infrastruktury. Zakres przekazania dopasowuję do modelu współpracy i późniejszej opieki." },
-      { "q": "Czy dbasz o wydajność, bezpieczeństwo i dostępność?", "a": "Tak — traktuję je jako część jakości produktu, a nie dodatki na ostatnią chwilę. Dobieram rozwiązania do ryzyka i charakteru danych, pilnuję szybkości działania, poprawnego zachowania na różnych urządzeniach oraz czytelnej obsługi. Przy bardziej wymagających systemach zakres zabezpieczeń i monitoringu ustalam osobno." },
-      { "q": "Czy pracujesz tylko z klientami z Łodzi?", "a": "Nie. Jestem związany z Łodzią i chętnie spotykam się lokalnie, ale cały proces może przebiegać zdalnie. Najważniejsze są sprawna komunikacja, dostęp do osób decyzyjnych i regularne zatwierdzanie kolejnych etapów." },
-      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." },
-      { "q": "Czy zajmujesz się też siecią, serwerem domowym albo smart home?", "a": "Tak — to naturalne rozszerzenie tego, czym się zajmuję. Stawiam serwery domowe i self-hosting (Docker, Proxmox, NAS), konfiguruję sieć i DNS z AdGuard Home, integruję smart home w Home Assistant oraz zapewniam bezpieczny zdalny dostęp przez VPN. Jeśli aplikacja albo CMS mają w końcu działać na czymś konkretnym — mogę przygotować i to zaplecze." }
+    "title": "Nie zaczynam od szablonu.",
+    "accent": "Zaczynam od Twojego sposobu pracy.",
+    "lead": "Jestem analitykiem danych, projektantem i programistą. Łączę kompetencje, które w większych realizacjach rozkłada się na kilka osób.",
+    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon — zawsze od zera i pod konkretny sposób działania.\n\nDuża część rzeczy w rejestrze powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
+    "strengths": [
+      "Analityka danych i raportowanie",
+      "Grafika i projektowanie interfejsów",
+      "Aplikacje oraz systemy webowe",
+      "Programy na Windows, Androida i macOS",
+      "Autorskie CMS-y i panele zarządzania",
+      "Serwery, sieć i smart home"
     ]
   },
   "pagesSection": {
-    "kicker": "",
     "title": "Szczegóły",
     "accent": "w konkretnych obszarach.",
-    "lead": "Więcej o tym, jak podchodzę do poszczególnych rodzajów projektów i jakie możliwości może otrzymać rozwiązanie tworzone na zamówienie."
+    "lead": "Więcej o tym, jak podchodzę do poszczególnych rodzajów projektów i co może dostać rozwiązanie tworzone na zamówienie."
+  },
+  "faq": {
+    "title": "Zanim",
+    "accent": "zaczniemy.",
+    "items": [
+      { "q": "Czy muszę mieć gotową specyfikację?", "a": "Nie. Wystarczy problem, pomysł albo proces, który dziś nie działa tak, jak powinien. Pomogę uporządkować potrzeby, ustalić priorytety i zamienić je w konkretny plan." },
+      { "q": "Ile trwa realizacja?", "a": "Skupiona strona lub blog mogą powstać w kilka tygodni. Aplikacja, autorski CMS albo system z integracjami wymagają pracy etapowej. Po krótkiej analizie przedstawiam realistyczny harmonogram, bez terminu oderwanego od zakresu." },
+      { "q": "Jak wygląda wycena?", "a": "Wyceniam zakres, odpowiedzialność i oczekiwany rezultat, a nie liczbę ekranów. Przed startem dostajesz opis prac, etapów i kosztów. Jeśli projekt warto podzielić na wersję podstawową i dalszy rozwój, powiem to wprost." },
+      { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak, jeśli projekt tego potrzebuje. Panel projektuję pod rzeczywiste zadania: publikowanie, zarządzanie danymi, obsługę klientów, raportowanie. Nie dokładam funkcji tylko dlatego, że są w gotowym CMS-ie." },
+      { "q": "Czy system połączy się z narzędziami, których już używam?", "a": "Tak — z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą czy CRM-em. Najpierw sprawdzam jakość i ograniczenia integracji, żeby kluczowy proces nie stanął na niestabilnym założeniu." },
+      { "q": "Czy możesz rozwinąć istniejący produkt?", "a": "Tak, po audycie kodu, danych i wdrożenia. Oceniam, co warto zachować, co wymaga przebudowy i czy bezpieczniej rozwijać obecną bazę, czy zbudować nowy fundament. Rekomendację uzasadniam technicznie i biznesowo." },
+      { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu i dostępów ustalamy przed rozpoczęciem. Projekt nie powinien uzależniać Cię od jednej osoby przez brak dokumentacji albo dostępu do infrastruktury." },
+      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." }
+    ]
   },
   "contact": {
-    "kicker": "",
-    "title": "Opowiedz mi, czego potrzebujesz.",
-    "accent": "Zaprojektuję właściwe rozwiązanie.",
-    "lead": "Możesz przyjść z gotowym pomysłem albo samym problemem. Porozmawiamy o celu, użytkownikach i sposobie pracy, a ja zaproponuję konkretny kierunek — bez wciskania projektu w gotowy pakiet."
+    "title": "Opowiedz, czego potrzebujesz.",
+    "accent": "Odpowiem konkretem.",
+    "lead": "Możesz przyjść z gotowym pomysłem albo z samym problemem. Porozmawiamy o celu, użytkownikach i sposobie pracy, a ja zaproponuję kierunek — bez wciskania projektu w gotowy pakiet."
   }
 }

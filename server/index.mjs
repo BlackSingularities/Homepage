@@ -6,6 +6,9 @@ import nodemailer from 'nodemailer'
 import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import sharp from 'sharp'
+import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
+import { PLATFORMS, projectSummary, publicProject, sanitizeProject } from './projects.mjs'
+import { createReleaseService } from './github.mjs'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -15,6 +18,9 @@ const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json')
 const OUTBOX_FILE = path.join(DATA_DIR, 'outbox.json')
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
 const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
+const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
+const RELEASES_FILE = path.join(DATA_DIR, 'releases.json')
+const INTEGRATIONS_FILE = path.join(DATA_DIR, 'integrations.json')
 const ADMIN_FILE = path.join(DATA_DIR, 'admin.json')
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
 const encryptionSecret = process.env.SETTINGS_ENCRYPTION_KEY
@@ -78,40 +84,6 @@ await fs.mkdir(DATA_DIR, { recursive: true })
 await fs.mkdir(UPLOAD_DIR, { recursive: true })
 
 /* ── helpers ─────────────────────────────────────────────────────────── */
-
-function cleanText(value, max = 5000) {
-  return String(value ?? '').replace(/\u0000/g, '').trim().slice(0, max)
-}
-
-function isEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-}
-
-function slugify(value, fallback = 'strona') {
-  const slug = String(value ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ł/g, 'l')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 70)
-  return slug || fallback
-}
-
-/** Accepts only site-relative media paths — blocks javascript: and foreign hosts. */
-function cleanMedia(value) {
-  const raw = cleanText(value, 400)
-  if (!raw) return ''
-  return /^\/(uploads|assets)\/[\w\-./]+$/.test(raw) ? raw : ''
-}
-
-function cleanLink(value, fallback = '') {
-  const raw = cleanText(value, 400)
-  if (!raw) return fallback
-  if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(raw)) return raw
-  return fallback
-}
 
 function parseCookies(header = '') {
   return Object.fromEntries(header.split(';').map(part => {
@@ -299,15 +271,7 @@ function sanitizeContent(input) {
     return typeof base === 'string' ? base : ''
   }
   const merged = walk(defaultContent, input)
-  merged.about.image = cleanMedia(input?.about?.image) || defaultContent.about.image
-  merged.work.items = merged.work.items.map((item, index) => ({
-    ...item,
-    href: cleanLink(input?.work?.items?.[index]?.href, '#'),
-    slides: (Array.isArray(input?.work?.items?.[index]?.slides) ? input.work.items[index].slides : [])
-      .map(cleanMedia)
-      .filter(Boolean)
-      .slice(0, 12),
-  }))
+  merged.about.image = cleanMedia(input?.about?.image) || defaultContent.about.image || ''
   return merged
 }
 
@@ -315,16 +279,38 @@ async function getContent() {
   return mergeContent(await readJson(CONTENT_FILE, {}))
 }
 
-function getPublicContent(content) {
-  return {
-    ...content,
-    work: {
-      ...content.work,
-      items: (content.work?.items || [])
-        .filter(item => item.hidden !== true)
-        .map(item => (item.linkHidden === true ? { ...item, href: '' } : item)),
-    },
+/* ── realizacje (portfolio) ──────────────────────────────────────────── */
+
+async function getGithubToken() {
+  const stored = await readJson(INTEGRATIONS_FILE, {})
+  try {
+    return decrypt(stored.githubToken)
+  } catch {
+    return ''
   }
+}
+
+const releases = createReleaseService({
+  cacheFile: RELEASES_FILE,
+  readJson,
+  updateJson,
+  getToken: getGithubToken,
+})
+
+async function readProjects() {
+  const stored = await readJson(PROJECTS_FILE, [])
+  return Array.isArray(stored) ? stored : []
+}
+
+function sortProjects(projects) {
+  return [...projects].sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name, 'pl'))
+}
+
+/** Opublikowane realizacje z dołożonymi plikami z najnowszych wydań. */
+async function publishedProjects() {
+  const projects = sortProjects(await readProjects()).filter(project => project.published !== false)
+  const map = await releases.getMany(projects.map(project => (project.releaseSource === 'github' ? project.repo : '')))
+  return projects.map(project => ({ project, release: map[project.repo] || null }))
 }
 
 /* ── pages (CMS subpages) ────────────────────────────────────────────── */
@@ -402,15 +388,6 @@ function sanitizePage(input, existing = {}) {
     createdAt: existing.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
-}
-
-function uniqueSlug(slug, pages, selfId) {
-  let candidate = slug
-  let counter = 2
-  while (pages.some(page => page.slug === candidate && page.id !== selfId)) {
-    candidate = `${slug}-${counter++}`
-  }
-  return candidate
 }
 
 function publicPageSummary(page) {
@@ -616,11 +593,16 @@ app.post('/api/auth/logout', enforceSameOrigin, (_req, res) => {
 app.get('/health', (_req, res) => res.json({ ok: true }))
 
 app.get('/api/content', async (_req, res) => {
-  const [content, pages] = await Promise.all([getContent(), readJson(PAGES_FILE, [])])
+  const [content, pages, projects] = await Promise.all([
+    getContent(),
+    readJson(PAGES_FILE, []),
+    publishedProjects(),
+  ])
   res.set('Cache-Control', 'no-cache')
   res.json({
-    content: getPublicContent(content),
+    content,
     pages: pages.filter(page => page.published !== false).sort(byOrder).map(publicPageSummary),
+    projects: projects.map(({ project, release }) => projectSummary(project, release)),
   })
 })
 
@@ -629,6 +611,45 @@ app.get('/api/pages/:slug', async (req, res) => {
   const page = pages.find(item => item.slug === req.params.slug && item.published !== false)
   if (!page) return res.status(404).json({ error: 'Nie znaleziono strony.' })
   res.json(page)
+})
+
+app.get('/api/projects/:slug', async (req, res) => {
+  const entries = await publishedProjects()
+  const index = entries.findIndex(entry => entry.project.slug === req.params.slug)
+  if (index === -1) return res.status(404).json({ error: 'Nie znaleziono realizacji.' })
+  const { project, release } = entries[index]
+  const neighbour = step => {
+    const target = entries[(index + step + entries.length) % entries.length]
+    return target && target.project.slug !== project.slug
+      ? { slug: target.project.slug, name: target.project.name, kind: target.project.kind }
+      : null
+  }
+  res.set('Cache-Control', 'no-cache')
+  res.json({ project: publicProject(project, release), previous: neighbour(-1), next: neighbour(1) })
+})
+
+/** Proxy pobierania dla prywatnych wydań — token nie opuszcza serwera. */
+app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
+  try {
+    const projects = await readProjects()
+    const project = projects.find(item => item.slug === req.params.slug && item.published !== false)
+    if (!project || project.releaseSource !== 'github' || !project.repo) {
+      return res.status(404).json({ error: 'Nie znaleziono pliku.' })
+    }
+    const release = await releases.get(project.repo)
+    const asset = (release?.assets || []).find(item => item.id === req.params.assetId)
+    if (!asset) return res.status(404).json({ error: 'Nie znaleziono pliku.' })
+
+    const file = await releases.asset(project.repo, asset.id)
+    res.set('Content-Type', file.type)
+    res.set('Content-Disposition', `attachment; filename="${asset.name.replace(/[^\w.\-]/g, '_')}"`)
+    if (file.size) res.set('Content-Length', file.size)
+    for await (const chunk of file.body) res.write(chunk)
+    res.end()
+  } catch (error) {
+    if (error.status) return res.status(error.status).json({ error: error.message })
+    next(error)
+  }
 })
 
 app.post('/api/contact', async (req, res) => {
@@ -812,6 +833,86 @@ app.post('/api/admin/pages/reorder', enforceSameOrigin, async (req, res) => {
       return index === -1 ? page : { ...page, order: index }
     }))
   res.json([...updated].sort(byOrder))
+})
+
+/* ── admin: realizacje ───────────────────────────────────────────────── */
+
+/** Panel widzi też stan odpytywania GitHuba, żeby błąd tokenu nie był niewidzialny. */
+async function adminProjectList() {
+  const projects = sortProjects(await readProjects())
+  const map = await releases.getMany(projects.map(project => (project.releaseSource === 'github' ? project.repo : '')))
+  return projects.map(project => ({
+    ...project,
+    release: project.releaseSource === 'github' ? map[project.repo] || null : null,
+  }))
+}
+
+app.get('/api/admin/projects', async (_req, res) => {
+  res.json({ projects: await adminProjectList(), platforms: PLATFORMS })
+})
+
+app.post('/api/admin/projects', enforceSameOrigin, async (req, res) => {
+  const current = await readProjects()
+  const project = sanitizeProject(req.body)
+  project.slug = uniqueSlug(project.slug, current, project.id)
+  project.order = current.length
+  await updateJson(PROJECTS_FILE, [], list => [...list, project])
+  res.status(201).json(project)
+})
+
+app.put('/api/admin/projects/:id', enforceSameOrigin, async (req, res) => {
+  const current = await readProjects()
+  const existing = current.find(item => item.id === req.params.id)
+  if (!existing) return res.status(404).json({ error: 'Nie znaleziono realizacji.' })
+  const project = sanitizeProject({ ...req.body, order: req.body?.order ?? existing.order }, existing)
+  project.slug = uniqueSlug(project.slug, current, project.id)
+  await updateJson(PROJECTS_FILE, [], list => list.map(item => (item.id === project.id ? project : item)))
+  if (project.releaseSource === 'github' && project.repo && project.repo !== existing.repo) {
+    await releases.refresh(project.repo)
+  }
+  res.json(project)
+})
+
+app.delete('/api/admin/projects/:id', enforceSameOrigin, async (req, res) => {
+  await updateJson(PROJECTS_FILE, [], list => list.filter(item => item.id !== req.params.id))
+  res.json({ ok: true })
+})
+
+app.post('/api/admin/projects/reorder', enforceSameOrigin, async (req, res) => {
+  const order = (Array.isArray(req.body?.ids) ? req.body.ids : []).map(id => cleanText(id, 60))
+  await updateJson(PROJECTS_FILE, [], current =>
+    current.map(project => {
+      const index = order.indexOf(project.id)
+      return index === -1 ? project : { ...project, order: index }
+    }))
+  res.json(await adminProjectList())
+})
+
+app.post('/api/admin/projects/:id/release', enforceSameOrigin, async (req, res) => {
+  const project = (await readProjects()).find(item => item.id === req.params.id)
+  if (!project?.repo) return res.status(409).json({ error: 'Najpierw wpisz repozytorium w formacie owner/nazwa.' })
+  res.json(await releases.refresh(project.repo))
+})
+
+/** Podgląd wydania przed zapisaniem projektu — panel sprawdza wpisane repozytorium. */
+app.post('/api/admin/github/release', enforceSameOrigin, async (req, res) => {
+  const repo = cleanRepo(req.body?.repo)
+  if (!repo) return res.status(400).json({ error: 'Podaj repozytorium w formacie owner/nazwa.' })
+  res.json(await releases.refresh(repo))
+})
+
+app.get('/api/admin/github', async (_req, res) => {
+  res.json(await releases.check())
+})
+
+app.put('/api/admin/github', enforceSameOrigin, async (req, res) => {
+  const token = cleanText(req.body?.token, 300)
+  const previous = await readJson(INTEGRATIONS_FILE, {})
+  await updateJson(INTEGRATIONS_FILE, {}, () => ({
+    githubToken: req.body?.clear === true ? null : (token ? encrypt(token) : previous.githubToken || null),
+    updatedAt: new Date().toISOString(),
+  }))
+  res.json(await releases.check())
 })
 
 /* ── admin: media ────────────────────────────────────────────────────── */

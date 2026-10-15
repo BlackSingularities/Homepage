@@ -70,23 +70,6 @@ jobs:
 
             docker compose up -d --build
             docker compose exec -T homepage_gallery node -e "const D=require('better-sqlite3');const d=new D(process.env.DB_PATH,{readonly:true});console.log('Galeria:',d.prepare('SELECT COUNT(*) AS photos FROM photos').get())"
-            docker compose exec -T homepage_api node server/migrate-playmaster.mjs
-            docker compose exec -T homepage_api node server/migrate-arcadia.mjs
-            docker compose exec -T homepage_api node server/migrate-blinkbeam.mjs
-            docker compose exec -T homepage_api node server/migrate-traffic-timeline.mjs
-            docker compose exec -T homepage_api node server/migrate-eastflanker.mjs
-            docker compose exec -T homepage_api node server/migrate-ukladokresowy.mjs
-            docker compose exec -T homepage_api node server/migrate-photostar.mjs
-            docker compose exec -T homepage_api node server/migrate-personal-brand-v2.mjs
-            docker compose exec -T homepage_api node server/migrate-expanded-faq-v3.mjs
-            docker compose exec -T homepage_api node server/migrate-gallery-integration.mjs
-            docker compose exec -T homepage_api node server/migrate-manifesto-v4.mjs
-            docker compose exec -T homepage_api node server/migrate-work-showcase-v5.mjs
-            docker compose exec -T homepage_api node server/migrate-hide-podrozownik-v6.mjs
-            docker compose exec -T homepage_api node server/migrate-private-podrozownik-v7.mjs
-            docker compose exec -T homepage_api node server/migrate-home-infra-v8.mjs
-            docker compose exec -T homepage_api node server/migrate-offer-pages-v9.mjs
-            docker compose exec -T homepage_api node server/migrate-work-to-offer-page-v10.mjs
-            docker compose exec -T homepage_api node server/migrate-infrastructure-cover-v11.mjs
+            docker compose exec -T homepage_api node server/migrate-rebuild-v12.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f

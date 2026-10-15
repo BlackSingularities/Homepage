@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, Boxes, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toggle } from './parts'
 import PagesManager from './PagesManager'
+import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
 import '../styles/admin.css'
 
 const TABS = [
   ['dashboard', 'Pulpit', LayoutDashboard],
   ['submissions', 'Zgłoszenia', MessageSquareText],
+  ['projects', 'Realizacje', Boxes],
   ['pages', 'Podstrony', Files],
   ['content', 'Treści strony', FileStack],
   ['gallery', 'Galeria', Camera],
@@ -471,6 +473,8 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'submissions' && (
             <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} />
           )}
+
+          {tab === 'projects' && <ProjectsManager notify={notify} />}
 
           {tab === 'pages' && <PagesManager notify={notify} />}
 

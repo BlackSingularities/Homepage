@@ -84,71 +84,12 @@ export function useSpotlight() {
   return ref
 }
 
-/** Subtle 3D tilt following the cursor. */
-export function useTilt(strength = 7) {
-  const ref = useRef(null)
-  const reduce = useReducedMotion()
-  useEffect(() => {
-    const node = ref.current
-    if (!node || reduce || window.matchMedia('(hover: none)').matches) return undefined
-    let frame = 0
-    const move = event => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        const rect = node.getBoundingClientRect()
-        const x = (event.clientX - rect.left) / rect.width - 0.5
-        const y = (event.clientY - rect.top) / rect.height - 0.5
-        node.style.transform = `perspective(1400px) rotateX(${-y * strength}deg) rotateY(${x * strength}deg) translateY(-6px)`
-      })
-    }
-    const reset = () => {
-      cancelAnimationFrame(frame)
-      node.style.transform = ''
-    }
-    node.addEventListener('pointermove', move)
-    node.addEventListener('pointerleave', reset)
-    return () => {
-      cancelAnimationFrame(frame)
-      node.removeEventListener('pointermove', move)
-      node.removeEventListener('pointerleave', reset)
-    }
-  }, [strength, reduce])
-  return ref
-}
-
-/** Warm light that trails the cursor across the page. Decorative, desktop only. */
-export function PointerGlow() {
-  const ref = useRef(null)
-  const reduce = useReducedMotion()
-
-  useEffect(() => {
-    const node = ref.current
-    if (!node || reduce || window.matchMedia('(hover: none)').matches) return undefined
-    let frame = 0
-    const move = event => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        node.style.setProperty('--px', `${event.clientX}px`)
-        node.style.setProperty('--py', `${event.clientY}px`)
-        node.style.opacity = '1'
-      })
-    }
-    const hide = () => { node.style.opacity = '0' }
-    window.addEventListener('pointermove', move, { passive: true })
-    document.addEventListener('pointerleave', hide)
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('pointermove', move)
-      document.removeEventListener('pointerleave', hide)
-    }
-  }, [reduce])
-
-  return <div className="pointer-glow" ref={ref} aria-hidden="true" />
-}
-
-/** Tracks which section is currently in the viewport for nav highlighting. */
+/**
+ * Podświetlenie pozycji w nawigacji. Startuje puste — dopóki nie widać żadnej
+ * sekcji, żadna nie udaje aktywnej.
+ */
 export function useActiveSection(ids) {
-  const [active, setActive] = useState(ids[0])
+  const [active, setActive] = useState('')
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {

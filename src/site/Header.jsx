@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion'
 import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react'
+import { CATALOG_PATH } from '../lib/projects'
 import { useActiveSection } from '../lib/ui'
 
-const NAV = [
-  ['uslugi', 'Zakres'],
+const SECTIONS = [
+  ['zakres', 'Zakres'],
   ['proces', 'Proces'],
   ['o-mnie', 'O mnie'],
 ]
 
-const SECTION_IDS = NAV.map(([id]) => id)
+const SECTION_IDS = SECTIONS.map(([id]) => id)
 
 export default function Header({ brand, pages = [], home = true, onNavigate }) {
   const [open, setOpen] = useState(false)
@@ -18,7 +19,6 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
   const active = useActiveSection(home ? SECTION_IDS : [])
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 })
-  const roleParts = brand.role?.split(/\s+na\s+/i) || []
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -33,12 +33,13 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
   }, [open])
 
   const href = id => (home ? `#${id}` : `/#${id}`)
+
+  // Adresy wewnętrzne przechwytujemy, zakotwiczenia zostawiamy przeglądarce.
   const go = event => {
     setOpen(false)
     setPagesOpen(false)
-    if (!onNavigate) return
     const target = event.currentTarget.getAttribute('href')
-    if (target?.startsWith('/p/')) {
+    if (onNavigate && target && !target.startsWith('#')) {
       event.preventDefault()
       onNavigate(target)
     }
@@ -48,23 +49,17 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
     <>
       <motion.div className="scroll-progress" style={{ scaleX: progress }} aria-hidden="true" />
       <header className={`masthead ${scrolled ? 'is-scrolled' : ''}`}>
-        <a className="wordmark" href="/" onClick={event => { if (onNavigate) { event.preventDefault(); onNavigate('/') } }}>
+        <a className="wordmark" href="/" onClick={go}>
           <img className="wordmark-logo" src="/assets/brand/logo-ar-web.png" alt="" />
-          <span>
-            {brand.name}
-            <i>
-              {roleParts.length === 2 ? (
-                <><span>{roleParts[0]}</span><span>na {roleParts[1]}</span></>
-              ) : brand.role}
-            </i>
-          </span>
+          <span>{brand.name}<i>{brand.role}</i></span>
         </a>
 
-        {/* Both navigations are always rendered — CSS decides which one shows,
-            so the markup can never disagree with the layout. */}
+        {/* Obie nawigacje są zawsze w dokumencie — o tym, która jest widoczna,
+            decyduje CSS, więc układ nigdy nie rozjeżdża się ze znacznikami. */}
         <nav className="masthead-nav">
-          {NAV.map(([id, label]) => (
-            <a key={id} className={home && active === id ? 'is-active' : ''} href={href(id)}>{label}</a>
+          <a className={!home ? 'is-active' : ''} href={CATALOG_PATH} onClick={go}>Realizacje</a>
+          {SECTIONS.map(([id, label]) => (
+            <a key={id} className={home && active === id ? 'is-active' : ''} href={href(id)} onClick={go}>{label}</a>
           ))}
           {pages.length > 0 && (
             <div
@@ -79,10 +74,10 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
                 {pagesOpen && (
                   <motion.div
                     className="nav-dropdown"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.2 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.18 }}
                   >
                     {pages.map(page => (
                       <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
@@ -98,7 +93,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
         </nav>
 
         <div className="masthead-actions">
-          <a className="header-cta" href={href('kontakt')}>
+          <a className="header-cta" href={href('kontakt')} onClick={go}>
             <span>Nowy projekt</span>
             <ArrowUpRight size={15} />
           </a>
@@ -112,21 +107,16 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
         {open && (
           <motion.div
             className="mobile-sheet"
-            initial={{ opacity: 0, y: -16 }}
+            initial={{ opacity: 0, y: -14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.28 }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.24 }}
           >
             <nav>
-              {NAV.map(([id, label], index) => (
-                <a key={id} href={href(id)} onClick={go} style={{ '--i': index }}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>{label}
-                </a>
-              ))}
-              {pages.map((page, index) => (
-                <a key={page.id} href={`/p/${page.slug}`} onClick={go} style={{ '--i': NAV.length + index }}>
-                  <span>+</span>{page.title}
-                </a>
+              <a href={CATALOG_PATH} onClick={go}>Realizacje</a>
+              {SECTIONS.map(([id, label]) => <a key={id} href={href(id)} onClick={go}>{label}</a>)}
+              {pages.map(page => (
+                <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>
               ))}
             </nav>
             <a className="btn btn-primary" href={href('kontakt')} onClick={go}>
