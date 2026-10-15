@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════
-   STRONA — nagłówek, rejestr realizacji, sekcje, stopka
+   STRONA — nagłówek, lista prac, sekcje, stopka
    ══════════════════════════════════════════════════════════════════ */
 
 /* ── nagłówek ───────────────────────────────────────────────────── */
@@ -26,6 +26,19 @@
   transition: background .3s, border-color .3s, backdrop-filter .3s;
   border-bottom: 1px solid transparent;
 }
+
+/* Pasek stoi na dymie, więc ciemna poświata pod nim trzyma nazwy czytelne. */
+.masthead::before {
+  content: "";
+  position: absolute;
+  inset: -2px 0 -24px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(12, 11, 10, .92) 0%, rgba(12, 11, 10, .72) 58%, rgba(12, 11, 10, 0) 100%);
+  transition: opacity .3s;
+}
+
+.masthead.is-scrolled::before { opacity: 0; }
 
 .masthead.is-scrolled {
   background: rgba(12, 11, 10, .76);
@@ -84,12 +97,21 @@
 
 .nav-pages { position: relative; }
 
+/*
+ * Lista wysuwa się tuż pod przyciskiem, a odstęp robi jej własny padding —
+ * dzięki temu kursor nie przechodzi przez martwe pole i menu nie ucieka
+ * w trakcie sięgania do niego.
+ */
 .nav-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   width: min(360px, 80vw);
+  padding-top: 10px;
+}
+
+.nav-dropdown > div {
   display: grid;
   gap: 2px;
   padding: 7px;
@@ -170,44 +192,6 @@
   .wordmark > span i { display: none; }
 }
 
-/* ── boczna lista sekcji ────────────────────────────────────────── */
-
-.section-rail {
-  position: fixed;
-  top: 50%;
-  right: 16px;
-  z-index: 40;
-  transform: translateY(-50%);
-  display: grid;
-  gap: 14px;
-  justify-items: end;
-}
-
-.section-rail a { display: inline-flex; align-items: center; gap: 9px; }
-
-.section-rail i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--line-strong);
-  transition: background .25s, transform .25s;
-}
-
-.section-rail span {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: var(--ink-4);
-  opacity: 0;
-  transform: translateX(6px);
-  transition: opacity .25s, transform .25s;
-}
-
-.section-rail a:hover span,
-.section-rail a.is-active span { opacity: 1; transform: none; }
-.section-rail a.is-active i { background: var(--accent); transform: scale(1.5); }
-
-@media (max-width: 1280px) { .section-rail { display: none; } }
-
 /* ── hero ───────────────────────────────────────────────────────── */
 
 .hero {
@@ -219,7 +203,28 @@
   margin: 0 auto;
 }
 
-.hero-inner { display: grid; gap: clamp(24px, 3vw, 36px); max-width: 980px; }
+.hero-inner {
+  position: relative;
+  display: grid;
+  gap: clamp(24px, 3vw, 36px);
+  max-width: 980px;
+}
+
+/*
+ * Dym ma być widoczny, ale nie pod literami. Miękka ciemna kałuża pod kolumną
+ * tekstu gasi go dokładnie tam, gdzie zaczyna przeszkadzać, i rozmywa się do
+ * zera na brzegach — więc kadr wciąż żyje, a nagłówek da się czytać.
+ */
+.hero-inner::before {
+  content: "";
+  position: absolute;
+  inset: -14% -16% -12% -14%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 62% at 28% 46%, rgba(12, 11, 10, .95) 0%, rgba(12, 11, 10, .82) 48%, rgba(12, 11, 10, 0) 76%),
+    radial-gradient(70% 90% at 12% 50%, rgba(12, 11, 10, .72) 0%, rgba(12, 11, 10, 0) 70%);
+}
 
 .hero-title { max-width: 18ch; }
 .hero-title .accent { display: block; }
@@ -233,14 +238,7 @@
 
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 
-.hero-note {
-  max-width: 28ch;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-4);
-}
-
-/* Liczby policzone z rejestru. Rozdzielone cienką linią, nie kropką. */
+/* Liczby policzone z portfolio. Rozdzielone cienką linią, nie kropką. */
 .hero-facts {
   display: flex;
   flex-wrap: wrap;
@@ -283,7 +281,7 @@
   .hero-facts { gap: 0 24px; }
 }
 
-/* ── rejestr realizacji ─────────────────────────────────────────── */
+/* ── lista prac ─────────────────────────────────────────────────── */
 
 .register { display: grid; }
 
@@ -418,12 +416,12 @@
 
 /* ── katalog realizacji ─────────────────────────────────────────── */
 
-.catalog { padding-top: 60px; }
+.catalog { margin-top: 86px; }
 .catalog-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 
 /* ── strona realizacji ──────────────────────────────────────────── */
 
-.project-view { padding-top: 60px; }
+.project-view { margin-top: 86px; }
 
 .pv-back {
   display: inline-flex;
@@ -877,10 +875,7 @@
 
 .site-footer {
   position: relative;
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: clamp(50px, 6vw, 86px) var(--gutter) 30px;
-  border-top: 1px solid var(--line);
+  padding: clamp(44px, 5vw, 72px) var(--gutter) 28px;
 }
 
 .footer-top {
@@ -1542,7 +1537,6 @@
 @media (max-width: 720px) {
   h1 { font-size: clamp(36px, 10.5vw, 58px); }
   .hero-actions .btn { width: 100%; }
-  .hero-note { max-width: none; }
   .field-row { grid-template-columns: 1fr; }
   .form-nav { flex-direction: column-reverse; align-items: stretch; }
   .form-nav .btn { width: 100%; }

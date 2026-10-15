@@ -57,7 +57,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
         {/* Obie nawigacje są zawsze w dokumencie — o tym, która jest widoczna,
             decyduje CSS, więc układ nigdy nie rozjeżdża się ze znacznikami. */}
         <nav className="masthead-nav">
-          <a className={!home ? 'is-active' : ''} href={CATALOG_PATH} onClick={go}>Realizacje</a>
+          <a className={!home ? 'is-active' : ''} href={CATALOG_PATH} onClick={go}>Portfolio</a>
           {SECTIONS.map(([id, label]) => (
             <a key={id} className={home && active === id ? 'is-active' : ''} href={href(id)} onClick={go}>{label}</a>
           ))}
@@ -79,12 +79,14 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
                     exit={{ opacity: 0, y: 5 }}
                     transition={{ duration: 0.18 }}
                   >
-                    {pages.map(page => (
-                      <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
-                        <b>{page.title}</b>
-                        {page.excerpt && <span>{page.excerpt}</span>}
-                      </a>
-                    ))}
+                    <div>
+                      {pages.map(page => (
+                        <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
+                          <b>{page.title}</b>
+                          {page.excerpt && <span>{page.excerpt}</span>}
+                        </a>
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -113,7 +115,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
             transition={{ duration: 0.24 }}
           >
             <nav>
-              <a href={CATALOG_PATH} onClick={go}>Realizacje</a>
+              <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
               {SECTIONS.map(([id, label]) => <a key={id} href={href(id)} onClick={go}>{label}</a>)}
               {pages.map(page => (
                 <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>

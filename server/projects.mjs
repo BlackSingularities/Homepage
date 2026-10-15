@@ -107,7 +107,7 @@ export function sanitizeProject(input, existing = {}) {
   }
 }
 
-/** Wiersz rejestru na stronie głównej i w katalogu — bez pełnego opisu i galerii. */
+/** Wiersz listy na stronie głównej i w portfolio — bez pełnego opisu i galerii. */
 export function projectSummary(project, release) {
   return {
     id: project.id,

@@ -1,10 +1,10 @@
 /**
- * Przebudowa strony: nowy frontend, nowe teksty i osobny rejestr realizacji.
+ * Przebudowa strony: nowy frontend, nowe teksty i osobne portfolio.
  *
  * Treści strony głównej zmieniły kształt (zniknęły sekcje `work`, `services`,
  * `intelligence` i `manifesto`), więc zapisany `content.json` zostaje odłożony
  * na kopię i usunięty — serwer wraca do nowych wartości domyślnych. Portfolio
- * startuje puste: pozycje dodaje się w panelu, w zakładce Realizacje.
+ * startuje puste: pozycje dodaje się w panelu, w zakładce Portfolio.
  */
 
 import fs from 'node:fs/promises'
@@ -32,4 +32,4 @@ if (!await exists(projectsFile)) {
 }
 
 await fs.writeFile(markerFile, `${new Date().toISOString()}\n`, { mode: 0o600 })
-console.log('Przebudowa v12: treści przywrócone do domyślnych, rejestr realizacji pusty.')
+console.log('Przebudowa v12: treści przywrócone do domyślnych, portfolio puste.')

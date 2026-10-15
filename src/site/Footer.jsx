@@ -25,7 +25,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
         <nav className="footer-nav">
           <div>
             <span>Strona</span>
-            <a href={CATALOG_PATH} onClick={go}>Realizacje</a>
+            <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
             <a href={href('zakres')} onClick={go}>Zakres</a>
             <a href={href('proces')} onClick={go}>Proces</a>
             <a href={href('o-mnie')} onClick={go}>O mnie</a>

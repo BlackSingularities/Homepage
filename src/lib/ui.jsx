@@ -35,7 +35,13 @@ export function Reveal({ children, delay = 0, y = 26, className, as = 'div', amo
   )
 }
 
-/** Headline that reveals word by word. */
+/**
+ * Nagłówek odsłaniany słowo po słowie.
+ *
+ * Odstęp stoi POZA kafelkiem słowa: `inline-block` jest nierozerwalny, więc
+ * spacja schowana w środku nie daje przeglądarce miejsca na złamanie linii
+ * i długi nagłówek wyjeżdża poza kolumnę.
+ */
 export function KineticText({ text, accent, className }) {
   const reduce = useReducedMotion()
   const words = useMemo(() => String(text || '').split(' ').filter(Boolean), [text])
@@ -51,16 +57,16 @@ export function KineticText({ text, accent, className }) {
         <motion.span className="kinetic-word" key={`${word}-${index}`} variants={{
           hidden: { opacity: 0, y: '0.5em', filter: 'blur(8px)' },
           show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease } },
-        }}>{word}{' '}</motion.span>
-      ))}
+        }}>{word}</motion.span>
+      )).flatMap((node, index) => (index ? [' ', node] : [node]))}
       {accentWords.length > 0 && (
         <em className="accent">
           {accentWords.map((word, index) => (
             <motion.span className="kinetic-word" key={`accent-${index}`} variants={{
               hidden: { opacity: 0, y: '0.4em', filter: 'blur(10px)' },
               show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.9, ease } },
-            }}>{word}{' '}</motion.span>
-          ))}
+            }}>{word}</motion.span>
+          )).flatMap((node, index) => (index ? [' ', node] : [node]))}
         </em>
       )}
     </motion.span>
@@ -106,24 +112,4 @@ export function useActiveSection(ids) {
     return () => observer.disconnect()
   }, [ids.join(',')])
   return active
-}
-
-/** Fixed dot navigation mirroring the sections currently on screen. */
-export function SectionRail({ sections }) {
-  const active = useActiveSection(sections.map(([id]) => id))
-  return (
-    <nav className="section-rail" aria-label="Sekcje strony">
-      {sections.map(([id, label]) => (
-        <a
-          key={id}
-          href={`#${id}`}
-          className={active === id ? 'is-active' : ''}
-          aria-current={active === id ? 'location' : undefined}
-        >
-          <i aria-hidden="true" />
-          <span>{label}</span>
-        </a>
-      ))}
-    </nav>
-  )
 }

@@ -1,6 +1,5 @@
 import { ArrowRight } from 'lucide-react'
 import { CATALOG_PATH, plural } from '../lib/projects'
-import { SectionRail } from '../lib/ui'
 import Hero from './Hero'
 import Register from './Register'
 import SectionHead from './SectionHead'
@@ -11,20 +10,11 @@ import About from './About'
 import Faq from './Faq'
 import Contact from './Contact'
 
-const RAIL = [
-  ['start', 'Start'],
-  ['realizacje', 'Realizacje'],
-  ['zakres', 'Zakres'],
-  ['proces', 'Proces'],
-  ['o-mnie', 'O mnie'],
-  ['kontakt', 'Kontakt'],
-]
-
 const FEATURED_LIMIT = 5
 
 export default function Home({ content, pages, projects, onNavigate }) {
   // Na stronie głównej stoją tylko pozycje zaznaczone w panelu jako wybrane;
-  // gdy żadnej nie zaznaczono, pokazujemy początek rejestru.
+  // gdy żadnej nie zaznaczono, pokazujemy początek portfolio.
   const marked = projects.filter(project => project.featured)
   const featured = (marked.length ? marked : projects).slice(0, FEATURED_LIMIT)
   const hidden = projects.length - featured.length
@@ -32,16 +22,18 @@ export default function Home({ content, pages, projects, onNavigate }) {
 
   return (
     <main>
-      <SectionRail sections={RAIL} />
       <Hero hero={content.hero} projects={projects} onNavigate={onNavigate} />
 
-      <section className="section work" id="realizacje">
+      {/* Wszystko poniżej hero stoi na jednej płycie, żeby dym nie przechodził
+          pod treścią, a kolumna miała wyraźny początek i koniec. */}
+      <div className="page-slab">
+      <section className="section work" id="portfolio">
         <SectionHead
           title={content.projects.title}
           accent={content.projects.accent}
           lead={content.projects.lead}
           count={hidden > 0
-            ? `${featured.length} z ${projects.length} — ${hidden} ${plural(hidden, 'pozycja czeka w pełnym rejestrze', 'pozycje czekają w pełnym rejestrze', 'pozycji czeka w pełnym rejestrze')}`
+            ? `${featured.length} z ${projects.length} — ${hidden} ${plural(hidden, 'pozycja czeka w portfolio', 'pozycje czekają w portfolio', 'pozycji czeka w portfolio')}`
             : undefined}
         />
         <Register projects={featured} onNavigate={onNavigate} lead empty={content.projects.empty} />
@@ -62,6 +54,7 @@ export default function Home({ content, pages, projects, onNavigate }) {
       <About data={content.about} brand={content.brand} />
       <Faq data={content.faq} />
       <Contact data={content.contact} brand={content.brand} scopeOptions={scopeOptions} />
+      </div>
     </main>
   )
 }

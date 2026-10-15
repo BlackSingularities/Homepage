@@ -12,7 +12,7 @@ import {
 } from './parts'
 
 /**
- * Rejestr realizacji. Dwa rodzaje treści, więc formularz pokazuje tylko to, co
+ * Portfolio. Dwa rodzaje treści, więc formularz pokazuje tylko to, co
  * dotyczy wybranego rodzaju: strona ma adres, aplikacja — repozytorium albo
  * ręczną listę plików. Wydania z GitHuba podglądamy tutaj, żeby błąd tokenu
  * albo brak uprawnień było widać przed publikacją, a nie na stronie.
@@ -31,7 +31,7 @@ const RELEASE_OPTIONS = [
 
 function emptyProject() {
   return {
-    name: 'Nowa realizacja',
+    name: 'Nowa praca',
     slug: '',
     kind: 'web',
     label: '',
@@ -246,10 +246,10 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
       <div className="ap-grid-3">
         <Text label="Nazwa" value={project.name} onChange={name => update({ name })} />
         <Text
-          label="Adres w rejestrze"
+          label="Adres pracy"
           value={project.slug}
           onChange={slug => update({ slug })}
-          hint={`/realizacje/${project.slug || '…'}`}
+          hint={`/portfolio/${project.slug || '…'}`}
         />
         <Select
           label="Rodzaj"
@@ -264,10 +264,10 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
         <Text label="Rok" value={project.year} onChange={year => update({ year })} />
       </div>
 
-      <Text label="Zdanie w rejestrze" value={project.tagline} onChange={tagline => update({ tagline })} wide
+      <Text label="Zdanie na liście" value={project.tagline} onChange={tagline => update({ tagline })} wide
         hint="Jedno zdanie, które widać na liście." />
       <Area label="Wprowadzenie" value={project.summary} onChange={summary => update({ summary })} rows={2}
-        hint="Pierwszy, wyróżniony akapit na stronie realizacji." />
+        hint="Pierwszy, wyróżniony akapit na stronie pracy." />
       <Area label="Opis" value={project.body} onChange={body => update({ body })} rows={7}
         hint="Akapity rozdzielaj pustą linią." />
       <Text label="Mój udział" value={project.role} onChange={role => update({ role })} wide
@@ -278,7 +278,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
         <Lines label="Technologie" value={project.stack} onChange={stack => update({ stack })} rows={5} />
       </div>
 
-      <ImagePicker label="Okładka w rejestrze" value={project.cover} onChange={cover => update({ cover })}
+      <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
         hint="Najlepiej poziomy zrzut ekranu — kadrowany do 16:10." />
       <Shots value={project.shots} onChange={shots => update({ shots })} />
 
@@ -360,13 +360,13 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
       <div className="ap-grid-2">
         <Toggle
           label="Opublikowana"
-          hint="Dopóki wyłączone, realizacja jest widoczna tylko tutaj."
+          hint="Dopóki wyłączone, praca jest widoczna tylko tutaj."
           checked={project.published !== false}
           onChange={published => update({ published })}
         />
         <Toggle
           label="Wybrana na stronę główną"
-          hint="Strona główna pokazuje do pięciu wybranych pozycji."
+          hint="Strona główna pokazuje do pięciu wybranych prac."
           checked={project.featured === true}
           onChange={featured => update({ featured })}
         />
@@ -374,10 +374,10 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
 
       <div className="ap-project-foot">
         <button className="ap-btn ap-btn-danger" onClick={onDelete}>
-          <Trash2 size={14} /> Usuń realizację
+          <Trash2 size={14} /> Usuń pracę
         </button>
         {project.slug && project.published !== false && (
-          <a className="ap-btn ap-btn-ghost" href={`/realizacje/${project.slug}`} target="_blank" rel="noreferrer">
+          <a className="ap-btn ap-btn-ghost" href={`/portfolio/${project.slug}`} target="_blank" rel="noreferrer">
             Podejrzyj na stronie <ArrowUpRight size={14} />
           </a>
         )}
@@ -428,7 +428,7 @@ export default function ProjectsManager({ notify }) {
     try {
       const created = await api('/api/admin/projects', json('POST', emptyProject()))
       await load(created.id)
-      notify('Realizacja dodana. Uzupełnij treść i opublikuj.')
+      notify('Praca dodana. Uzupełnij treść i opublikuj.')
     } catch (requestError) {
       setError(requestError.message)
     }
@@ -440,7 +440,7 @@ export default function ProjectsManager({ notify }) {
     try {
       const saved = await api(`/api/admin/projects/${draft.id}`, json('PUT', draft))
       await load(saved.id)
-      notify('Realizacja zapisana.')
+      notify('Praca zapisana.')
     } catch (requestError) {
       setError(requestError.message)
     } finally {
@@ -449,12 +449,12 @@ export default function ProjectsManager({ notify }) {
   }
 
   const remove = async () => {
-    if (!window.confirm(`Usunąć „${draft.name}” z rejestru?`)) return
+    if (!window.confirm(`Usunąć „${draft.name}” z portfolio?`)) return
     await api(`/api/admin/projects/${draft.id}`, { method: 'DELETE' })
     setSelected('')
     setDraft(null)
     await load()
-    notify('Realizacja usunięta.')
+    notify('Praca usunięta.')
   }
 
   const move = async (id, direction) => {
@@ -467,7 +467,7 @@ export default function ProjectsManager({ notify }) {
   }
 
   if (!projects) {
-    return <div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję rejestr…</div>
+    return <div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję portfolio…</div>
   }
 
   return (
@@ -479,11 +479,11 @@ export default function ProjectsManager({ notify }) {
       <div className="ap-projects-layout">
         <div className="ap-projects-list">
           <div className="ap-projects-list-head">
-            <span>{projects.length} w rejestrze</span>
+            <span>{projects.length} w portfolio</span>
             <button className="ap-btn ap-btn-primary" onClick={create}><Plus size={14} /> Dodaj</button>
           </div>
 
-          {!projects.length && <Empty>Rejestr jest pusty. Dodaj pierwszą realizację.</Empty>}
+          {!projects.length && <Empty>Portfolio jest puste. Dodaj pierwszą pracę.</Empty>}
 
           {projects.map((project, index) => (
             <div key={project.id} className={`ap-project-row ${project.id === selected ? 'is-active' : ''}`}>
@@ -527,7 +527,7 @@ export default function ProjectsManager({ notify }) {
                 dirty={dirty}
               />
             )
-            : <Empty>Wybierz realizację z listy albo dodaj nową.</Empty>}
+            : <Empty>Wybierz pracę z listy albo dodaj nową.</Empty>}
         </div>
       </div>
     </div>

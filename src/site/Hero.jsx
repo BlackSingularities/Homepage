@@ -6,7 +6,7 @@ import { KineticText, ease } from '../lib/ui'
 /**
  * Pierwszy ekran jest cichy: tło ze znaków samo w sobie jest wydarzeniem, więc
  * nad nim stoi tylko typografia, jedno wezwanie i trzy liczby policzone
- * z rejestru. Liczby są prawdziwe — nie da się ich przeterminować w panelu.
+ * z portfolio. Liczby są prawdziwe — nie da się ich przeterminować w panelu.
  */
 
 function counts(projects) {
@@ -54,7 +54,6 @@ export default function Hero({ hero, projects = [], onNavigate }) {
           >
             {hero.secondaryCta}
           </a>
-          {hero.note && <span className="hero-note">{hero.note}</span>}
         </motion.div>
 
         {facts.length > 0 && (

@@ -4,7 +4,7 @@ import Register from './Register'
 import SectionHead from './SectionHead'
 
 /**
- * Pełny rejestr pod `/realizacje`. Filtr dzieli treść na dwa rodzaje, które
+ * Całe portfolio pod `/portfolio`. Filtr dzieli treść na dwa rodzaje, które
  * naprawdę różnią się dowodem: serwis otwiera się w przeglądarce, aplikację
  * się pobiera. Liczba przy filtrze mówi, ile pozycji za nim stoi.
  */
@@ -36,9 +36,9 @@ export default function Catalog({ data, projects, onNavigate }) {
           title={data.title}
           accent={data.accent}
           lead={data.lead}
-          count={`${projects.length} ${plural(projects.length, 'pozycja', 'pozycje', 'pozycji')} w rejestrze`}
+          count={`${projects.length} ${plural(projects.length, 'pozycja', 'pozycje', 'pozycji')} w portfolio`}
           action={filters.length > 2 ? (
-            <div className="catalog-filters" role="group" aria-label="Rodzaj realizacji">
+            <div className="catalog-filters" role="group" aria-label="Rodzaj pracy">
               {filters.map(([id, label]) => (
                 <button
                   key={id}

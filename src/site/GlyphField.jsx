@@ -17,7 +17,7 @@ const CELL_W = 11
 const CELL_H = 15
 const FONT_PX = 11
 const FRAME_MS = 1000 / 30
-const LEVELS = 6
+const LEVELS = 10
 
 // deterministyczny hash siatki → [0, 1)
 function hash(ix, iy, seed) {
@@ -38,6 +38,31 @@ function valueNoise(x, y, seed) {
   const c = hash(ix, iy + 1, seed)
   const d = hash(ix + 1, iy + 1, seed)
   return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy
+}
+
+/** Miękkie przejście między progami — bez niego dym ma twarde krawędzie. */
+function smoothstep(edge0, edge1, value) {
+  const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)))
+  return t * t * (3 - 2 * t)
+}
+
+/**
+ * Gęstość dymu w punkcie siatki.
+ *
+ * Najpierw zniekształcamy współrzędne drugim polem szumu (domain warping) —
+ * to od tego biorą się kłęby i smugi zamiast równych plam. Dopiero tak
+ * przesuniętą próbkę czytamy trzema oktawami: pierwsza daje bryłę, kolejne
+ * strzępią jej brzegi. Całość powoli unosi się do góry, a drobne oktawy
+ * płyną szybciej niż bryła, więc dym kłębi się w miejscu, a nie tylko jedzie.
+ */
+function smoke(nx, ny, t, seed) {
+  const wx = valueNoise(nx * 0.55 + t * 0.021, ny * 0.55 - t * 0.055, seed + 31) - 0.5
+  const wy = valueNoise(nx * 0.55 - t * 0.017, ny * 0.55 - t * 0.047, seed + 57) - 0.5
+  const sx = nx + wx * 2.4
+  const sy = ny - t * 0.09 + wy * 2.4
+  return valueNoise(sx * 0.8, sy * 0.6, seed) * 0.56
+    + valueNoise(sx * 1.9, sy * 1.5 - t * 0.13, seed + 7) * 0.3
+    + valueNoise(sx * 4.1, sy * 3.2 - t * 0.21, seed + 11) * 0.14
 }
 
 function buildAtlas(color, dpr) {
@@ -116,21 +141,19 @@ export default function GlyphField({ intensity = 1 }) {
 
       const sw = CELL_W * dpr
       const sh = CELL_H * dpr
-      const driftX = t * 0.045
-      const driftY = t * 0.028
       for (let row = 0; row < rows; row += 1) {
         const py = row * CELL_H
-        const ny = row / 15
+        // kolumny czytamy gęściej niż wiersze, więc kłęby są wyższe niż szersze
+        const ny = row / 21
         for (let col = 0; col < cols; col += 1) {
           const idx = row * cols + col
           const px = col * CELL_W
-          const nx = col / 24
+          const nx = col / 26
 
-          // dwie oktawy szumu tworzą wolno płynące „wyspy” jaśniejszych znaków
-          const n = valueNoise(nx + driftX, ny - driftY, seed) * 0.68
-            + valueNoise(nx * 2.3 - driftY, ny * 2.3 + driftX, seed + 7) * 0.32
-          let level = Math.max(0, (n - 0.56) / 0.44)
-          level = Math.min(1, level * level * 2.4)
+          // Progi dobrane tak, żeby dym zapalał mniej więcej co szósty znak:
+          // reszta ekranu zostaje ciemna i kłęby mają kształt, zamiast zlewać
+          // się w jednolitą ścianę.
+          let level = smoothstep(0.56, 0.72, smoke(nx, ny, t, seed))
 
           if (pointer.active) {
             const dx = px - pointer.x
@@ -151,18 +174,22 @@ export default function GlyphField({ intensity = 1 }) {
           }
 
           // ślad po fali stygnie powoli, dzięki czemu znaki „pamiętają” przejście
-          const h = Math.max(level, heat[idx] * 0.94)
+          const h = Math.max(level, heat[idx] * 0.955)
           heat[idx] = h
 
-          if (Math.random() < 0.0025 + h * 0.03) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
+          if (Math.random() < 0.002 + h * 0.045) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
 
-          const base = 0.03 + hash(col, row, seed + 3) * 0.045
+          // Kontrast robi różnica między warstwami: znaki poza dymem są ledwie
+          // widoczne, rozświetlone — wyraźnie jasne. Dzięki temu dym ma kształt,
+          // zamiast rozmywać się w równomierną szarość.
+          const density = Math.min(1, h)
           const sx = glyphs[idx] * sw
-          ctx.globalAlpha = Math.min(1, base * (1 - Math.min(h, 1) * 0.7) * intensity)
+          const base = 0.016 + hash(col, row, seed + 3) * 0.026
+          ctx.globalAlpha = Math.min(1, base * (1 - density * 0.85) * intensity)
           ctx.drawImage(dim, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
-          if (h > 0.1) {
-            const q = Math.min(LEVELS, Math.ceil(h * LEVELS)) / LEVELS
-            ctx.globalAlpha = Math.min(0.9, q * 0.7 * intensity)
+          if (density > 0.06) {
+            const q = Math.min(LEVELS, Math.ceil(density * LEVELS)) / LEVELS
+            ctx.globalAlpha = Math.min(0.92, Math.pow(q, 1.6) * 0.9 * intensity)
             ctx.drawImage(glow, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
           }
         }

@@ -4,7 +4,7 @@ import { api, json, uid } from '../lib/api'
 import { Area, Field, Notice, Repeater, SaveBar, Text } from './parts'
 
 /**
- * Teksty strony głównej i katalogu. Realizacje mają własną zakładkę, bo są
+ * Teksty strony głównej i portfolio. Prace mają własną zakładkę, bo są
  * osobnym zbiorem danych — tutaj ustawia się tylko nagłówki sekcji, w których
  * się pokazują.
  */
@@ -124,7 +124,7 @@ export default function ContentManager({ notify }) {
       {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
       <div className="ap-content-intro">
-        <p>Teksty strony głównej i katalogu realizacji. Same realizacje dodaje się w zakładce Realizacje.</p>
+        <p>Teksty strony głównej i portfolio. Same prace dodaje się w zakładce Portfolio.</p>
         <button className="ap-btn ap-btn-ghost" onClick={resetAll}><RotateCcw size={14} /> Przywróć domyślne</button>
       </div>
 
@@ -144,7 +144,7 @@ export default function ContentManager({ notify }) {
         </div>
       </Section>
 
-      <Section id="hero" title="Pierwszy ekran" description="Nagłówek, wprowadzenie i przyciski. Liczby pod nimi liczą się same z rejestru." open={open === 'hero'} onToggle={toggle}>
+      <Section id="hero" title="Pierwszy ekran" description="Nagłówek, wprowadzenie i przyciski. Liczby pod nimi liczą się same z portfolio." open={open === 'hero'} onToggle={toggle}>
         <div className="ap-grid-2">
           <Text label="Nagłówek" value={draft.hero.titleTop} onChange={titleTop => patch('hero', { titleTop })} />
           <Text label="Nagłówek — część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
@@ -154,18 +154,17 @@ export default function ContentManager({ notify }) {
           <Text label="Przycisk główny" value={draft.hero.primaryCta} onChange={primaryCta => patch('hero', { primaryCta })} />
           <Text label="Przycisk dodatkowy" value={draft.hero.secondaryCta} onChange={secondaryCta => patch('hero', { secondaryCta })} />
         </div>
-        <Text label="Dopisek przy przyciskach" value={draft.hero.note} onChange={note => patch('hero', { note })} wide />
       </Section>
 
-      <Section id="projects" title="Realizacje na stronie głównej" description="Nagłówek sekcji z wybranymi pozycjami rejestru." open={open === 'projects'} onToggle={toggle}>
+      <Section id="projects" title="Portfolio na stronie głównej" description="Nagłówek sekcji z wybranymi pracami." open={open === 'projects'} onToggle={toggle}>
         <HeadFields data={draft.projects} patch={value => patch('projects', value)} />
         <div className="ap-grid-2">
           <Text label="Przycisk do katalogu" value={draft.projects.catalogCta} onChange={catalogCta => patch('projects', { catalogCta })} />
-          <Text label="Tekst przy pustym rejestrze" value={draft.projects.empty} onChange={empty => patch('projects', { empty })} />
+          <Text label="Tekst przy pustym portfolio" value={draft.projects.empty} onChange={empty => patch('projects', { empty })} />
         </div>
       </Section>
 
-      <Section id="catalog" title="Katalog realizacji" description="Teksty strony /realizacje i nazwy filtrów." open={open === 'catalog'} onToggle={toggle}>
+      <Section id="catalog" title="Całe portfolio" description="Teksty strony /portfolio i nazwy filtrów." open={open === 'catalog'} onToggle={toggle}>
         <HeadFields data={draft.catalog} patch={value => patch('catalog', value)} />
         <div className="ap-grid-3">
           <Text label="Filtr: wszystko" value={draft.catalog.filterAll} onChange={filterAll => patch('catalog', { filterAll })} />

@@ -160,6 +160,7 @@ em.accent,
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  opacity: .5;
 }
 
 .glyph-backdrop::after {
@@ -176,17 +177,29 @@ em.accent,
 .site > *:not(.glyph-backdrop) { position: relative; z-index: 1; }
 
 /*
- * Tło ze znaków ma oddychać w pierwszym ekranie i na marginesach, ale pod
- * tekstem musi ucichnąć. Każda sekcja poza hero kładzie się więc na
- * półprzezroczystej płycie szerokiej na kolumnę treści.
+ * Treść stoi na jednej płycie obrysowanej cienką linią, a dym zostaje pod nią
+ * i dookoła. Dzięki temu kolumna ma wyraźny początek i koniec, a tło nie
+ * przechodzi pod literami.
  */
-main > section:not(.hero),
-.catalog > .section,
-.project-view > .section,
+.page-slab,
+.catalog,
+.project-view,
 .page-view,
-.site-footer { background: rgba(12, 11, 10, .87); }
+.site-footer {
+  /* zawsze zostaje margines, więc obwódkę płyty widać przy każdej szerokości */
+  width: min(var(--maxw), calc(100% - 2 * clamp(10px, 2vw, 30px)));
+  margin: 0 auto clamp(26px, 3vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: clamp(14px, 1.6vw, 24px);
+  background: rgba(12, 11, 10, .93);
+  box-shadow: var(--shadow);
+}
 
-main > section:not(.hero) + section { margin-top: -1px; }
+.page-slab > .section,
+.catalog > .section,
+.project-view > .section { max-width: none; }
+
+.site-footer { border-radius: clamp(14px, 1.6vw, 24px); }
 
 .section {
   position: relative;

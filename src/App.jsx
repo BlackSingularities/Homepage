@@ -26,6 +26,7 @@ function usePath() {
 function routeOf(path) {
   const clean = path.replace(/\/+$/, '') || '/'
   if (clean === CATALOG_PATH) return { view: 'catalog' }
+  if (clean === '/realizacje') return { view: 'catalog' }
   if (clean.startsWith(`${CATALOG_PATH}/`)) {
     return { view: 'project', slug: decodeURIComponent(clean.slice(CATALOG_PATH.length + 1)) }
   }

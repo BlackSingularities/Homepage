@@ -5,8 +5,8 @@ import { Command, FileDown, Monitor, Smartphone, Tablet, Terminal } from 'lucide
  * sama, co na serwerze — pliki do pobrania zawsze układają się identycznie.
  */
 
-/** Adres katalogu realizacji — jedno miejsce, z którego korzystają wszystkie widoki. */
-export const CATALOG_PATH = '/realizacje'
+/** Adres portfolio — jedno miejsce, z którego korzystają wszystkie widoki. */
+export const CATALOG_PATH = '/portfolio'
 
 export const KIND_LABEL = { web: 'Strona', app: 'Aplikacja' }
 
@@ -45,7 +45,7 @@ export function formatReleaseDate(value) {
   return new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
 }
 
-/** Adres bez protokołu — w rejestrze liczy się domena, nie `https://`. */
+/** Adres bez protokołu — na liście liczy się domena, nie `https://`. */
 export function hostOf(url) {
   if (!url) return ''
   if (url.startsWith('/')) return `redzikowski.com${url}`

@@ -14,7 +14,7 @@ import '../styles/admin.css'
 const TABS = [
   ['dashboard', 'Pulpit', LayoutDashboard],
   ['submissions', 'Zgłoszenia', MessageSquareText],
-  ['projects', 'Realizacje', Boxes],
+  ['projects', 'Portfolio', Boxes],
   ['pages', 'Podstrony', Files],
   ['content', 'Treści strony', FileStack],
   ['gallery', 'Galeria', Camera],

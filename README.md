@@ -1,7 +1,7 @@
 # redzikowski.com — strona ofertowa + panel
 
 Strona ofertowa (React + Vite) i lekki CMS na Node/Express. Treści strony głównej,
-rejestr realizacji i dowolna liczba podstron są edytowalne z panelu `/admin`.
+portfolio i dowolna liczba podstron są edytowalne z panelu `/admin`.
 
 Oprawa wizualna jest wspólna z Arcadią: tło `GlyphField` (siatka znaków z falami po
 kliknięciu), chłodna paleta z niebieskim akcentem i fonty Space Grotesk / Inter Tight /
@@ -58,7 +58,7 @@ drugiego logowania i bez osobnego hasła galerii.
 | --- | --- |
 | Pulpit | Liczby, ostatnie zgłoszenia, skróty |
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
-| Realizacje | Rejestr portfolio: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
+| Portfolio | Prace: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
 | Treści strony | Teksty strony głównej i katalogu — hero, nagłówki sekcji, zakres, proces, FAQ, kontakt |
 | Zdjęcia | Biblioteka mediów: upload przeciągnięciem, kopiowanie adresu, usuwanie |
@@ -72,10 +72,10 @@ drugiego logowania i bez osobnego hasła galerii.
 Bloki można dowolnie dodawać, przestawiać i usuwać. Opublikowana strona jest dostępna
 pod `/p/<adres>` i pojawia się w menu, w sekcji oferty na stronie głównej oraz w stopce.
 
-## Realizacje
+## Portfolio
 
 Portfolio jest osobnym zbiorem danych (`projects.json`), a nie częścią treści strony.
-Każda pozycja jest jednego z dwóch rodzajów:
+Każda praca jest jednego z dwóch rodzajów:
 
 - **strona** — dowodem jest działający adres; można go ukryć, wtedy strona pisze,
   że prezentacja jest na życzenie,
@@ -89,8 +89,8 @@ Pliki aplikacji biorą się z jednego z trzech źródeł (`releaseSource`):
 | `manual` | Lista wpisana ręcznie w panelu: platforma, wersja, rozmiar, adres |
 | `none` | Bez sekcji pobierania |
 
-Strona główna pokazuje do pięciu pozycji zaznaczonych jako wybrane; pełny rejestr
-stoi pod `/realizacje`, a każda pozycja ma własny adres `/realizacje/<slug>`.
+Strona główna pokazuje do pięciu prac zaznaczonych jako wybrane; całe portfolio
+stoi pod `/portfolio`, a każda praca ma własny adres `/portfolio/<slug>`.
 
 ### Wydania z GitHuba
 
@@ -102,7 +102,7 @@ samym kluczem co hasło poczty i nigdy nie opuszcza serwera.
 
 Odpowiedzi GitHuba lądują w `releases.json` z czasem życia 30 minut, więc strona nie
 odpytuje API przy każdym wejściu. Gdy odświeżenie się nie powiedzie, serwer podaje
-ostatni udany wynik, a panel pokazuje powód błędu przy realizacji.
+ostatni udany wynik, a panel pokazuje powód błędu przy pracy.
 
 ## Dane
 
@@ -112,7 +112,7 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 | --- | --- |
 | `content.json` | Treści strony głównej (braki uzupełnia `server/content.default.json`) |
 | `pages.json` | Podstrony CMS |
-| `projects.json` | Rejestr realizacji |
+| `projects.json` | Prace w portfolio |
 | `releases.json` | Cache wydań z GitHuba |
 | `integrations.json` | Token GitHuba (zaszyfrowany) |
 | `submissions.json` | Zgłoszenia z formularza |

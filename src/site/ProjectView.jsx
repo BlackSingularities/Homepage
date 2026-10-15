@@ -121,13 +121,13 @@ export default function ProjectView({ slug, onNavigate }) {
     return (
       <main className="page-state">
         <h1>404</h1>
-        <p>Tej realizacji nie ma w rejestrze albo nie jest opublikowana.</p>
+        <p>Tej pracy nie ma w portfolio albo nie jest opublikowana.</p>
         <a
           className="btn btn-primary"
           href={CATALOG_PATH}
           onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
         >
-          Wróć do rejestru
+          Wróć do portfolio
         </a>
       </main>
     )
@@ -144,7 +144,7 @@ export default function ProjectView({ slug, onNavigate }) {
           href={CATALOG_PATH}
           onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
         >
-          <ArrowLeft size={15} /> Rejestr realizacji
+          <ArrowLeft size={15} /> Portfolio
         </a>
 
         <header className="pv-head">
@@ -217,7 +217,7 @@ export default function ProjectView({ slug, onNavigate }) {
         <Downloads project={project} />
 
         {(previous || next) && (
-          <nav className="pv-nav" aria-label="Inne realizacje">
+          <nav className="pv-nav" aria-label="Inne prace">
             {previous && (
               <a
                 href={`${CATALOG_PATH}/${previous.slug}`}

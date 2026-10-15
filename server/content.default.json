@@ -11,17 +11,16 @@
   "hero": {
     "titleTop": "Jedna osoba",
     "titleAccent": "od analizy do wdrożenia.",
-    "lead": "Projektuję i buduję strony oraz aplikacje na zamówienie. Zaczynam od problemu i sposobu pracy, potem odpowiadam za interfejs, kod, uruchomienie i dalszy rozwój. Niżej jest rejestr tego, co z tego wyszło — każdą rzecz można otworzyć albo pobrać.",
+    "lead": "Projektuję i buduję strony oraz aplikacje na zamówienie. Zaczynam od problemu i sposobu pracy, potem odpowiadam za interfejs, kod, uruchomienie i dalszy rozwój. Niżej są przykładowe prace — każdą można otworzyć w przeglądarce albo pobrać.",
     "primaryCta": "Napisz, czego potrzebujesz",
-    "secondaryCta": "Przejdź do rejestru",
-    "note": "Pracuję z Łodzi, cały proces może przebiegać zdalnie."
+    "secondaryCta": "Zobacz portfolio"
   },
   "projects": {
-    "title": "Rejestr zbudowanych",
-    "accent": "systemów.",
+    "title": "Przykładowe prace",
+    "accent": "z ostatnich lat.",
     "lead": "Każda pozycja ma własną architekturę, interfejs i zaplecze. Żadna nie powstała na gotowym motywie.",
-    "catalogCta": "Pełny rejestr",
-    "empty": "Rejestr jest jeszcze pusty."
+    "catalogCta": "Całe portfolio",
+    "empty": "Portfolio jest jeszcze puste."
   },
   "catalog": {
     "title": "Wszystko, co zbudowałem",
@@ -90,7 +89,7 @@
     "title": "Nie zaczynam od szablonu.",
     "accent": "Zaczynam od Twojego sposobu pracy.",
     "lead": "Jestem analitykiem danych, projektantem i programistą. Łączę kompetencje, które w większych realizacjach rozkłada się na kilka osób.",
-    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon — zawsze od zera i pod konkretny sposób działania.\n\nDuża część rzeczy w rejestrze powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
+    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon — zawsze od zera i pod konkretny sposób działania.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
     "strengths": [
       "Analityka danych i raportowanie",
       "Grafika i projektowanie interfejsów",

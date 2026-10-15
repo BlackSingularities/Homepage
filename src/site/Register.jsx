@@ -3,7 +3,7 @@ import { CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from 
 import { Reveal } from '../lib/ui'
 
 /**
- * Rejestr zbudowanych systemów. Każdy wiersz niesie informację, a nie ozdobę:
+ * Lista prac. Każdy wiersz niesie informację, a nie ozdobę:
  * rodzaj treści, rok, i po prawej dowód — adres działającej strony albo
  * platformy, na które jest plik do pobrania.
  *
@@ -65,7 +65,7 @@ function Row({ project, onNavigate, lead }) {
 }
 
 export default function Register({ projects, onNavigate, lead = false, empty }) {
-  if (!projects.length) return <p className="reg-empty">{empty || 'Rejestr jest jeszcze pusty.'}</p>
+  if (!projects.length) return <p className="reg-empty">{empty || 'Portfolio jest jeszcze puste.'}</p>
 
   return (
     <div className="register">
