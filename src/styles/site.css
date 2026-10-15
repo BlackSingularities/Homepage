@@ -28,7 +28,7 @@
 }
 
 .masthead.is-scrolled {
-  background: rgba(11, 12, 15, .76);
+  background: rgba(12, 11, 10, .76);
   border-bottom-color: var(--line);
   backdrop-filter: blur(18px) saturate(1.4);
 }
@@ -95,7 +95,7 @@
   padding: 7px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
-  background: rgba(17, 19, 24, .97);
+  background: rgba(20, 17, 15, .97);
   box-shadow: var(--shadow-lg);
 }
 
@@ -141,7 +141,7 @@
   padding: 18px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-xl);
-  background: rgba(13, 15, 19, .98);
+  background: rgba(14, 12, 11, .98);
   backdrop-filter: blur(20px);
   box-shadow: var(--shadow-lg);
 }
@@ -350,10 +350,10 @@
   font-size: 10.5px;
   letter-spacing: .02em;
   background: rgba(var(--accent-rgb), .13);
-  color: #9cc4ff;
+  color: #f0d6a6;
 }
 
-.reg-kind[data-kind="app"] { background: rgba(167, 139, 250, .15); color: #c4b2ff; }
+.reg-kind[data-kind="app"] { background: rgba(255, 255, 255, .07); color: #c9cfd9; }
 
 .reg-label { font-size: 12.5px; color: var(--ink-4); }
 
@@ -559,7 +559,7 @@
 
 .pv-downloads-head h2 { font-size: clamp(22px, 2.2vw, 30px); }
 .pv-release { font-size: 12.5px; color: var(--ink-3); }
-.pv-release .mono { color: var(--good); }
+.pv-release .mono { color: var(--accent); }
 .pv-release a { color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--line-strong); }
 .pv-release a:hover { color: var(--accent); }
 
@@ -957,7 +957,7 @@
   display: grid;
   place-items: center;
   padding: clamp(20px, 5vw, 70px);
-  background: rgba(5, 6, 8, .9);
+  background: rgba(6, 5, 4, .9);
   backdrop-filter: blur(8px);
   cursor: zoom-out;
 }
@@ -986,7 +986,7 @@
   position: absolute;
   inset: auto -20% -40% ;
   height: 70%;
-  background: radial-gradient(ellipse at 50% 100%, rgba(94, 162, 255, .16), transparent 62%);
+  background: radial-gradient(ellipse at 50% 100%, rgba(231, 198, 138, .16), transparent 62%);
   filter: blur(60px);
   pointer-events: none;
 }
@@ -1011,7 +1011,7 @@
   border: 1px solid var(--line);
   border-radius: clamp(20px, 2.5vw, 32px);
   overflow: hidden;
-  background: rgba(14, 16, 20, .92);
+  background: rgba(15, 13, 12, .92);
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow-lg);
 }
@@ -1027,7 +1027,7 @@
   padding: clamp(28px, 3.4vw, 48px);
   border-right: 1px solid var(--line-soft);
   background:
-    radial-gradient(circle at 12% 5%, rgba(94, 162, 255, .13), transparent 38%),
+    radial-gradient(circle at 12% 5%, rgba(231, 198, 138, .13), transparent 38%),
     linear-gradient(160deg, rgba(255, 255, 255, .035), transparent 65%);
 }
 
@@ -1068,10 +1068,10 @@
 
 .form-step > span { display: grid; gap: 3px; }
 .form-step small { font-size: 9.5px; font-weight: 500; color: var(--ink-4); }
-.form-step.is-active { color: var(--ink); border-color: var(--line-strong); background: rgba(94, 162, 255, .07); }
+.form-step.is-active { color: var(--ink); border-color: var(--line-strong); background: rgba(231, 198, 138, .07); }
 .form-step.is-active i { background: var(--gradient-gold); color: var(--accent-ink); }
 .form-step.is-done { color: var(--gold); }
-.form-step.is-done i { background: rgba(94, 162, 255, .18); color: var(--gold); }
+.form-step.is-done i { background: rgba(231, 198, 138, .18); color: var(--gold); }
 
 .form-progress {
   height: 3px;
@@ -1126,7 +1126,7 @@
 .field textarea:focus {
   border-color: var(--line-strong);
   background: rgba(255, 255, 255, .045);
-  box-shadow: 0 0 0 4px rgba(94, 162, 255, .08);
+  box-shadow: 0 0 0 4px rgba(231, 198, 138, .08);
 }
 
 .field.has-error input,
@@ -1160,7 +1160,7 @@
 
 .chip:hover { transform: translateY(-2px); border-color: var(--line); color: var(--ink); }
 .chip i { display: grid; place-items: center; width: 20px; height: 20px; flex: none; border-radius: 6px; background: rgba(255, 255, 255, .05); font-style: normal; color: var(--gold); }
-.chip.is-active { border-color: var(--line-strong); background: rgba(94, 162, 255, .09); color: var(--ink); }
+.chip.is-active { border-color: var(--line-strong); background: rgba(231, 198, 138, .09); color: var(--ink); }
 .chip.is-active i { background: var(--gold); color: #161109; }
 
 .method-choice { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -1181,7 +1181,7 @@
 
 .method-choice button.is-active {
   border-color: var(--line-strong);
-  background: linear-gradient(120deg, rgba(94, 162, 255, .14), rgba(255, 255, 255, .02));
+  background: linear-gradient(120deg, rgba(231, 198, 138, .14), rgba(255, 255, 255, .02));
   color: var(--ink);
 }
 
@@ -1200,7 +1200,7 @@
 
 .consent.has-error { border-color: rgba(255, 138, 116, .6); }
 
-.consent input { width: 18px; height: 18px; flex: none; accent-color: #3f7fd6; margin-top: 1px; }
+.consent input { width: 18px; height: 18px; flex: none; accent-color: #a9782e; margin-top: 1px; }
 .consent span { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
 
 .form-nav {
@@ -1232,7 +1232,7 @@
   border-radius: 50%;
   background: var(--gradient-gold);
   color: var(--accent-ink);
-  box-shadow: 0 18px 50px rgba(94, 162, 255, .3);
+  box-shadow: 0 18px 50px rgba(231, 198, 138, .3);
 }
 
 .contact-success h3 { font-size: clamp(30px, 4vw, 52px); line-height: 1.05; }
@@ -1453,7 +1453,7 @@
   padding: clamp(28px, 3.5vw, 46px);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-xl);
-  background: linear-gradient(140deg, rgba(94, 162, 255, .12), rgba(255, 255, 255, .015));
+  background: linear-gradient(140deg, rgba(231, 198, 138, .12), rgba(255, 255, 255, .015));
 }
 
 .pb-cta h2 { margin-bottom: 8px; }
@@ -1515,9 +1515,9 @@
 }
 
 /* Warianty akcentu podstron CMS — wszystkie w chłodnej palecie strony. */
-.accent-ivory { --accent: #c7d2e4; --accent-rgb: 199, 210, 228; --gradient-gold: linear-gradient(100deg, #aab6cc, #e4ebf7 60%, #b9c4d8); }
-.accent-ember { --accent: #a78bfa; --accent-rgb: 167, 139, 250; --gradient-gold: linear-gradient(100deg, #8b7bff, #c4b2ff 60%, #a78bfa); }
-.accent-mint { --accent: #5fd39a; --accent-rgb: 95, 211, 154; --gradient-gold: linear-gradient(100deg, #3fae7c, #8ee5bb 60%, #5fd39a); }
+.accent-ivory { --accent: #efe7d6; --accent-rgb: 239, 231, 214; --gradient-gold: linear-gradient(112deg, #9d9484, #f6f1e6 45%, #b9b0a0, #f4eee2); }
+.accent-ember { --accent: #f0a97e; --accent-rgb: 240, 169, 126; --gradient-gold: linear-gradient(112deg, #a75c2c, #f7c39c 45%, #c2703a, #f5bd93); }
+.accent-mint { --accent: #9fdcc4; --accent-rgb: 159, 220, 196; --gradient-gold: linear-gradient(112deg, #4d8a72, #b7e9d5 45%, #5f9a83, #b0e5d0); }
 
 /* ══════════════════════════════════════════════════════════════════
    RESPONSIVE — tylko to, co nie zmieściło się przy komponentach

@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Tło z „systemowych” znaków — ten sam układ, co w Arcadii: siatka losowych
- * liter i cyfr, przez którą powoli przepływają jaśniejsze, niebieskie
- * skupiska (szum wartości w 2D). Kliknięcie w puste tło wypuszcza falę, która
+ * liter i cyfr, przez którą powoli przepływają jaśniejsze, złote skupiska
+ * (szum wartości w 2D). Kliknięcie w puste tło wypuszcza falę, która
  * rozjaśnia i przetasowuje znaki po drodze, a kursor podświetla otoczenie.
  *
  * Rysujemy przez `drawImage` z przygotowanego atlasu glifów — to wielokrotnie
@@ -96,8 +96,8 @@ export default function GlyphField({ intensity = 1 }) {
       glyphs = new Uint8Array(cols * rows)
       for (let i = 0; i < glyphs.length; i += 1) glyphs[i] = Math.floor(Math.random() * CHARS.length)
       heat = new Float32Array(cols * rows)
-      dim = buildAtlas('#9aa3b2', dpr)
-      glow = buildAtlas('#4f9bff', dpr)
+      dim = buildAtlas('#a3998a', dpr)
+      glow = buildAtlas('#e0b773', dpr)
     }
 
     const draw = now => {

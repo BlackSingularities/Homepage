@@ -1355,7 +1355,7 @@
 }
 
 .ap-project-pick:hover { background: rgba(255, 255, 255, .035); }
-.ap-project-row.is-active .ap-project-pick { border-color: rgba(94, 162, 255, .45); background: rgba(94, 162, 255, .1); }
+.ap-project-row.is-active .ap-project-pick { border-color: rgba(231, 198, 138, .45); background: rgba(231, 198, 138, .1); }
 
 .ap-project-thumb {
   display: grid;
@@ -1414,9 +1414,9 @@
   display: grid;
   gap: 10px;
   padding: 14px;
-  border: 1px solid rgba(94, 162, 255, .3);
+  border: 1px solid rgba(231, 198, 138, .3);
   border-radius: 12px;
-  background: rgba(94, 162, 255, .07);
+  background: rgba(231, 198, 138, .07);
 }
 
 .ap-release.is-error { border-color: rgba(255, 107, 107, .35); background: rgba(255, 107, 107, .08); }

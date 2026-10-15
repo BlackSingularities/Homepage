@@ -2,15 +2,15 @@
    FUNDAMENT — tokeny, reset, typografia, wspólne kontrolki
 
    Paleta i fonty są wspólne z Arcadią, żeby obie strony czytało się
-   jak jeden system. Nazwy `--gold` i `--gradient-gold` zostają jako
-   aliasy akcentu — korzysta z nich arkusz panelu.
+   jak jeden system: ciemne tło ze znakami i złoty akcent. `--gold` jest
+   aliasem `--accent` — korzysta z niego arkusz panelu.
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
   /* tła */
-  --bg: #0b0c0f;
-  --bg-soft: #0e1014;
-  --bg-lift: #13161c;
+  --bg: #0c0b0a;
+  --bg-soft: #100e0c;
+  --bg-lift: #161311;
   --panel: rgba(255, 255, 255, .028);
   --panel-2: rgba(255, 255, 255, .055);
   --panel-3: rgba(255, 255, 255, .085);
@@ -25,14 +25,14 @@
   --ink-4: #545b68;
 
   /* akcent */
-  --accent: #5ea2ff;
-  --accent-rgb: 94, 162, 255;
-  --accent-2: #a78bfa;
-  --accent-ink: #06101f;
-  --accent-glow: rgba(94, 162, 255, .18);
+  --accent: #e7c68a;
+  --accent-rgb: 231, 198, 138;
+  --accent-2: #c1913f;
+  --accent-ink: #14100a;
+  --accent-glow: rgba(231, 198, 138, .18);
   --good: #5fd39a;
   --gold: var(--accent);
-  --gradient-gold: linear-gradient(100deg, #5ea2ff 8%, #8fb8ff 48%, #a78bfa 92%);
+  --gradient-gold: linear-gradient(112deg, #a9782e 0%, #f3d69b 42%, #c1913f 70%, #f0d093 100%);
 
   /* geometria */
   --radius-xl: 22px;
@@ -87,7 +87,7 @@ img { display: block; max-width: 100%; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 p { margin: 0; }
 
-::selection { background: rgba(var(--accent-rgb), .38); color: #fff; }
+::selection { background: rgba(var(--accent-rgb), .42); color: var(--accent-ink); }
 
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -167,8 +167,8 @@ em.accent,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 80% at 50% 0%, transparent 40%, rgba(11, 12, 15, .55) 100%),
-    linear-gradient(180deg, transparent 70%, rgba(11, 12, 15, .6));
+    radial-gradient(120% 80% at 50% 0%, transparent 40%, rgba(12, 11, 10, .55) 100%),
+    linear-gradient(180deg, transparent 70%, rgba(12, 11, 10, .6));
 }
 
 .glyph-field { position: absolute; inset: 0; display: block; }
@@ -184,7 +184,7 @@ main > section:not(.hero),
 .catalog > .section,
 .project-view > .section,
 .page-view,
-.site-footer { background: rgba(11, 12, 15, .87); }
+.site-footer { background: rgba(12, 11, 10, .87); }
 
 main > section:not(.hero) + section { margin-top: -1px; }
 
@@ -256,7 +256,7 @@ main > section:not(.hero) + section { margin-top: -1px; }
 }
 
 .btn-primary:hover {
-  background: #7db4ff;
+  background: #f3d69b;
   transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(var(--accent-rgb), .3);
 }
