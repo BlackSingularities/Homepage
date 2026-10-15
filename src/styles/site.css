@@ -469,8 +469,15 @@
 
 .pv-gallery.is-single { grid-template-columns: minmax(0, 1fr); }
 
+/*
+ * Kafelki mają jedną proporcję niezależnie od tego, co się w nich znajdzie:
+ * zrzut z telefonu jest wysoki i wąski, a z przeglądarki szeroki, więc bez
+ * tego jeden potrafi rozdąć całą kolumnę. Pełny rozmiar pokazuje podgląd.
+ */
 .pv-gallery button {
-  display: block;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--line);
@@ -480,7 +487,14 @@
 }
 
 .pv-gallery button:hover { border-color: var(--line-strong); transform: translateY(-3px); }
-.pv-gallery img { width: 100%; height: auto; }
+
+.pv-gallery img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
 
 .pv-body {
   display: grid;

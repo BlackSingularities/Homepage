@@ -72,5 +72,6 @@ jobs:
             docker compose exec -T homepage_gallery node -e "const D=require('better-sqlite3');const d=new D(process.env.DB_PATH,{readonly:true});console.log('Galeria:',d.prepare('SELECT COUNT(*) AS photos FROM photos').get())"
             docker compose exec -T homepage_api node server/migrate-rebuild-v12.mjs
             docker compose exec -T homepage_api node server/migrate-arcadia-v13.mjs
+            docker compose exec -T homepage_api node server/migrate-openpdf-v14.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f
