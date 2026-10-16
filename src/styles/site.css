@@ -1071,18 +1071,6 @@
 .works-list a.is-current .works-meta { color: var(--ink-2); }
 .works-meta span:last-child { font-variant-numeric: tabular-nums; }
 
-/* Złoty znak przy nazwie mówi, która praca jest w podglądzie. */
-.works-list a.is-current strong::after {
-  content: "";
-  display: inline-block;
-  width: .16em;
-  height: .16em;
-  margin-left: .22em;
-  border-radius: 50%;
-  background: var(--accent);
-  vertical-align: .12em;
-}
-
 .works-preview {
   position: sticky;
   top: 88px;
@@ -1144,7 +1132,6 @@
   .works-body { grid-template-columns: minmax(0, 1fr); }
   .works-preview { display: none; }
   .works-list strong { color: var(--ink); }
-  .works-list a.is-current strong::after { display: none; }
 }
 
 @media (max-width: 560px) {
