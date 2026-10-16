@@ -4,12 +4,17 @@ import { CATALOG_PATH } from '../lib/projects'
 import { useActiveSection } from '../lib/ui'
 
 const SECTIONS = [
-  ['zakres', 'Zakres'],
+  ['zakres', 'Oferta'],
   ['proces', 'Proces'],
+  ['portfolio', 'Portfolio'],
   ['o-mnie', 'O mnie'],
 ]
 
-const SECTION_IDS = SECTIONS.map(([id]) => id)
+// Portfolio to osobna podstrona, nie sekcja – ma własny adres i podświetla
+// się poza stroną główną.
+const PORTFOLIO = 'portfolio'
+
+const SECTION_IDS = SECTIONS.map(([id]) => id).filter(id => id !== PORTFOLIO)
 
 /**
  * Pasek jest cienki i nieprzezroczysty dopiero po zjechaniu z pierwszego
@@ -34,7 +39,8 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
     return () => document.body.classList.remove('no-scroll')
   }, [open])
 
-  const href = id => (home ? `#${id}` : `/#${id}`)
+  const href = id => (id === PORTFOLIO ? CATALOG_PATH : home ? `#${id}` : `/#${id}`)
+  const isActive = id => (id === PORTFOLIO ? !home : home && active === id)
 
   // Adresy wewnętrzne przechwytujemy, zakotwiczenia zostawiamy przeglądarce.
   const go = event => {
@@ -56,31 +62,39 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
         </a>
 
         <nav className="masthead-nav" aria-label="Główna">
-          <a className={!home ? 'is-active' : ''} href={CATALOG_PATH} onClick={go}>Portfolio</a>
-          {SECTIONS.map(([id, label]) => (
-            <a key={id} className={home && active === id ? 'is-active' : ''} href={href(id)} onClick={go}>{label}</a>
-          ))}
-          {pages.length > 0 && (
-            <div
-              className={`nav-pages ${pagesOpen ? 'is-open' : ''}`}
-              onMouseEnter={() => setPagesOpen(true)}
-              onMouseLeave={() => setPagesOpen(false)}
-            >
-              <button type="button" onClick={() => setPagesOpen(value => !value)} aria-expanded={pagesOpen}>
-                Oferta <ChevronDown size={13} />
-              </button>
-              {pagesOpen && (
-                <div className="nav-dropdown">
-                  {pages.map(page => (
-                    <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
-                      <b>{page.title}</b>
-                      {page.excerpt && <span>{page.excerpt}</span>}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          {SECTIONS.map(([id, label]) => {
+            const link = (
+              <a key={id} className={isActive(id) ? 'is-active' : ''} href={href(id)} onClick={go}>
+                {label}
+                {id === 'zakres' && pages.length > 0 && <ChevronDown size={13} aria-hidden="true" />}
+              </a>
+            )
+            if (id !== 'zakres' || pages.length === 0) return link
+            // „Oferta” prowadzi do sekcji zakresu, a po najechaniu (albo
+            // fokusie) pokazuje podstrony ze szczegółami.
+            return (
+              <div
+                key={id}
+                className={`nav-pages ${pagesOpen ? 'is-open' : ''}`}
+                onMouseEnter={() => setPagesOpen(true)}
+                onMouseLeave={() => setPagesOpen(false)}
+                onFocus={() => setPagesOpen(true)}
+                onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setPagesOpen(false) }}
+              >
+                {link}
+                {pagesOpen && (
+                  <div className="nav-dropdown">
+                    {pages.map(page => (
+                      <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
+                        <b>{page.title}</b>
+                        {page.excerpt && <span>{page.excerpt}</span>}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
           <a className="masthead-cta" href={href('kontakt')} onClick={go}>Kontakt</a>
         </nav>
 
@@ -92,7 +106,6 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
       {open && (
         <div className="mobile-sheet">
           <nav aria-label="Główna">
-            <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
             {SECTIONS.map(([id, label]) => <a key={id} href={href(id)} onClick={go}>{label}</a>)}
             {pages.map(page => (
               <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>

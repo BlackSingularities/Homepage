@@ -844,6 +844,7 @@
 .masthead-nav { display: flex; align-items: center; gap: 4px; }
 
 .masthead-nav > a,
+.nav-pages > a,
 .nav-pages > button {
   display: inline-flex;
   align-items: center;
@@ -860,12 +861,15 @@
 }
 
 .masthead-nav > a:hover,
+.nav-pages > a:hover,
 .nav-pages > button:hover,
-.masthead-nav > a.is-active { color: var(--ink); }
+.masthead-nav > a.is-active,
+.nav-pages > a.is-active { color: var(--ink); }
 
 /* Aktywna sekcja: złota kropka pod słowem, nie belka ani tło. */
-.masthead-nav > a.is-active { position: relative; }
-.masthead-nav > a.is-active::after {
+.masthead-nav a.is-active { position: relative; }
+.masthead-nav > a.is-active::after,
+.nav-pages > a.is-active::after {
   content: "";
   position: absolute;
   left: 50%;

@@ -21,9 +21,9 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
         </div>
 
         <nav className="footer-nav" aria-label="Stopka">
-          <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
-          <a href={href('zakres')} onClick={go}>Zakres</a>
+          <a href={href('zakres')} onClick={go}>Oferta</a>
           <a href={href('proces')} onClick={go}>Proces</a>
+          <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
           <a href={href('o-mnie')} onClick={go}>O mnie</a>
           {pages.slice(0, 6).map(page => (
             <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>
