@@ -1,7 +1,8 @@
 /**
  * Przesuwa granicę między tytułem a złotą końcówką („accent”) w dwóch
  * nagłówkach, tak żeby złote były tylko słowa niosące sens:
- * „W czym mogę pomóc” i „Od pierwszej rozmowy po stałą opiekę”.
+ * „W czym mogę pomóc”, „Od pierwszej rozmowy po stałą opiekę” i „…Zaczynam od
+ * Twojego sposobu pracy”.
  *
  * Działa raz (znacznik), żeby nie nadpisać późniejszych zmian z panelu.
  */
@@ -16,6 +17,7 @@ const markerFile = path.join(dataDir, '.migration-heading-split-v17')
 export const SPLITS = {
   scope: { title: 'W czym mogę', accent: 'pomóc' },
   process: { title: 'Od pierwszej rozmowy po', accent: 'stałą opiekę' },
+  about: { title: 'Nie zaczynam od szablonu. Zaczynam od', accent: 'Twojego sposobu pracy' },
 }
 
 const exists = file => fs.access(file).then(() => true).catch(() => false)

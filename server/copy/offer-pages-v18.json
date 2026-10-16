@@ -1,0 +1,80 @@
+{
+  "pagesSection": {
+    "title": "Więcej o tym,",
+    "accent": "co mogę zrobić",
+    "lead": "Dwa obszary, którymi zajmuję się najczęściej. Na każdej podstronie znajdziesz przykłady, zakres prac i to, jak wygląda współpraca."
+  },
+  "software": {
+    "slug": "strony-aplikacje-cms",
+    "title": "Strony internetowe i programy dla firm",
+    "excerpt": "Strony, sklepy i programy działające w przeglądarce – zrobione od zera, z prostym panelem, w którym sam zmienisz treści.",
+    "lead": "Projektuję i buduję strony internetowe oraz programy dla firm: od wizytówki, przez sklep, po system do obsługi zamówień i klientów. Wszystko robię sam – od rozmowy, przez wygląd, po uruchomienie i dalszą opiekę – więc masz jedną osobę, która zna cały projekt.",
+    "seoDescription": "Strony internetowe, sklepy i programy dla firm na zamówienie – zrobione od zera, z panelem do samodzielnej edycji. Przykłady realizacji, zakres i przebieg współpracy.",
+    "cover": "/assets/portfolio/travel-1.png",
+    "blocks": [
+      {
+        "type": "text",
+        "heading": "Zrobione pod Ciebie, nie z szablonu",
+        "layout": "default",
+        "body": "Gotowe szablony wyglądają podobnie u każdego i rzadko pasują do tego, jak naprawdę działa firma. Dlatego każdą stronę i każdy program buduję od zera: najpierw rozumiem, co ma robić, a dopiero potem projektuję wygląd i działanie.\n\nEfekt to rozwiązanie, które wygląda po Twojemu, robi dokładnie to, czego potrzebujesz, i nie jest obciążone funkcjami, z których nikt nie korzysta."
+      },
+      {
+        "type": "features",
+        "heading": "Co mogę dla Ciebie zbudować",
+        "items": [
+          { "title": "Strona firmowa", "text": "Wizytówka, która jasno mówi, czym się zajmujesz, pokazuje ofertę i zachęca do kontaktu." },
+          { "title": "Sklep internetowy", "text": "Produkty, koszyk, płatności online i wysyłka – z obsługą zamówień w jednym miejscu." },
+          { "title": "Strefa klienta", "text": "Miejsce, w którym Twoi klienci logują się, sprawdzają zamówienia, pobierają dokumenty albo rezerwują terminy." },
+          { "title": "Program do obsługi firmy", "text": "Oferty, zamówienia, grafiki, magazyn czy rozliczenia w jednym narzędziu dostępnym z przeglądarki – bez instalowania." },
+          { "title": "Panel do edycji strony", "text": "Prosty panel, w którym sam zmienisz teksty, zdjęcia, ceny i wpisy na blogu – bez wołania programisty." },
+          { "title": "Portal z treściami", "text": "Blog, magazyn albo serwis z poradnikami – z wyszukiwarką, kategoriami i narzędziami dla redakcji." }
+        ]
+      },
+      {
+        "type": "gallery",
+        "heading": "Przykłady z moich realizacji",
+        "images": [
+          { "src": "/assets/portfolio/travel-1.png", "alt": "Panel biura podróży: lista ofert i edycja wyjazdu" },
+          { "src": "/assets/portfolio/strefa-1.png", "alt": "Panel redakcji portalu: edycja artykułu, zdjęcia i publikacja" },
+          { "src": "/assets/portfolio/kompendium-1.png", "alt": "Serwis o podróżach: klimat, pogoda i informacje o mieście" },
+          { "src": "/assets/portfolio/arcadia-01-katalog.webp", "alt": "Arcadia: katalog gier i narzędzi działających w przeglądarce" }
+        ]
+      },
+      {
+        "type": "features",
+        "heading": "Co dostajesz w każdym projekcie",
+        "items": [
+          { "title": "Własny wygląd", "text": "Projekt dopasowany do Twojej firmy i klientów, a nie kolejny popularny motyw." },
+          { "title": "Działa na telefonie", "text": "Strona i program wygodnie działają na komputerze, tablecie i telefonie." },
+          { "title": "Widoczność w Google", "text": "Poprawna budowa strony, opisy i szybkość, dzięki którym łatwiej Cię znaleźć." },
+          { "title": "Szybkość i bezpieczeństwo", "text": "Szyfrowane połączenie, kopie zapasowe i aktualizacje, żeby nic nie przepadło." },
+          { "title": "Pokazanie, jak korzystać", "text": "Po uruchomieniu pokazuję, jak obsługiwać panel, i zostawiam krótką instrukcję." },
+          { "title": "Opieka po starcie", "text": "Mogę dalej dbać o stronę, odpowiadać na pytania i dodawać nowe funkcje." }
+        ]
+      },
+      {
+        "type": "text",
+        "heading": "Jak wygląda współpraca",
+        "layout": "default",
+        "body": "Zaczynamy od rozmowy: opowiadasz, czego potrzebujesz, a ja dopytuję o szczegóły i proponuję rozwiązanie z terminem i ceną.\n\nPotem przygotowuję projekt wyglądu i działania. Gdy go zaakceptujesz, buduję gotową wersję i pokazuję postępy na bieżąco, żebyś mógł zgłaszać uwagi, zanim wszystko będzie gotowe.\n\nNa koniec uruchamiam stronę lub program, przenoszę treści, pokazuję, jak z niego korzystać, i zostaję do dyspozycji, gdy pojawią się pytania albo nowe pomysły."
+      },
+      {
+        "type": "quote",
+        "body": "Najpierw rozumiem, jak pracujesz. Dopiero potem projektuję.",
+        "author": "Zasada, którą się kieruję"
+      },
+      {
+        "type": "cta",
+        "heading": "Zobacz, co już zbudowałem",
+        "body": "W portfolio są działające strony i aplikacje – każdą możesz otworzyć albo pobrać.",
+        "label": "Przejdź do portfolio",
+        "href": "/portfolio"
+      }
+    ]
+  },
+  "infra": {
+    "slug": "infrastruktura-domowa",
+    "title": "Sieć domowa, serwer i inteligentny dom",
+    "excerpt": "Domowy serwer, kopie zapasowe, blokowanie reklam w całej sieci i inteligentny dom – ustawione raz, a porządnie."
+  }
+}

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, LoaderCircle, Quote, X } from 'lucide-react'
-import { Reveal, ease } from '../lib/ui'
+import { ArrowLeft, ArrowRight, LoaderCircle, Quote } from 'lucide-react'
+import { Reveal } from '../lib/ui'
+import Heading from './Heading'
+import Lightbox from './Lightbox'
 
 function Paragraphs({ text }) {
   return String(text || '')
@@ -21,7 +22,7 @@ function Block({ block, onZoom }) {
     case 'image':
       return block.src ? (
         <Reveal className={`pb pb-image ${block.layout === 'full' ? 'is-full' : ''}`}>
-          <button type="button" onClick={() => onZoom(block.src)}>
+          <button type="button" onClick={() => onZoom([block], 0)}>
             <img src={block.src} alt={block.alt} loading="lazy" />
           </button>
           {block.caption && <span className="pb-caption">{block.caption}</span>}
@@ -33,8 +34,8 @@ function Block({ block, onZoom }) {
         <Reveal className="pb pb-gallery">
           {block.heading && <h2>{block.heading}</h2>}
           <div className="pb-gallery-grid">
-            {block.images.map(image => (
-              <button type="button" key={image.src} onClick={() => onZoom(image.src)}>
+            {block.images.map((image, index) => (
+              <button type="button" key={image.src} onClick={() => onZoom(block.images, index)}>
                 <img src={image.src} alt={image.alt} loading="lazy" />
               </button>
             ))}
@@ -47,9 +48,8 @@ function Block({ block, onZoom }) {
         <Reveal className="pb pb-features">
           {block.heading && <h2>{block.heading}</h2>}
           <div className="pb-features-grid">
-            {block.items.map((item, index) => (
-              <article key={index}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
+            {block.items.map(item => (
+              <article key={item.title}>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
               </article>
@@ -103,7 +103,13 @@ function Block({ block, onZoom }) {
 export default function PageView({ slug, onNavigate }) {
   const [page, setPage] = useState(null)
   const [status, setStatus] = useState('loading')
-  const [zoom, setZoom] = useState('')
+  // podgląd: lista zdjęć z bloku i numer otwartego
+  const [zoom, setZoom] = useState(null)
+  const openZoom = (images, index) => setZoom({ images, index })
+  const step = delta => setZoom(current => current && ({
+    ...current,
+    index: (current.index + delta + current.images.length) % current.images.length,
+  }))
 
   useEffect(() => {
     let active = true
@@ -123,10 +129,19 @@ export default function PageView({ slug, onNavigate }) {
   }, [page])
 
   useEffect(() => {
-    const onKey = event => event.key === 'Escape' && setZoom('')
+    if (!zoom) return undefined
+    const onKey = event => {
+      if (event.key === 'Escape') setZoom(null)
+      if (event.key === 'ArrowRight') step(1)
+      if (event.key === 'ArrowLeft') step(-1)
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+    document.body.classList.add('no-scroll')
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.classList.remove('no-scroll')
+    }
+  }, [Boolean(zoom)]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (status === 'loading') {
     return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>Wczytuję stronę…</span></main>
@@ -146,62 +161,44 @@ export default function PageView({ slug, onNavigate }) {
 
   return (
     <main className={`page-view accent-${page.accent || 'gold'}`}>
-      <div className="page-aura" aria-hidden="true"><i /><i /></div>
-
       <header className="page-hero">
         <a className="page-back" href="/" onClick={event => { event.preventDefault(); onNavigate('/') }}>
           <ArrowLeft size={15} /> Strona główna
         </a>
-        <motion.h1 initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease }}>
-          {page.title}
-        </motion.h1>
+        <h1 className="rise">{page.title}</h1>
         {page.lead && (
-          <motion.p className="page-lead" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.12, ease }}>
-            {page.lead}
-          </motion.p>
+          <p className="page-lead rise" style={{ '--rise-delay': '0.12s' }}>{page.lead}</p>
         )}
         {page.cover && (
-          <motion.div className="page-cover" initial={{ opacity: 0, y: 34 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.2, ease }}>
+          <div className="page-cover rise" style={{ '--rise-delay': '0.24s' }}>
             <img src={page.cover} alt={page.title} />
-          </motion.div>
+          </div>
         )}
       </header>
 
       <div className="page-blocks">
-        {page.blocks.map(block => <Block key={block.id} block={block} onZoom={setZoom} />)}
+        {page.blocks.map(block => <Block key={block.id} block={block} onZoom={openZoom} />)}
       </div>
 
       <Reveal className="page-foot">
         <div>
           <span>Masz podobny projekt?</span>
-          <h2>Opisz go w kilku zdaniach – <em className="accent">resztą zajmę się ja.</em></h2>
+          <h2><Heading title="Opisz go w kilku zdaniach –" accent="resztą zajmę się ja" /></h2>
         </div>
         <a className="btn btn-primary" href="/#kontakt" onClick={event => { event.preventDefault(); onNavigate('/#kontakt') }}>
           Przejdź do formularza <ArrowRight size={17} />
         </a>
       </Reveal>
 
-      <AnimatePresence>
-        {zoom && (
-          <motion.div
-            className="lightbox"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setZoom('')}
-          >
-            <button aria-label="Zamknij"><X size={20} /></button>
-            <motion.img
-              src={zoom}
-              alt=""
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.3, ease }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {zoom && (
+        <Lightbox
+          shots={zoom.images}
+          index={zoom.index}
+          name={page.title}
+          onClose={() => setZoom(null)}
+          onStep={step}
+        />
+      )}
     </main>
   )
 }

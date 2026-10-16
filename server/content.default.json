@@ -106,8 +106,8 @@
     ]
   },
   "about": {
-    "title": "Nie zaczynam od szablonu.",
-    "accent": "Zaczynam od Twojego sposobu pracy.",
+    "title": "Nie zaczynam od szablonu. Zaczynam od",
+    "accent": "Twojego sposobu pracy",
     "lead": "Jestem analitykiem danych, projektantem i programistą. Łączę kompetencje, które w większych realizacjach rozkłada się na kilka osób.",
     "text": "Sam prowadzę projekt od pierwszej rozmowy, przez plan, wygląd i programowanie, aż po uruchomienie. Buduję strony internetowe, programy dla firm, panele do samodzielnej edycji stron oraz aplikacje na komputer i telefon – zawsze od zera i pod konkretne potrzeby.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu drogowym albo rozpoznać gwiazdy na zdjęciu nieba. Dlatego wiem, jak wygląda program, z którego korzysta się na co dzień.\n\nFotografia to mój drugi sposób opowiadania o miejscach i ludziach. Po uruchomieniu projektu mogę dalej o niego dbać, pomagać w obsłudze i rozwijać go.",
     "strengths": [
@@ -121,9 +121,9 @@
     ]
   },
   "pagesSection": {
-    "title": "Szczegóły",
-    "accent": "w konkretnych obszarach.",
-    "lead": "Więcej o tym, jak podchodzę do poszczególnych rodzajów projektów i co może dostać rozwiązanie tworzone na zamówienie."
+    "title": "Więcej o tym,",
+    "accent": "co mogę zrobić",
+    "lead": "Dwa obszary, którymi zajmuję się najczęściej. Na każdej podstronie znajdziesz przykłady, zakres prac i to, jak wygląda współpraca."
   },
   "faq": {
     "title": "Zanim",

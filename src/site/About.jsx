@@ -25,12 +25,14 @@ export default function About({ data, brand }) {
       <div className="about-body">
         <p className="about-lead">{data.lead}</p>
         <div className="about-copy"><Paragraphs text={data.text} /></div>
-        {(data.strengths || []).length > 0 && (
-          <ul className="about-strengths">
-            {data.strengths.map(strength => <li key={strength}>{strength}</li>)}
-          </ul>
-        )}
       </div>
+
+      {/* Kompetencje zamykają sekcję na całą szerokość, pod obiema kolumnami. */}
+      {(data.strengths || []).length > 0 && (
+        <ul className="about-strengths">
+          {data.strengths.map(strength => <li key={strength}>{strength}</li>)}
+        </ul>
+      )}
     </section>
   )
 }

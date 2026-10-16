@@ -1269,10 +1269,13 @@
 .about-copy p { font-size: 16px; line-height: 1.75; color: var(--ink-2); }
 
 .about-strengths {
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 8px;
+  justify-content: center;
+  gap: 10px;
+  padding-top: clamp(28px, 3vw, 44px);
+  border-top: 1px solid var(--line-soft);
 }
 
 .about-strengths li {
@@ -1563,3 +1566,15 @@
 
 /* Pierwsza część tytułu (z panelu: „titleTop”) jest złota. */
 .hero-title-lead { color: var(--accent); }
+
+/* Wybory w formularzu zaczynają się tuż pod etykietą; krótsza kolumna nie
+   rozciąga kafelków do wysokości sąsiedniej. */
+.field-row { align-items: start; }
+.chips { align-content: start; }
+
+/* Podstrony oferty: kafelki bez numerów i bez podskakiwania, nazwy złote
+   jak w ofercie na stronie głównej. */
+.pb-features-grid article { transform: none !important; }
+.pb-features-grid h3 { margin: 0 0 10px; color: var(--accent); }
+.pb-features-grid p { font-size: 14.5px; color: var(--ink-2); }
+.pb-gallery button:hover { transform: none; border-color: var(--line-gold); }

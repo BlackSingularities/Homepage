@@ -76,5 +76,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-dashes-v15.mjs
             docker compose exec -T homepage_api node server/migrate-plain-copy-v16.mjs
             docker compose exec -T homepage_api node server/migrate-heading-split-v17.mjs
+            docker compose exec -T homepage_api node server/migrate-offer-pages-v18.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f
