@@ -1,3 +1,4 @@
+import Heading from './Heading'
 import { useState } from 'react'
 import { CATALOG_PATH, KIND_LABEL, plural } from '../lib/projects'
 
@@ -38,7 +39,7 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
       {featured.length > 0 && (
         <div className="works rise" id="portfolio" {...enter(0.35)}>
           <div className="works-head">
-            <h2>{labels.title} {labels.accent}</h2>
+            <h2><Heading title={labels.title} accent={labels.accent} /></h2>
           </div>
 
           <div className="works-body">

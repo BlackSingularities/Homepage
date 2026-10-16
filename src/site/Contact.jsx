@@ -1,10 +1,11 @@
+import Heading from './Heading'
 import ContactForm from './ContactForm'
 
 export default function Contact({ data, brand, scopeOptions }) {
   return (
     <section className="section contact" id="kontakt">
       <div className="contact-head">
-        <h2 className="contact-title">{data.title} {data.accent}</h2>
+        <h2 className="contact-title"><Heading title={data.title} accent={data.accent} /></h2>
         <div className="contact-side">
           <p>{data.lead}</p>
           {(brand.email || brand.phone) && (

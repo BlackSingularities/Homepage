@@ -1,3 +1,4 @@
+import Heading from './Heading'
 function Paragraphs({ text }) {
   return String(text || '')
     .split(/\n{2,}/)
@@ -14,7 +15,7 @@ export default function About({ data, brand }) {
   return (
     <section className="section rail about" id="o-mnie">
       <header className="section-head">
-        <h2>{data.title} {data.accent}</h2>
+        <h2><Heading title={data.title} accent={data.accent} /></h2>
         <div className="about-sign">
           <img src="/assets/brand/logo-ar-web.png" alt="" />
           <span>{brand.name}<i>{brand.location}</i></span>

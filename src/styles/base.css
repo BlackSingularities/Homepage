@@ -127,11 +127,11 @@ h1 { font-size: clamp(44px, 6.4vw, 96px); font-weight: 300; letter-spacing: -.03
 h2 { font-size: clamp(32px, 3.8vw, 56px); font-weight: 300; letter-spacing: -.025em; }
 h3 { font-size: clamp(21px, 1.8vw, 26px); }
 
-/* Akcent w tytułach z panelu nie zmienia już koloru – dopisuje się do zdania. */
+/* Końcówka tytułu z panelu („accent”) jest złota i pisana prosto. */
 em.accent,
 .accent {
   font-style: normal;
-  color: inherit;
+  color: var(--accent);
 }
 
 .text-new-line { display: block; }
