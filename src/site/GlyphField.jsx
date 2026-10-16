@@ -150,7 +150,7 @@ export default function GlyphField({ intensity = 1 }) {
       fh = Math.ceil(rows / STEP) + 1
       field = new Float32Array(fw * fh)
       const dim = buildAtlas('#a3998a', dpr)
-      glow = buildAtlas('#e0b773', dpr)
+      glow = buildAtlas('#efcb45', dpr)
 
       // nieruchoma warstwa ciemnych znaków – rysowana raz, nie co klatkę
       dimLayer = document.createElement('canvas')

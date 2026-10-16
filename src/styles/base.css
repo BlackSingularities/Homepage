@@ -25,14 +25,14 @@
   --ink-4: #5c574f;
 
   /* akcent */
-  --accent: #e7c68a;
-  --accent-rgb: 231, 198, 138;
-  --accent-2: #c1913f;
+  --accent: #f0cc3f;
+  --accent-rgb: 240, 204, 63;
+  --accent-2: #c9a21f;
   --accent-ink: #14100a;
-  --accent-glow: rgba(231, 198, 138, .18);
+  --accent-glow: rgba(240, 204, 63, .18);
   --good: #5fd39a;
   --gold: var(--accent);
-  --gradient-gold: linear-gradient(112deg, #a9782e 0%, #f3d69b 42%, #c1913f 70%, #f0d093 100%);
+  --gradient-gold: linear-gradient(112deg, #c49a12 0%, #ffe066 42%, #d9ad1f 70%, #f7d44c 100%);
 
   /* geometria */
   --radius-xl: 14px;
@@ -44,7 +44,7 @@
      nimi to dwa razy tyle – stąd ta wartość jest połową docelowego rytmu. */
   --section-y: clamp(38px, 3.2vw, 58px);
   --maxw: 1240px;
-  --line-gold: rgba(231, 198, 138, .36);
+  --line-gold: rgba(240, 204, 63, .38);
 
   /* głębia */
   --shadow-sm: 0 6px 18px rgba(0, 0, 0, .32);
