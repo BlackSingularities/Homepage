@@ -1552,8 +1552,8 @@
    znaki z tła nie wchodziły między litery. Bez obwódki – samo tło. */
 .hero-side {
   padding: clamp(20px, 2.4vw, 30px);
-  border-radius: var(--radius-lg);
-  background: rgba(12, 11, 10, .55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  background: rgba(12, 11, 10, .12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
