@@ -1,6 +1,10 @@
+import { ArrowUpRight } from 'lucide-react'
 import SectionHead from './SectionHead'
 
-/** Podstrony z panelu jako spis: tytuł, jedno zdanie, cała linia klikalna. */
+/**
+ * Podstrony z panelu jako wejścia: każda pozycja jest obwiedzionym polem
+ * z jawnym „Zobacz szczegóły” i strzałką, więc od razu widać, że prowadzi dalej.
+ */
 export default function PagesGrid({ data, pages, onNavigate }) {
   if (!pages.length) return null
   return (
@@ -13,8 +17,12 @@ export default function PagesGrid({ data, pages, onNavigate }) {
               href={`/p/${page.slug}`}
               onClick={event => { event.preventDefault(); onNavigate(`/p/${page.slug}`) }}
             >
-              <strong>{page.title}</strong>
-              {page.excerpt && <span>{page.excerpt}</span>}
+              <span className="pages-text">
+                <strong>{page.title}</strong>
+                {page.excerpt && <span>{page.excerpt}</span>}
+                <em>Zobacz szczegóły</em>
+              </span>
+              <i className="pages-go" aria-hidden="true"><ArrowUpRight size={20} /></i>
             </a>
           </li>
         ))}
