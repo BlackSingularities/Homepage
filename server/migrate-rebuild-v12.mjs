@@ -3,7 +3,7 @@
  *
  * Treści strony głównej zmieniły kształt (zniknęły sekcje `work`, `services`,
  * `intelligence` i `manifesto`), więc zapisany `content.json` zostaje odłożony
- * na kopię i usunięty — serwer wraca do nowych wartości domyślnych. Portfolio
+ * na kopię i usunięty – serwer wraca do nowych wartości domyślnych. Portfolio
  * startuje puste: pozycje dodaje się w panelu, w zakładce Portfolio.
  */
 

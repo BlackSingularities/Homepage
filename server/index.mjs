@@ -50,7 +50,7 @@ const IMAGE_TYPES = {
 
 const UPLOAD_MAX_DIMENSION = 2400
 
-// Nowe zrzuty ekranu potrafią mieć po kilka MB w oryginalnej rozdzielczości —
+// Nowe zrzuty ekranu potrafią mieć po kilka MB w oryginalnej rozdzielczości –
 // przeglądarka i tak skaluje je w dół do rozmiaru kontenera, co przy dużym
 // źródle daje słabą interpolację. Dociskamy je tutaj raz, przy uploadzie.
 async function resizeForUpload(buffer, extension) {
@@ -233,7 +233,7 @@ function enforceSameOrigin(req, res, next) {
 
 /* ── content (homepage sections) ─────────────────────────────────────── */
 
-/** Stored content may be partial — defaults fill every gap so the site never breaks. */
+/** Stored content may be partial – defaults fill every gap so the site never breaks. */
 function mergeContent(stored) {
   const merge = (base, override) => {
     if (Array.isArray(base)) return Array.isArray(override) ? override : base
@@ -248,7 +248,7 @@ function mergeContent(stored) {
   return merge(defaultContent, stored)
 }
 
-/** Strings only, arrays of plain objects — never trusts shapes coming from the client. */
+/** Strings only, arrays of plain objects – never trusts shapes coming from the client. */
 function sanitizeContent(input) {
   const walk = (base, value) => {
     if (Array.isArray(base)) {
@@ -412,7 +412,7 @@ const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0) || String(a.title).loc
 async function getSettings({ includePassword = false } = {}) {
   const stored = await readJson(SETTINGS_FILE, {})
   const settings = {
-    fromName: stored.fromName || 'Adam Rędzikowski — Digital Studio',
+    fromName: stored.fromName || 'Adam Rędzikowski – Digital Studio',
     ownerEmail: stored.ownerEmail || '',
     imapHost: stored.imapHost || '',
     imapPort: Number(stored.imapPort || 993),
@@ -628,7 +628,7 @@ app.get('/api/projects/:slug', async (req, res) => {
   res.json({ project: publicProject(project, release), previous: neighbour(-1), next: neighbour(1) })
 })
 
-/** Proxy pobierania dla prywatnych wydań — token nie opuszcza serwera. */
+/** Proxy pobierania dla prywatnych wydań – token nie opuszcza serwera. */
 app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
   try {
     const projects = await readProjects()
@@ -727,7 +727,7 @@ app.post('/api/contact', async (req, res) => {
         from: { name: settings.fromName, address: settings.smtpUsername },
         to: submission.email,
         replyTo: settings.ownerEmail,
-        subject: 'Dziękuję za wiadomość — Adam Rędzikowski',
+        subject: 'Dziękuję za wiadomość – Adam Rędzikowski',
         text: `Cześć ${submission.name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
         html: emailFrame(`
           <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Wiadomość dotarła</div>
@@ -894,7 +894,7 @@ app.post('/api/admin/projects/:id/release', enforceSameOrigin, async (req, res) 
   res.json(await releases.refresh(project.repo))
 })
 
-/** Podgląd wydania przed zapisaniem projektu — panel sprawdza wpisane repozytorium. */
+/** Podgląd wydania przed zapisaniem projektu – panel sprawdza wpisane repozytorium. */
 app.post('/api/admin/github/release', enforceSameOrigin, async (req, res) => {
   const repo = cleanRepo(req.body?.repo)
   if (!repo) return res.status(400).json({ error: 'Podaj repozytorium w formacie owner/nazwa.' })
@@ -972,7 +972,7 @@ app.put('/api/admin/settings', enforceSameOrigin, async (req, res) => {
   const previous = await readJson(SETTINGS_FILE, {})
   const password = cleanText(req.body.password, 500)
   const updated = {
-    fromName: cleanText(req.body.fromName, 150) || 'Adam Rędzikowski — Digital Studio',
+    fromName: cleanText(req.body.fromName, 150) || 'Adam Rędzikowski – Digital Studio',
     ownerEmail: cleanText(req.body.ownerEmail, 200).toLowerCase(),
     imapHost: cleanText(req.body.imapHost, 250),
     imapPort: Number(req.body.imapPort) || 993,

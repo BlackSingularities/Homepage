@@ -12,7 +12,7 @@ export default function Catalog({ data, projects, onNavigate }) {
   const [kind, setKind] = useState('all')
 
   useEffect(() => {
-    document.title = `${data.title} ${data.accent} — Adam Rędzikowski`.replace(/\s+/g, ' ').trim()
+    document.title = `${data.title} ${data.accent} – Adam Rędzikowski`.replace(/\s+/g, ' ').trim()
   }, [data.title, data.accent])
 
   const groups = useMemo(() => ({

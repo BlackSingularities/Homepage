@@ -3,7 +3,7 @@
     "initials": "AR",
     "name": "Adam Rędzikowski",
     "role": "Strony i aplikacje na zamówienie",
-    "tagline": "Analiza, projekt, kod, wdrożenie — u jednej osoby.",
+    "tagline": "Analiza, projekt, kod, wdrożenie – u jednej osoby.",
     "location": "Łódź · współpraca zdalna",
     "email": "",
     "phone": ""
@@ -11,7 +11,7 @@
   "hero": {
     "titleTop": "Jedna osoba",
     "titleAccent": "od analizy do wdrożenia.",
-    "lead": "Projektuję i buduję strony oraz aplikacje na zamówienie. Zaczynam od problemu i sposobu pracy, potem odpowiadam za interfejs, kod, uruchomienie i dalszy rozwój. Niżej są przykładowe prace — każdą można otworzyć w przeglądarce albo pobrać.",
+    "lead": "Projektuję i buduję strony oraz aplikacje na zamówienie. Zaczynam od problemu i sposobu pracy, potem odpowiadam za interfejs, kod, uruchomienie i dalszy rozwój. Niżej są przykładowe prace – każdą można otworzyć w przeglądarce albo pobrać.",
     "primaryCta": "Napisz, czego potrzebujesz",
     "secondaryCta": "Zobacz portfolio"
   },
@@ -25,7 +25,7 @@
   "catalog": {
     "title": "Wszystko, co zbudowałem",
     "accent": "i nadal utrzymuję.",
-    "lead": "Serwisy, które da się otworzyć w przeglądarce, i aplikacje, które da się pobrać. Pliki aplikacji pochodzą wprost z najnowszych wydań — nie z ręcznie aktualizowanej listy.",
+    "lead": "Serwisy, które da się otworzyć w przeglądarce, i aplikacje, które da się pobrać. Pliki aplikacji pochodzą wprost z najnowszych wydań – nie z ręcznie aktualizowanej listy.",
     "filterAll": "Wszystko",
     "filterWeb": "Strony i serwisy",
     "filterApp": "Aplikacje"
@@ -39,7 +39,7 @@
         "id": "sc-web",
         "title": "Strony i serwisy",
         "lead": "Projekt z własnym charakterem i konkretną funkcją.",
-        "detail": "Serwisy firmowe, portfolia, sklepy, magazyny i rozbudowane blogi. Architektura informacji, grafika, treść, interfejs, analityka, SEO i wdrożenie — bez ograniczeń narzuconych przez gotowy motyw."
+        "detail": "Serwisy firmowe, portfolia, sklepy, magazyny i rozbudowane blogi. Architektura informacji, grafika, treść, interfejs, analityka, SEO i wdrożenie – bez ograniczeń narzuconych przez gotowy motyw."
       },
       {
         "id": "sc-apps",
@@ -51,7 +51,7 @@
         "id": "sc-desktop",
         "title": "Programy na komputer i telefon",
         "lead": "Aplikacje, które się instaluje, a nie tylko otwiera.",
-        "detail": "Wydaję narzędzia na Windows, Androida i macOS — z instalatorami, wersjami i aktualizacjami. Część z nich stoi otwarcie na GitHubie, razem z historią wydań i kodem."
+        "detail": "Wydaję narzędzia na Windows, Androida i macOS – z instalatorami, wersjami i aktualizacjami. Część z nich stoi otwarcie na GitHubie, razem z historią wydań i kodem."
       },
       {
         "id": "sc-data",
@@ -69,7 +69,7 @@
         "id": "sc-infra",
         "title": "Infrastruktura i smart home",
         "lead": "Sieć, serwer i dom, które po prostu działają.",
-        "detail": "Serwery domowe i self-hosting na Dockerze oraz Proxmoksie, NAS-y, kopie zapasowe, DNS z AdGuard Home blokującym reklamy w całej sieci, smart home w Home Assistant i bezpieczny dostęp przez VPN — bez wystawiania portów na świat."
+        "detail": "Serwery domowe i self-hosting na Dockerze oraz Proxmoksie, NAS-y, kopie zapasowe, DNS z AdGuard Home blokującym reklamy w całej sieci, smart home w Home Assistant i bezpieczny dostęp przez VPN – bez wystawiania portów na świat."
       }
     ]
   },
@@ -89,7 +89,7 @@
     "title": "Nie zaczynam od szablonu.",
     "accent": "Zaczynam od Twojego sposobu pracy.",
     "lead": "Jestem analitykiem danych, projektantem i programistą. Łączę kompetencje, które w większych realizacjach rozkłada się na kilka osób.",
-    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon — zawsze od zera i pod konkretny sposób działania.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
+    "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon – zawsze od zera i pod konkretny sposób działania.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
     "strengths": [
       "Analityka danych i raportowanie",
       "Grafika i projektowanie interfejsów",
@@ -112,7 +112,7 @@
       { "q": "Ile trwa realizacja?", "a": "Skupiona strona lub blog mogą powstać w kilka tygodni. Aplikacja, autorski CMS albo system z integracjami wymagają pracy etapowej. Po krótkiej analizie przedstawiam realistyczny harmonogram, bez terminu oderwanego od zakresu." },
       { "q": "Jak wygląda wycena?", "a": "Wyceniam zakres, odpowiedzialność i oczekiwany rezultat, a nie liczbę ekranów. Przed startem dostajesz opis prac, etapów i kosztów. Jeśli projekt warto podzielić na wersję podstawową i dalszy rozwój, powiem to wprost." },
       { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak, jeśli projekt tego potrzebuje. Panel projektuję pod rzeczywiste zadania: publikowanie, zarządzanie danymi, obsługę klientów, raportowanie. Nie dokładam funkcji tylko dlatego, że są w gotowym CMS-ie." },
-      { "q": "Czy system połączy się z narzędziami, których już używam?", "a": "Tak — z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą czy CRM-em. Najpierw sprawdzam jakość i ograniczenia integracji, żeby kluczowy proces nie stanął na niestabilnym założeniu." },
+      { "q": "Czy system połączy się z narzędziami, których już używam?", "a": "Tak – z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą czy CRM-em. Najpierw sprawdzam jakość i ograniczenia integracji, żeby kluczowy proces nie stanął na niestabilnym założeniu." },
       { "q": "Czy możesz rozwinąć istniejący produkt?", "a": "Tak, po audycie kodu, danych i wdrożenia. Oceniam, co warto zachować, co wymaga przebudowy i czy bezpieczniej rozwijać obecną bazę, czy zbudować nowy fundament. Rekomendację uzasadniam technicznie i biznesowo." },
       { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu i dostępów ustalamy przed rozpoczęciem. Projekt nie powinien uzależniać Cię od jednej osoby przez brak dokumentacji albo dostępu do infrastruktury." },
       { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." }
@@ -121,6 +121,6 @@
   "contact": {
     "title": "Opowiedz, czego potrzebujesz.",
     "accent": "Odpowiem konkretem.",
-    "lead": "Możesz przyjść z gotowym pomysłem albo z samym problemem. Porozmawiamy o celu, użytkownikach i sposobie pracy, a ja zaproponuję kierunek — bez wciskania projektu w gotowy pakiet."
+    "lead": "Możesz przyjść z gotowym pomysłem albo z samym problemem. Porozmawiamy o celu, użytkownikach i sposobie pracy, a ja zaproponuję kierunek – bez wciskania projektu w gotowy pakiet."
   }
 }

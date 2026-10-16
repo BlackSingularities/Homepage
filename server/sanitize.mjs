@@ -23,7 +23,7 @@ export function slugify(value, fallback = 'strona') {
   return slug || fallback
 }
 
-/** Przyjmuje wyłącznie ścieżki do mediów na tym serwerze — blokuje `javascript:` i obce hosty. */
+/** Przyjmuje wyłącznie ścieżki do mediów na tym serwerze – blokuje `javascript:` i obce hosty. */
 export function cleanMedia(value) {
   const raw = cleanText(value, 400)
   if (!raw) return ''
@@ -37,7 +37,7 @@ export function cleanLink(value, fallback = '') {
   return fallback
 }
 
-/** `owner/repo` albo pusty łańcuch — nic innego nie trafia do zapytań do GitHuba. */
+/** `owner/repo` albo pusty łańcuch – nic innego nie trafia do zapytań do GitHuba. */
 export function cleanRepo(value) {
   const raw = cleanText(value, 140)
     .replace(/^https?:\/\/(www\.)?github\.com\//i, '')

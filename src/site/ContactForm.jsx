@@ -82,7 +82,7 @@ export default function ContactForm({ scopeOptions = [] }) {
         <div className="form-steps-intro">
           <span>Brief projektu</span>
           <h3>Kilka konkretów wystarczy.</h3>
-          <p>Nie potrzebujesz gotowej specyfikacji. Opisz cel albo problem — resztę uporządkujemy wspólnie.</p>
+          <p>Nie potrzebujesz gotowej specyfikacji. Opisz cel albo problem – resztę uporządkujemy wspólnie.</p>
         </div>
 
         <div className="form-step-list">
@@ -154,7 +154,7 @@ export default function ContactForm({ scopeOptions = [] }) {
             <label className={`field ${touched && !stepOneValid ? 'has-error' : ''}`}>
               <span>Najważniejsza informacja *</span>
               <textarea name="message" value={form.message} onChange={update} rows="6" placeholder="Co dziś nie działa, czego potrzebują użytkownicy i jaki efekt chcesz osiągnąć?" />
-              {touched && !stepOneValid && <i className="field-error">Napisz kilka zdań — minimum 12 znaków.</i>}
+              {touched && !stepOneValid && <i className="field-error">Napisz kilka zdań – minimum 12 znaków.</i>}
             </label>
 
             <div className="form-nav">

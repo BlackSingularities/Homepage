@@ -3,7 +3,7 @@ import { CATALOG_PATH, KIND_LABEL, plural } from '../lib/projects'
 
 /**
  * Pierwszy ekran to od razu indeks prac. Zdanie o tym, co robię, stoi nad
- * nim krótko — dowodem są nazwy realizacji, a podgląd po prawej pokazuje
+ * nim krótko – dowodem są nazwy realizacji, a podgląd po prawej pokazuje
  * tę, na której właśnie jest kursor albo fokus klawiatury.
  *
  * To jedyne miejsce na stronie, które się porusza bez udziału czytelnika:

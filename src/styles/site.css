@@ -747,13 +747,13 @@
   color: var(--ink);
 }
 
-/* Warianty akcentu podstron CMS — wszystkie w chłodnej palecie strony. */
+/* Warianty akcentu podstron CMS – wszystkie w chłodnej palecie strony. */
 .accent-ivory { --accent: #efe7d6; --accent-rgb: 239, 231, 214; --gradient-gold: linear-gradient(112deg, #9d9484, #f6f1e6 45%, #b9b0a0, #f4eee2); }
 .accent-ember { --accent: #f0a97e; --accent-rgb: 240, 169, 126; --gradient-gold: linear-gradient(112deg, #a75c2c, #f7c39c 45%, #c2703a, #f5bd93); }
 .accent-mint { --accent: #9fdcc4; --accent-rgb: 159, 220, 196; --gradient-gold: linear-gradient(112deg, #4d8a72, #b7e9d5 45%, #5f9a83, #b0e5d0); }
 
 /* ══════════════════════════════════════════════════════════════════
-   RESPONSIVE — tylko to, co nie zmieściło się przy komponentach
+   RESPONSIVE – tylko to, co nie zmieściło się przy komponentach
    ══════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 1180px) {
@@ -801,10 +801,10 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   STRONA GŁÓWNA — nagłówek, indeks prac, sekcje rejestru, stopka
+   STRONA GŁÓWNA – nagłówek, indeks prac, sekcje rejestru, stopka
 
    Jedna rzecz jest głośna: indeks prac na pierwszym ekranie, z dużymi
-   nazwami w szeryfie i podglądem obok. Wszystko poniżej jest ciche —
+   nazwami w szeryfie i podglądem obok. Wszystko poniżej jest ciche –
    linie, tekst i jedno złote wezwanie na ekran.
    ══════════════════════════════════════════════════════════════════ */
 
@@ -882,7 +882,7 @@
 
 .nav-pages { position: relative; }
 
-/* Niewidzialny mostek nad szczeliną między przyciskiem a listą — kursor
+/* Niewidzialny mostek nad szczeliną między przyciskiem a listą – kursor
    przechodzący w dół nie opuszcza menu, więc lista nie znika. */
 .nav-pages.is-open::after {
   content: "";
@@ -1457,7 +1457,7 @@
 
 .page-state h1 { color: var(--accent); }
 
-/* Formularz dziedziczy dawne kroki — tu tylko wyciszamy ich tło. */
+/* Formularz dziedziczy dawne kroki – tu tylko wyciszamy ich tło. */
 .contact-panel .form-steps { background: transparent; }
 .contact-panel .form-step { border-radius: var(--radius-sm); }
 

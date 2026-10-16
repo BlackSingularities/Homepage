@@ -1,11 +1,11 @@
-# redzikowski.com — strona ofertowa + panel
+# redzikowski.com – strona ofertowa + panel
 
 Strona ofertowa (React + Vite) i lekki CMS na Node/Express. Treści strony głównej,
 portfolio i dowolna liczba podstron są edytowalne z panelu `/admin`.
 
 Oprawa wizualna jest wspólna z Arcadią: tło `GlyphField` (siatka znaków z falami po
 kliknięciu). Reszta to własny system: ciepła czerń, płaskie złoto, Newsreader / Hanken Grotesk /
-JetBrains Mono. Font monospace niesie wyłącznie dane techniczne — wersje, rozmiary
+JetBrains Mono. Font monospace niesie wyłącznie dane techniczne – wersje, rozmiary
 plików, platformy i daty wydań.
 
 ## Uruchomienie lokalne
@@ -29,9 +29,9 @@ Vite proxuje `/api` i `/uploads` na `http://localhost:3001` (można nadpisać zm
 Wdrożenie idzie automatycznie z gałęzi `main` (`.github/workflows/deploy-homepage.yml`):
 pliki lądują w `/opt/apps/homepage`, a workflow uruchamia `docker compose up -d --build`.
 
-- `homepage` — nginx z zbudowanym frontendem
-- `homepage_api` — Express z danymi na wolumenie i wspólnym uwierzytelnianiem panelu
-- `homepage_gallery` — publiczna galeria i jej API, uruchamiane z tego samego repozytorium pod `/galeria`
+- `homepage` – nginx z zbudowanym frontendem
+- `homepage_api` – Express z danymi na wolumenie i wspólnym uwierzytelnianiem panelu
+- `homepage_gallery` – publiczna galeria i jej API, uruchamiane z tego samego repozytorium pod `/galeria`
 
 **Katalog trwały: `/opt/apps/homepage-persist`.** Krok kopiujący czyści `/opt/apps/homepage`
 przy każdym wdrożeniu, więc rzeczy, które mają przetrwać, leżą obok:
@@ -43,7 +43,7 @@ przy każdym wdrożeniu, więc rzeczy, które mają przetrwać, leżą obok:
 | `homepage-persist/gallery` | Baza SQLite galerii, oryginały zdjęć i miniatury |
 
 Klucz generuje się sam przy pierwszym wdrożeniu i potem się nie zmienia.
-Podmiana go unieważnia zapisane hasło skrzynki — trzeba je wtedy wpisać ponownie w panelu.
+Podmiana go unieważnia zapisane hasło skrzynki – trzeba je wtedy wpisać ponownie w panelu.
 
 ## Panel `/admin`
 
@@ -60,7 +60,7 @@ drugiego logowania i bez osobnego hasła galerii.
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
 | Portfolio | Prace: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
-| Treści strony | Teksty strony głównej i katalogu — hero, nagłówki sekcji, zakres, proces, FAQ, kontakt |
+| Treści strony | Teksty strony głównej i katalogu – hero, nagłówki sekcji, zakres, proces, FAQ, kontakt |
 | Zdjęcia | Biblioteka mediów: upload przeciągnięciem, kopiowanie adresu, usuwanie |
 | Galeria | Portfolio fotograficzne, albumy klientów, metadane i upload zdjęć |
 | Odebrane / Wysłane | Podgląd skrzynki IMAP i historia wysyłek |
@@ -77,9 +77,9 @@ pod `/p/<adres>` i pojawia się w menu, w sekcji oferty na stronie głównej ora
 Portfolio jest osobnym zbiorem danych (`projects.json`), a nie częścią treści strony.
 Każda praca jest jednego z dwóch rodzajów:
 
-- **strona** — dowodem jest działający adres; można go ukryć, wtedy strona pisze,
+- **strona** – dowodem jest działający adres; można go ukryć, wtedy strona pisze,
   że prezentacja jest na życzenie,
-- **aplikacja** — dowodem są pliki do pobrania; opcjonalnie ma też własną stronę.
+- **aplikacja** – dowodem są pliki do pobrania; opcjonalnie ma też własną stronę.
 
 Pliki aplikacji biorą się z jednego z trzech źródeł (`releaseSource`):
 
@@ -96,7 +96,7 @@ stoi pod `/portfolio`, a każda praca ma własny adres `/portfolio/<slug>`.
 
 Bez tokenu serwer czyta tylko repozytoria publiczne i linkuje wprost do plików na
 GitHubie. Token wpisany w panelu (zakładka Realizacje) otwiera także repozytoria
-prywatne — ich pliki idą wtedy przez `/api/projects/:slug/asset/:id`, bo adresy
+prywatne – ich pliki idą wtedy przez `/api/projects/:slug/asset/:id`, bo adresy
 `browser_download_url` wymagają autoryzacji. Token jest szyfrowany AES-256-GCM tym
 samym kluczem co hasło poczty i nigdy nie opuszcza serwera.
 
@@ -126,5 +126,5 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 Publiczne: `GET /api/content`, `GET /api/pages/:slug`, `GET /api/projects/:slug`,
 `GET /api/projects/:slug/asset/:id`, `POST /api/contact`.
 Uwierzytelnianie: `/api/auth/status`, `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout`.
-Administracyjne (za sesją): `/api/admin/*` — zgłoszenia, treści, realizacje, podstrony,
+Administracyjne (za sesją): `/api/admin/*` – zgłoszenia, treści, realizacje, podstrony,
 media, poczta i token GitHuba.

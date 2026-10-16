@@ -2,10 +2,10 @@ import { Command, FileDown, Monitor, Smartphone, Tablet, Terminal } from 'lucide
 
 /**
  * Wspólny słownik realizacji dla strony i panelu. Kolejność platform jest ta
- * sama, co na serwerze — pliki do pobrania zawsze układają się identycznie.
+ * sama, co na serwerze – pliki do pobrania zawsze układają się identycznie.
  */
 
-/** Adres portfolio — jedno miejsce, z którego korzystają wszystkie widoki. */
+/** Adres portfolio – jedno miejsce, z którego korzystają wszystkie widoki. */
 export const CATALOG_PATH = '/portfolio'
 
 export const KIND_LABEL = { web: 'Strona', app: 'Aplikacja' }
@@ -45,7 +45,7 @@ export function formatReleaseDate(value) {
   return new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
 }
 
-/** Adres bez protokołu — na liście liczy się domena, nie `https://`. */
+/** Adres bez protokołu – na liście liczy się domena, nie `https://`. */
 export function hostOf(url) {
   if (!url) return ''
   if (url.startsWith('/')) return `redzikowski.com${url}`

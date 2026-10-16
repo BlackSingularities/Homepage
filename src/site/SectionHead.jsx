@@ -1,5 +1,5 @@
 /**
- * Nagłówek sekcji: tytuł, wprowadzenie i — gdy jest czym — licznik pozycji.
+ * Nagłówek sekcji: tytuł, wprowadzenie i – gdy jest czym – licznik pozycji.
  * W układzie rejestru stoi w lewej kolumnie i trzyma się góry ekranu.
  */
 export default function SectionHead({ id, title, accent, lead, count, action }) {

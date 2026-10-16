@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * Tło z „systemowych” znaków — ten sam układ, co w Arcadii: siatka losowych
+ * Tło z „systemowych” znaków – ten sam układ, co w Arcadii: siatka losowych
  * liter i cyfr, przez którą powoli przepływają jaśniejsze, złote skupiska
  * (szum wartości w 2D). Kliknięcie w puste tło wypuszcza falę, która
  * rozjaśnia i przetasowuje znaki po drodze, a kursor podświetla otoczenie.
  *
- * Rysujemy przez `drawImage` z przygotowanego atlasu glifów — to wielokrotnie
+ * Rysujemy przez `drawImage` z przygotowanego atlasu glifów – to wielokrotnie
  * szybsze niż `fillText` dla kilku tysięcy znaków na klatkę. Animacja chodzi
  * w ~30 fps, zatrzymuje się w ukrytej karcie, a przy `prefers-reduced-motion`
  * rysujemy tylko pojedyncze klatki po kliknięciu.
@@ -40,7 +40,7 @@ function valueNoise(x, y, seed) {
   return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy
 }
 
-/** Miękkie przejście między progami — bez niego dym ma twarde krawędzie. */
+/** Miękkie przejście między progami – bez niego dym ma twarde krawędzie. */
 function smoothstep(edge0, edge1, value) {
   const t = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)))
   return t * t * (3 - 2 * t)
@@ -49,7 +49,7 @@ function smoothstep(edge0, edge1, value) {
 /**
  * Gęstość dymu w punkcie siatki.
  *
- * Najpierw zniekształcamy współrzędne drugim polem szumu (domain warping) —
+ * Najpierw zniekształcamy współrzędne drugim polem szumu (domain warping) –
  * to od tego biorą się kłęby i smugi zamiast równych plam. Dopiero tak
  * przesuniętą próbkę czytamy trzema oktawami: pierwsza daje bryłę, kolejne
  * strzępią jej brzegi. Całość powoli unosi się do góry, a drobne oktawy
@@ -180,7 +180,7 @@ export default function GlyphField({ intensity = 1 }) {
           if (Math.random() < 0.002 + h * 0.045) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
 
           // Kontrast robi różnica między warstwami: znaki poza dymem są ledwie
-          // widoczne, rozświetlone — wyraźnie jasne. Dzięki temu dym ma kształt,
+          // widoczne, rozświetlone – wyraźnie jasne. Dzięki temu dym ma kształt,
           // zamiast rozmywać się w równomierną szarość.
           const density = Math.min(1, h)
           const sx = glyphs[idx] * sw

@@ -182,7 +182,7 @@ export function Dropzone({ onFiles, busy, compact }) {
     >
       {busy ? <LoaderCircle className="spin" size={20} /> : <Upload size={20} />}
       <b>{busy ? 'Wysyłam pliki…' : 'Przeciągnij zdjęcia albo kliknij'}</b>
-      {!compact && <span>PNG, JPG, WEBP, AVIF lub GIF — do 10 MB każde.</span>}
+      {!compact && <span>PNG, JPG, WEBP, AVIF lub GIF – do 10 MB każde.</span>}
       <input
         ref={inputRef}
         type="file"

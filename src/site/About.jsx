@@ -8,7 +8,7 @@ function Paragraphs({ text }) {
 
 /**
  * „O mnie” w układzie rejestru: po lewej tytuł i podpis, po prawej tekst.
- * Kompetencje to zwykła lista bez numerów — nie mają kolejności.
+ * Kompetencje to zwykła lista bez numerów – nie mają kolejności.
  */
 export default function About({ data, brand }) {
   return (

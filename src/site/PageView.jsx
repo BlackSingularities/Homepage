@@ -117,7 +117,7 @@ export default function PageView({ slug, onNavigate }) {
 
   useEffect(() => {
     if (!page) return
-    document.title = `${page.title} — Adam Rędzikowski`
+    document.title = `${page.title} – Adam Rędzikowski`
     const meta = document.querySelector('meta[name="description"]')
     if (meta && page.seoDescription) meta.setAttribute('content', page.seoDescription)
   }, [page])
@@ -174,7 +174,7 @@ export default function PageView({ slug, onNavigate }) {
       <Reveal className="page-foot">
         <div>
           <span>Masz podobny projekt?</span>
-          <h2>Opisz go w kilku zdaniach — <em className="accent">resztą zajmę się ja.</em></h2>
+          <h2>Opisz go w kilku zdaniach – <em className="accent">resztą zajmę się ja.</em></h2>
         </div>
         <a className="btn btn-primary" href="/#kontakt" onClick={event => { event.preventDefault(); onNavigate('/#kontakt') }}>
           Przejdź do formularza <ArrowRight size={17} />

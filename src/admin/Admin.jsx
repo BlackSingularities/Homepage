@@ -176,7 +176,7 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
       </Card>
 
       <div className="ap-two">
-        <Card title="IMAP — poczta przychodząca">
+        <Card title="IMAP – poczta przychodząca">
           <Text label="Host" value={settings.imapHost} onChange={imapHost => update({ imapHost })} placeholder="imap.example.com" />
           <div className="ap-grid-2">
             <Text label="Port" type="number" value={settings.imapPort} onChange={imapPort => update({ imapPort: Number(imapPort) || 993 })} />
@@ -185,7 +185,7 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
           <Toggle label="Połączenie szyfrowane TLS" checked={settings.imapSecure} onChange={imapSecure => update({ imapSecure })} />
         </Card>
 
-        <Card title="SMTP — poczta wychodząca">
+        <Card title="SMTP – poczta wychodząca">
           <Text label="Host" value={settings.smtpHost} onChange={smtpHost => update({ smtpHost })} placeholder="smtp.example.com" />
           <div className="ap-grid-2">
             <Text label="Port" type="number" value={settings.smtpPort} onChange={smtpPort => update({ smtpPort: Number(smtpPort) || 465 })} />
@@ -201,7 +201,7 @@ function MailSettings({ settings, setSettings, onSave, loading }) {
           type="password"
           value={settings.password}
           onChange={password => update({ password })}
-          placeholder={settings.hasPassword ? 'Zapisane — wpisz tylko, aby zmienić' : 'Hasło lub hasło aplikacji'}
+          placeholder={settings.hasPassword ? 'Zapisane – wpisz tylko, aby zmienić' : 'Hasło lub hasło aplikacji'}
         />
         <button className="ap-btn ap-btn-primary" type="submit" disabled={loading}>
           {loading ? <LoaderCircle className="spin" size={15} /> : <Save size={15} />} Zapisz ustawienia

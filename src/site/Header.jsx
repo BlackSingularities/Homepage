@@ -13,7 +13,7 @@ const SECTION_IDS = SECTIONS.map(([id]) => id)
 
 /**
  * Pasek jest cienki i nieprzezroczysty dopiero po zjechaniu z pierwszego
- * ekranu. Kontakt to zwykły link w obwódce — złoto zostaje dla jednego
+ * ekranu. Kontakt to zwykły link w obwódce – złoto zostaje dla jednego
  * przycisku na ekranie, a nie dla nawigacji.
  */
 export default function Header({ brand, pages = [], home = true, onNavigate }) {

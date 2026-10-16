@@ -3,7 +3,7 @@ import SectionHead from './SectionHead'
 /**
  * Zakres jako lista definicji, nie siatka kart: nazwa obszaru z hasłem,
  * pod nią to, co się pod nim naprawdę robi. Pozycje nie są numerowane,
- * bo nie tworzą kolejności — można zamówić dowolną.
+ * bo nie tworzą kolejności – można zamówić dowolną.
  */
 export default function Scope({ data }) {
   return (

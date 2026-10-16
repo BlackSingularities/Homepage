@@ -1,4 +1,4 @@
-// Lightweight, dependency-free document <head> updates — this SPA has no
+// Lightweight, dependency-free document <head> updates – this SPA has no
 // server-side rendering, so these only help the browser tab/history and
 // client-side link-preview tools, not crawlers, but cost nothing to keep.
 

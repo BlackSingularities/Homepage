@@ -73,5 +73,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-rebuild-v12.mjs
             docker compose exec -T homepage_api node server/migrate-arcadia-v13.mjs
             docker compose exec -T homepage_api node server/migrate-openpdf-v14.mjs
+            docker compose exec -T homepage_api node server/migrate-dashes-v15.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f

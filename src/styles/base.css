@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════
-   FUNDAMENT — tokeny, reset, typografia, wspólne kontrolki
+   FUNDAMENT – tokeny, reset, typografia, wspólne kontrolki
 
    Tło ze znaków jest wspólne z Arcadią; reszta to własny system strony:
    ciepła czerń, płaskie złoto, szeryf Newsreader w nagłówkach i Hanken
@@ -41,7 +41,7 @@
   --radius-sm: 5px;
   --gutter: clamp(18px, 5vw, 76px);
   /* Sąsiednie sekcje dokładają swoje paddingi do siebie, więc odstęp między
-     nimi to dwa razy tyle — stąd ta wartość jest połową docelowego rytmu. */
+     nimi to dwa razy tyle – stąd ta wartość jest połową docelowego rytmu. */
   --section-y: clamp(38px, 3.2vw, 58px);
   --maxw: 1240px;
   --line-gold: rgba(231, 198, 138, .36);
@@ -110,7 +110,7 @@ p { margin: 0; }
 
 /* ── typografia ─────────────────────────────────────────────────── */
 
-/* Nagłówki niesie szeryf o optycznym rozmiarze — lekki w dużych stopniach,
+/* Nagłówki niesie szeryf o optycznym rozmiarze – lekki w dużych stopniach,
    żeby złoto i znaki w tle miały przeciwwagę, a nie konkurencję. */
 h1, h2, h3, h4 {
   margin: 0;
@@ -127,7 +127,7 @@ h1 { font-size: clamp(44px, 6.4vw, 96px); font-weight: 300; letter-spacing: -.03
 h2 { font-size: clamp(32px, 3.8vw, 56px); font-weight: 300; letter-spacing: -.025em; }
 h3 { font-size: clamp(21px, 1.8vw, 26px); }
 
-/* Akcent w tytułach z panelu nie zmienia już koloru — dopisuje się do zdania. */
+/* Akcent w tytułach z panelu nie zmienia już koloru – dopisuje się do zdania. */
 em.accent,
 .accent {
   font-style: normal;
@@ -138,7 +138,7 @@ em.accent,
 
 .kinetic-word { display: inline-block; white-space: pre; }
 
-/* Dane techniczne — wersje, rozmiary plików, daty, platformy. */
+/* Dane techniczne – wersje, rozmiary plików, daty, platformy. */
 .mono {
   font-family: var(--font-mono);
   font-size: .78em;
@@ -155,7 +155,7 @@ em.accent,
   background: var(--bg);
 }
 
-/* Tło ze znaków — identyczne jak w Arcadii, pod całą treścią. */
+/* Tło ze znaków – identyczne jak w Arcadii, pod całą treścią. */
 .glyph-backdrop {
   position: fixed;
   inset: 0;
@@ -180,7 +180,7 @@ em.accent,
 
 /*
  * Tło widać w pełni tylko na pierwszym ekranie. Dalej treść leży na
- * pełnoszerokim, prawie czarnym pasie — znaki prześwitują, ale nie wchodzą
+ * pełnoszerokim, prawie czarnym pasie – znaki prześwitują, ale nie wchodzą
  * pod litery.
  */
 .page-slab,

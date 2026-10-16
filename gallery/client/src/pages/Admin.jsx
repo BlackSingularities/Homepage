@@ -419,7 +419,7 @@ function TabPortfolio() {
       <div className="divider" />
 
       {!loading && photos.length > 1 && (
-        <p style={{ color:'var(--text-3)', fontSize:12, marginBottom:16 }}>Zdjęcia są sortowane automatycznie od najnowszych według daty wykonania z metadanych, a gdy jej brak — według daty dodania.</p>
+        <p style={{ color:'var(--text-3)', fontSize:12, marginBottom:16 }}>Zdjęcia są sortowane automatycznie od najnowszych według daty wykonania z metadanych, a gdy jej brak – według daty dodania.</p>
       )}
 
       {loading ? <div className="spinner" /> : (
@@ -651,7 +651,7 @@ function TabUpload() {
       <Dropzone
         key={`${selAlbum}-${refreshKey}`}
         albumId={selAlbum || null}
-        onDone={() => { setRefreshKey(k => k+1); toast.success('Gotowe — zdjęcia dodane.') }}
+        onDone={() => { setRefreshKey(k => k+1); toast.success('Gotowe – zdjęcia dodane.') }}
       />
     </div>
   )

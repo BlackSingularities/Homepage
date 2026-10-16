@@ -5,7 +5,7 @@ import { Area, Field, Notice, Repeater, SaveBar, Text } from './parts'
 
 /**
  * Teksty strony głównej i portfolio. Prace mają własną zakładkę, bo są
- * osobnym zbiorem danych — tutaj ustawia się tylko nagłówki sekcji, w których
+ * osobnym zbiorem danych – tutaj ustawia się tylko nagłówki sekcji, w których
  * się pokazują.
  */
 
@@ -57,7 +57,7 @@ function HeadFields({ data, patch, withLead = true }) {
     <>
       <div className="ap-grid-2">
         <Text label="Nagłówek" value={data.title} onChange={title => patch({ title })} />
-        <Text label="Nagłówek — część wyróżniona" value={data.accent} onChange={accent => patch({ accent })} />
+        <Text label="Nagłówek – część wyróżniona" value={data.accent} onChange={accent => patch({ accent })} />
       </div>
       {withLead && <Area label="Opis sekcji" value={data.lead} onChange={lead => patch({ lead })} rows={2} />}
     </>
@@ -147,7 +147,7 @@ export default function ContentManager({ notify }) {
       <Section id="hero" title="Pierwszy ekran" description="Nagłówek, wprowadzenie i przyciski. Liczby pod nimi liczą się same z portfolio." open={open === 'hero'} onToggle={toggle}>
         <div className="ap-grid-2">
           <Text label="Nagłówek" value={draft.hero.titleTop} onChange={titleTop => patch('hero', { titleTop })} />
-          <Text label="Nagłówek — część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
+          <Text label="Nagłówek – część wyróżniona" value={draft.hero.titleAccent} onChange={titleAccent => patch('hero', { titleAccent })} />
         </div>
         <Area label="Wprowadzenie" value={draft.hero.lead} onChange={lead => patch('hero', { lead })} rows={3} />
         <div className="ap-grid-2">

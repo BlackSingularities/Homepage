@@ -46,7 +46,7 @@ export default function Grid({
   const [tileSize, setTileSize] = useState(() => localStorage.getItem(tileSizeStorageKey) || 'medium')
   const [columnCount, setColumnCount] = useState(3)
 
-  // Render photos in growing batches instead of all at once — keeps the
+  // Render photos in growing batches instead of all at once – keeps the
   // initial paint light and defers offscreen images (native loading="lazy"
   // only helps once an <img> exists in the DOM at all).
   const [visibleCount, setVisibleCount] = useState(() => {

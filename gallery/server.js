@@ -25,7 +25,7 @@ fs.mkdirSync(THUMBS_DIR,  { recursive: true })
 
 if (NODE_ENV === 'production' && JWT_SECRET === 'galeria-secret-change-me-in-production') {
   console.warn('\n' + '⚠ '.repeat(20))
-  console.warn('UWAGA: GALLERY_JWT_SECRET nie został ustawiony — używana jest wartość domyślna.')
+  console.warn('UWAGA: GALLERY_JWT_SECRET nie został ustawiony – używana jest wartość domyślna.')
   console.warn('Ustaw GALLERY_JWT_SECRET przed wdrożeniem produkcyjnym!')
   console.warn('⚠ '.repeat(20) + '\n')
 }
@@ -66,7 +66,7 @@ const PHOTO_DATE_ORDER_DESC = "datetime(COALESCE(NULLIF(p.taken_at, ''), p.creat
 
 // ── Media access gate ────────────────────────────────────────────────────────
 // Listing endpoints already require a password/token, but the raw file URLs
-// used to be served unconditionally by express.static — anyone who learned a
+// used to be served unconditionally by express.static – anyone who learned a
 // filename could fetch it forever. This middleware re-checks access on every
 // single file request. Portfolio originals and thumbnails stay public for
 // display; password-protected album originals require album/admin access.
@@ -95,7 +95,7 @@ async function protectMedia(req, res, next) {
   return res.status(403).json({ error: 'Brak dostępu' })
 }
 
-// Static files (served directly — nginx proxy strips /galeria prefix)
+// Static files (served directly – nginx proxy strips /galeria prefix)
 app.use('/uploads', protectMedia, express.static(UPLOADS_DIR, { maxAge: '1y', immutable: true }))
 app.use('/thumbs',  protectMedia, express.static(THUMBS_DIR,  { maxAge: '1y', immutable: true }))
 
@@ -140,7 +140,7 @@ function fmtFocal(f) {
   return `${Math.round(f)}mm`
 }
 
-// GPS is intentionally never parsed/stored — client photos can contain shoot
+// GPS is intentionally never parsed/stored – client photos can contain shoot
 // locations that shouldn't leak through gallery metadata.
 async function extractExif(filePath) {
   try {
@@ -168,7 +168,7 @@ async function extractExif(filePath) {
 }
 
 // EXIF orientation 5-8 means the raw pixel grid is rotated 90°/270° relative
-// to how it's displayed — swap width/height so stored dimensions match what
+// to how it's displayed – swap width/height so stored dimensions match what
 // browsers actually render (they auto-rotate JPEGs per the orientation tag).
 function displayDims(meta) {
   const rotated = meta.orientation >= 5 && meta.orientation <= 8

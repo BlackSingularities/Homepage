@@ -4,8 +4,8 @@ import { cleanLink, cleanMedia, cleanRepo, cleanText, slugify } from './sanitize
 /**
  * Model realizacji. Dwa rodzaje treści:
  *
- * - `web` — strona lub serwis, którego dowodem jest działający adres,
- * - `app` — aplikacja do pobrania, opcjonalnie z własną stroną.
+ * - `web` – strona lub serwis, którego dowodem jest działający adres,
+ * - `app` – aplikacja do pobrania, opcjonalnie z własną stroną.
  *
  * Aplikacja może brać listę plików z najnowszego wydania na GitHubie
  * (`releaseSource: 'github'`) albo z ręcznie wpisanych pozycji (`'manual'`).
@@ -14,7 +14,7 @@ import { cleanLink, cleanMedia, cleanRepo, cleanText, slugify } from './sanitize
 export const KINDS = ['web', 'app']
 export const RELEASE_SOURCES = ['github', 'manual', 'none']
 
-/** Kolejność wyświetlania plików do pobrania — od najczęściej używanej platformy. */
+/** Kolejność wyświetlania plików do pobrania – od najczęściej używanej platformy. */
 export const PLATFORMS = [
   ['windows', 'Windows'],
   ['macos', 'macOS'],
@@ -107,7 +107,7 @@ export function sanitizeProject(input, existing = {}) {
   }
 }
 
-/** Wiersz listy na stronie głównej i w portfolio — bez pełnego opisu i galerii. */
+/** Wiersz listy na stronie głównej i w portfolio – bez pełnego opisu i galerii. */
 export function projectSummary(project, release) {
   return {
     id: project.id,
@@ -127,7 +127,7 @@ export function projectSummary(project, release) {
 }
 
 /**
- * Łączy ręczne pozycje z plikami wydania — zależnie od wybranego źródła.
+ * Łączy ręczne pozycje z plikami wydania – zależnie od wybranego źródła.
  * Pliki z prywatnego repozytorium nie mają publicznego adresu, więc kierujemy
  * je przez proxy serwera, które dokłada token.
  */

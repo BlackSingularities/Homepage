@@ -1,7 +1,7 @@
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '') // e.g. '/galeria' or ''
 
 export const API   = `${BASE}/api`
-// `token` is only required for photos in password-protected albums — public
+// `token` is only required for photos in password-protected albums – public
 // portfolio photos and public albums ignore it. Passing it unconditionally is
 // harmless, so callers with a token in scope can just always pass it through.
 export const fileUrl  = (f, token) => f ? `${BASE}/uploads/${f}${token ? `?t=${encodeURIComponent(token)}` : ''}` : ''

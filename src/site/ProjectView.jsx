@@ -17,7 +17,7 @@ function Paragraphs({ text }) {
 
 /**
  * Pliki do pobrania. Jedna pozycja na platformę w kolejności ustalonej na
- * serwerze, obok rozmiar i wersja — to dane, więc idą fontem monospace.
+ * serwerze, obok rozmiar i wersja – to dane, więc idą fontem monospace.
  * Pliki z prywatnych repozytoriów lecą przez proxy API, więc adres jest
  * zawsze względny i nie ujawnia tokenu.
  */
@@ -79,7 +79,7 @@ function Gallery({ shots, name, onZoom }) {
         <button type="button" key={shot.src} onClick={() => onZoom(shot.src)}>
           <img
             src={shot.src}
-            alt={shot.alt || `${name} — ekran ${index + 1}`}
+            alt={shot.alt || `${name} – ekran ${index + 1}`}
             loading={index === 0 ? 'eager' : 'lazy'}
           />
         </button>
@@ -104,7 +104,7 @@ export default function ProjectView({ slug, onNavigate }) {
   }, [slug])
 
   useEffect(() => {
-    if (data?.project) document.title = `${data.project.name} — Adam Rędzikowski`
+    if (data?.project) document.title = `${data.project.name} – Adam Rędzikowski`
   }, [data])
 
   useEffect(() => {
@@ -168,7 +168,7 @@ export default function ProjectView({ slug, onNavigate }) {
             )}
             {project.siteUrl && <span className="pv-host mono">{hostOf(project.siteUrl)}</span>}
             {!project.siteUrl && project.kind === 'web' && (
-              <span className="pv-host mono is-quiet">Adres nie jest publiczny — prezentacja na życzenie.</span>
+              <span className="pv-host mono is-quiet">Adres nie jest publiczny – prezentacja na życzenie.</span>
             )}
             {project.repo && (
               <a className="pv-repo mono" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">

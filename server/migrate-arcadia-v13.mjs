@@ -1,7 +1,7 @@
 /**
  * Wstawia Arcadię na początek portfolio.
  *
- * Portfolio startowało puste, a ta pozycja ma stać pierwsza — i na stronie
+ * Portfolio startowało puste, a ta pozycja ma stać pierwsza – i na stronie
  * głównej, i w katalogu. Jeśli wpis już istnieje, migracja tylko przesuwa go
  * na początek i odświeża zrzuty, więc da się ją puścić ponownie bez szkody.
  */
@@ -33,9 +33,9 @@ const project = {
   kind: 'web',
   label: 'Gry i narzędzia / aplikacja webowa',
   year: '2026',
-  tagline: 'Czterdzieści gier i trzydzieści pięć narzędzi, które liczą się w przeglądarce — bez instalowania, reklam i kont.',
+  tagline: 'Czterdzieści gier i trzydzieści pięć narzędzi, które liczą się w przeglądarce – bez instalowania, reklam i kont.',
   summary: 'Jeden katalog zamiast rozsypanych zakładek: klasyki w świeżym wydaniu, zupełnie nowe pomysły i warsztat narzędzi, które naprawdę przydają się w pracy i w nauce.',
-  body: 'Każda pozycja to osobna, dopracowana rzecz, a nie wariant tego samego szablonu. Tetris ma hold i kombosy, LUNARIS odtwarza pełny lot Apollo z siedmioma etapami i fizyką modułu, Chrono Rally prowadzi kierowcę przez sezon mistrzostw z oponami, paliwem i duchem najlepszego okrążenia, a Metro Manager jest spokojną strategią o projektowaniu linii w rosnącym mieście.\n\nNarzędzia idą tą samą drogą: układ okresowy z pełnymi danymi pierwiastków, wykresy funkcji z miejscami zerowymi i pochodną, Color Lab przeliczający kolory między HEX, RGB, HSL i OKLCH razem z kontrastem WCAG, pianino z nauką melodii. Wszystko liczy się lokalnie — pliki nie opuszczają komputera i nie ma żadnego konta do założenia.\n\nCałość spina wspólny katalog z filtrami, wyszukiwarką i paletą poleceń pod Ctrl+K, wspólne rankingi po stronie serwera oraz jeden system wizualny, którego ta strona jest częścią: to samo tło ze znaków i ta sama typografia.',
+  body: 'Każda pozycja to osobna, dopracowana rzecz, a nie wariant tego samego szablonu. Tetris ma hold i kombosy, LUNARIS odtwarza pełny lot Apollo z siedmioma etapami i fizyką modułu, Chrono Rally prowadzi kierowcę przez sezon mistrzostw z oponami, paliwem i duchem najlepszego okrążenia, a Metro Manager jest spokojną strategią o projektowaniu linii w rosnącym mieście.\n\nNarzędzia idą tą samą drogą: układ okresowy z pełnymi danymi pierwiastków, wykresy funkcji z miejscami zerowymi i pochodną, Color Lab przeliczający kolory między HEX, RGB, HSL i OKLCH razem z kontrastem WCAG, pianino z nauką melodii. Wszystko liczy się lokalnie – pliki nie opuszczają komputera i nie ma żadnego konta do założenia.\n\nCałość spina wspólny katalog z filtrami, wyszukiwarką i paletą poleceń pod Ctrl+K, wspólne rankingi po stronie serwera oraz jeden system wizualny, którego ta strona jest częścią: to samo tło ze znaków i ta sama typografia.',
   role: 'Pomysł, projekt, grafika, kod, wdrożenie i rozwój',
   stack: ['Next.js', 'TypeScript', 'React', 'Canvas', 'Web Audio'],
   features: [

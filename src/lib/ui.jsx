@@ -15,7 +15,7 @@ export const stagger = (delay = 0.07) => ({
 
 /**
  * Dawniej wjazd każdej sekcji przy przewijaniu. Strona ma teraz jeden
- * moment ruchu — wejście pierwszego ekranu — więc Reveal zostaje tylko
+ * moment ruchu – wejście pierwszego ekranu – więc Reveal zostaje tylko
  * jako zwykły kontener, żeby widoki z niego korzystające się nie zmieniały.
  */
 // eslint-disable-next-line no-unused-vars
@@ -80,7 +80,7 @@ export function useSpotlight() {
 }
 
 /**
- * Podświetlenie pozycji w nawigacji. Startuje puste — dopóki nie widać żadnej
+ * Podświetlenie pozycji w nawigacji. Startuje puste – dopóki nie widać żadnej
  * sekcji, żadna nie udaje aktywnej.
  */
 export function useActiveSection(ids) {

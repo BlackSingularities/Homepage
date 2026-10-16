@@ -39,7 +39,7 @@ export default function Album() {
       setMediaToken(token || null)
       setNeedsPass(false)
       setPageMeta({
-        title: `${d.album.name} — Adam Rędzikowski`,
+        title: `${d.album.name} – Adam Rędzikowski`,
         description: d.album.description || `Album zdjęć: ${d.album.name}`,
       })
     } catch (err) {

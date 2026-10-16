@@ -4,7 +4,7 @@ import defaultContent from '../../server/content.default.json'
 /**
  * Treści i portfolio przychodzą z panelu, ale dołączone wartości
  * domyślne trzymają stronę w całości przy pierwszym rysowaniu i wtedy, gdy API
- * jest nieosiągalne. Portfolio startuje puste — prace dodaje się w panelu.
+ * jest nieosiągalne. Portfolio startuje puste – prace dodaje się w panelu.
  */
 export function useSiteData() {
   const [data, setData] = useState({ content: defaultContent, pages: [], projects: [], ready: false })

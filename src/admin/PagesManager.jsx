@@ -338,7 +338,7 @@ export default function PagesManager({ notify }) {
         {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
         {!draft ? (
-          <Empty>Wybierz stronę z listy albo utwórz nową — dodasz do niej opisy, zdjęcia i galerie.</Empty>
+          <Empty>Wybierz stronę z listy albo utwórz nową – dodasz do niej opisy, zdjęcia i galerie.</Empty>
         ) : (
           <>
             <Card
@@ -372,13 +372,13 @@ export default function PagesManager({ notify }) {
               </div>
             </Card>
 
-            <Card title="Treść strony" description="Układaj stronę z bloków — tekstu, zdjęć, galerii, liczb i wezwań do działania.">
+            <Card title="Treść strony" description="Układaj stronę z bloków – tekstu, zdjęć, galerii, liczb i wezwań do działania.">
               <Repeater
                 items={draft.blocks}
                 onChange={blocks => patch({ blocks })}
                 create={() => newBlock('text')}
                 addLabel="Dodaj blok tekstowy"
-                itemLabel={block => `${BLOCK_LABEL[block.type] || 'Blok'}${block.heading ? ` — ${block.heading}` : ''}`}
+                itemLabel={block => `${BLOCK_LABEL[block.type] || 'Blok'}${block.heading ? ` – ${block.heading}` : ''}`}
                 render={(block, update) => <BlockEditor block={block} patch={update} />}
               />
 

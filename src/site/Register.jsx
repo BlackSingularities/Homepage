@@ -4,7 +4,7 @@ import { Reveal } from '../lib/ui'
 
 /**
  * Lista prac. Każdy wiersz niesie informację, a nie ozdobę:
- * rodzaj treści, rok, i po prawej dowód — adres działającej strony albo
+ * rodzaj treści, rok, i po prawej dowód – adres działającej strony albo
  * platformy, na które jest plik do pobrania.
  *
  * `lead` wyróżnia pierwszą pozycję dużą okładką; hierarchia bierze się wtedy

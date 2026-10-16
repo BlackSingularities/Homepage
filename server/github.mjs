@@ -23,7 +23,7 @@ function headers(token, accept = 'application/vnd.github+json') {
   }
 }
 
-/** Usuwa z nazwy pliku powtórzenia nazwy projektu i wersji — zostaje sama treść. */
+/** Usuwa z nazwy pliku powtórzenia nazwy projektu i wersji – zostaje sama treść. */
 function assetLabel(name) {
   const base = String(name || '').replace(/\.[a-z0-9]{1,8}$/i, '')
   const extension = String(name || '').match(/\.([a-z0-9]{1,8})$/i)?.[1] || ''
@@ -40,7 +40,7 @@ async function request(path, token, accept) {
     throw error
   }
   if (response.status === 401 || response.status === 403) {
-    const error = new Error('GitHub odrzucił zapytanie — sprawdź token i jego uprawnienia.')
+    const error = new Error('GitHub odrzucił zapytanie – sprawdź token i jego uprawnienia.')
     error.status = response.status
     throw error
   }
@@ -52,7 +52,7 @@ async function request(path, token, accept) {
   return response.json()
 }
 
-/** Najpierw oficjalne „latest”, a gdy go nie ma — najnowsze wydanie z listy (także wersje wstępne). */
+/** Najpierw oficjalne „latest”, a gdy go nie ma – najnowsze wydanie z listy (także wersje wstępne). */
 async function fetchRelease(repo, token) {
   try {
     return await request(`/repos/${repo}/releases/latest`, token)
@@ -126,7 +126,7 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     return task
   }
 
-  /** Zwraca wynik z cache, a gdy jest przedawniony — odświeża w tle i podaje stary. */
+  /** Zwraca wynik z cache, a gdy jest przedawniony – odświeża w tle i podaje stary. */
   async function get(repo, { wait = false } = {}) {
     if (!repo) return null
     const cached = (await read())[repo]
@@ -146,7 +146,7 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
 
   /**
    * Strumień pliku z prywatnego wydania. GitHub odpowiada przekierowaniem do
-   * magazynu, do którego nie wolno przesłać nagłówka autoryzacji — dlatego
+   * magazynu, do którego nie wolno przesłać nagłówka autoryzacji – dlatego
    * przekierowanie obsługujemy ręcznie.
    */
   async function asset(repo, assetId) {
@@ -174,7 +174,7 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     }
   }
 
-  /** Sprawdzenie tokenu dla panelu — zwraca nazwę konta i widoczne zakresy. */
+  /** Sprawdzenie tokenu dla panelu – zwraca nazwę konta i widoczne zakresy. */
   async function check() {
     const token = await getToken()
     if (!token) return { configured: false }

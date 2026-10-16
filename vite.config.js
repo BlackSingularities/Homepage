@@ -10,7 +10,7 @@ export default defineConfig({
     port: parseInt(process.env.PORT) || 5173,
     strictPort: false,
     // changeOrigin stays off so the Host header keeps matching the browser's
-    // Origin — the API rejects cross-origin writes exactly like in production.
+    // Origin – the API rejects cross-origin writes exactly like in production.
     proxy: {
       '/api': { target: apiTarget, changeOrigin: false },
       '/uploads': { target: apiTarget, changeOrigin: false },

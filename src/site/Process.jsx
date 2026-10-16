@@ -1,6 +1,6 @@
 import SectionHead from './SectionHead'
 
-/** Proces to prawdziwa kolejność, więc tu — i tylko tu — kroki mają numery. */
+/** Proces to prawdziwa kolejność, więc tu – i tylko tu – kroki mają numery. */
 export default function Process({ data }) {
   return (
     <section className="section rail" id="proces">

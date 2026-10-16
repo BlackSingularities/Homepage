@@ -21,8 +21,8 @@ export default function Portfolio() {
 
   useEffect(() => {
     setPageMeta({
-      title: 'Adam Rędzikowski — Galeria fotograficzna',
-      description: 'Portfolio fotograficzne Adam Rędzikowski — wybrane prace, śluby, portrety i plenery.',
+      title: 'Adam Rędzikowski – Galeria fotograficzna',
+      description: 'Portfolio fotograficzne Adam Rędzikowski – wybrane prace, śluby, portrety i plenery.',
     })
     getPortfolio()
       .then(setPhotos)

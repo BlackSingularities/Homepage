@@ -13,7 +13,7 @@ import {
 
 /**
  * Portfolio. Dwa rodzaje treści, więc formularz pokazuje tylko to, co
- * dotyczy wybranego rodzaju: strona ma adres, aplikacja — repozytorium albo
+ * dotyczy wybranego rodzaju: strona ma adres, aplikacja – repozytorium albo
  * ręczną listę plików. Wydania z GitHuba podglądamy tutaj, żeby błąd tokenu
  * albo brak uprawnień było widać przed publikacją, a nie na stronie.
  */
@@ -55,7 +55,7 @@ function emptyProject() {
   }
 }
 
-/** Edytor listy prostych łańcuchów — jedna linia to jedna pozycja. */
+/** Edytor listy prostych łańcuchów – jedna linia to jedna pozycja. */
 function Lines({ label, value = [], onChange, hint, rows = 4 }) {
   const joined = value.join('\n')
   const [text, setText] = useState(joined)
@@ -112,7 +112,7 @@ function Shots({ value = [], onChange }) {
   )
 }
 
-/** Podgląd wydania pobranego z GitHuba — albo powód, dla którego go nie ma. */
+/** Podgląd wydania pobranego z GitHuba – albo powód, dla którego go nie ma. */
 function ReleasePreview({ release, busy, onRefresh }) {
   if (!release && !busy) return null
   return (
@@ -186,7 +186,7 @@ function GithubPanel({ notify }) {
         <div>
           <strong>Połączenie z GitHubem</strong>
           <p>
-            {state?.configured && state?.ok && `Token działa — konto ${state.login}. Prywatne repozytoria są czytane.`}
+            {state?.configured && state?.ok && `Token działa – konto ${state.login}. Prywatne repozytoria są czytane.`}
             {state?.configured && state?.ok === false && (state.error || 'Token nie działa.')}
             {state && !state.configured && 'Bez tokenu czytam tylko repozytoria publiczne i ich publiczne wydania.'}
             {!state && 'Sprawdzam połączenie…'}
@@ -200,7 +200,7 @@ function GithubPanel({ notify }) {
           type="password"
           value={token}
           onChange={setToken}
-          placeholder={state?.configured ? '•••••••• — wpisz nowy, aby podmienić' : 'ghp_…'}
+          placeholder={state?.configured ? '•••••••• – wpisz nowy, aby podmienić' : 'ghp_…'}
           hint="Wystarczy uprawnienie do odczytu zawartości repozytoriów. Token jest szyfrowany przed zapisem i nigdy nie opuszcza serwera."
           wide
         />
@@ -279,7 +279,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
       </div>
 
       <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
-        hint="Najlepiej poziomy zrzut ekranu — kadrowany do 16:10." />
+        hint="Najlepiej poziomy zrzut ekranu – kadrowany do 16:10." />
       <Shots value={project.shots} onChange={shots => update({ shots })} />
 
       <div className="ap-grid-2">
@@ -287,7 +287,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
           placeholder="https://przyklad.pl albo /sciezka" />
         <Toggle
           label="Adres widoczny publicznie"
-          hint="Wyłącz, żeby pokazać realizację bez linku — strona napisze, że prezentacja jest na życzenie."
+          hint="Wyłącz, żeby pokazać realizację bez linku – strona napisze, że prezentacja jest na życzenie."
           checked={!project.siteHidden}
           onChange={visible => update({ siteHidden: !visible })}
         />
@@ -310,7 +310,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
                   value={project.repo}
                   onChange={repo => update({ repo })}
                   placeholder="owner/nazwa"
-                  hint="Można wkleić cały adres z GitHuba — zostanie z niego owner/nazwa."
+                  hint="Można wkleić cały adres z GitHuba – zostanie z niego owner/nazwa."
                 />
                 <Toggle
                   label="Pokaż link do repozytorium"
