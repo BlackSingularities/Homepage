@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Tło z „systemowych” znaków – ten sam układ, co w Arcadii: siatka losowych
- * liter i cyfr, przez którą powoli przepływają jaśniejsze, złote skupiska
- * (szum wartości w 2D). Kliknięcie w puste tło wypuszcza falę, która
+ * liter i cyfr, przez którą unoszą się jaśniejsze, złote smugi dymu
+ * (szum wartości w 3D, z czasem jako trzecim wymiarem). Kliknięcie w puste tło wypuszcza falę, która
  * rozjaśnia i przetasowuje znaki po drodze, a kursor podświetla otoczenie.
  *
  * Rysujemy przez `drawImage` z przygotowanego atlasu glifów – to wielokrotnie
@@ -17,7 +17,6 @@ const CELL_W = 11
 const CELL_H = 15
 const FONT_PX = 11
 const FRAME_MS = 1000 / 30
-const LEVELS = 10
 
 // deterministyczny hash siatki → [0, 1)
 function hash(ix, iy, seed) {
@@ -47,22 +46,39 @@ function smoothstep(edge0, edge1, value) {
 }
 
 /**
- * Gęstość dymu w punkcie siatki.
- *
- * Najpierw zniekształcamy współrzędne drugim polem szumu (domain warping) –
- * to od tego biorą się kłęby i smugi zamiast równych plam. Dopiero tak
- * przesuniętą próbkę czytamy trzema oktawami: pierwsza daje bryłę, kolejne
- * strzępią jej brzegi. Całość powoli unosi się do góry, a drobne oktawy
- * płyną szybciej niż bryła, więc dym kłębi się w miejscu, a nie tylko jedzie.
+ * Szum wartości w trzech wymiarach: trzecim jest czas. Kłęby nie tylko się
+ * przesuwają, ale też powoli zmieniają kształt – rozwiewają się i zlewają.
  */
-function smoke(nx, ny, t, seed) {
-  const wx = valueNoise(nx * 0.55 + t * 0.021, ny * 0.55 - t * 0.055, seed + 31) - 0.5
-  const wy = valueNoise(nx * 0.55 - t * 0.017, ny * 0.55 - t * 0.047, seed + 57) - 0.5
-  const sx = nx + wx * 2.4
-  const sy = ny - t * 0.09 + wy * 2.4
-  return valueNoise(sx * 0.8, sy * 0.6, seed) * 0.56
-    + valueNoise(sx * 1.9, sy * 1.5 - t * 0.13, seed + 7) * 0.3
-    + valueNoise(sx * 4.1, sy * 3.2 - t * 0.21, seed + 11) * 0.14
+function valueNoise3(x, y, z, seed) {
+  const iz = Math.floor(z)
+  const fz = z - iz
+  const sz = fz * fz * (3 - 2 * fz)
+  const a = valueNoise(x, y, seed + iz * 101)
+  const b = valueNoise(x, y, seed + (iz + 1) * 101)
+  return a + (b - a) * sz
+}
+
+/**
+ * Gęstość dymu w punkcie siatki. `nx`, `ny` to współrzędne szumu, `rise`
+ * to wysokość na ekranie od 0 (dół) do 1 (góra).
+ *
+ * Próbkę czytamy z miejsca przesuniętego w dół o upływ czasu (`ny + t·k`),
+ * więc wzór wędruje do góry – dym się unosi, a nie spada. Współrzędne
+ * zniekształca drugie pole szumu (domain warping), a im wyżej, tym mocniej
+ * smugi falują na boki i tym bardziej dym rzednie, jak nad źródłem.
+ */
+function smoke(nx, ny, rise, t, seed) {
+  const z = t * 0.11
+  const wx = valueNoise3(nx * 0.5, ny * 0.5 + t * 0.06, z, seed + 31) - 0.5
+  const wy = valueNoise3(nx * 0.5, ny * 0.5 + t * 0.05, z, seed + 57) - 0.5
+  const sway = Math.sin(ny * 0.7 + t * 0.35 + nx * 0.2) * 0.45 * rise
+  const sx = nx + wx * (1.6 + rise * 2.2) + sway
+  const sy = ny + t * 0.16 + wy * 1.8
+  const d = valueNoise3(sx * 0.7, sy * 0.45, z, seed) * 0.55
+    + valueNoise3(sx * 1.7, sy * 1.1 + t * 0.08, z * 1.6, seed + 7) * 0.3
+    + valueNoise3(sx * 3.8, sy * 2.6 + t * 0.14, z * 2.3, seed + 11) * 0.15
+  // u dołu dym jest gęsty, ku górze rozrzedza się i strzępi
+  return d * (1.08 - rise * 0.32)
 }
 
 function buildAtlas(color, dpr) {
@@ -143,17 +159,17 @@ export default function GlyphField({ intensity = 1 }) {
       const sh = CELL_H * dpr
       for (let row = 0; row < rows; row += 1) {
         const py = row * CELL_H
-        // kolumny czytamy gęściej niż wiersze, więc kłęby są wyższe niż szersze
-        const ny = row / 21
+        // kolumny czytamy gęściej niż wiersze, więc smugi są wyższe niż szersze
+        const ny = row / 24
+        const rise = 1 - row / rows
         for (let col = 0; col < cols; col += 1) {
           const idx = row * cols + col
           const px = col * CELL_W
           const nx = col / 26
 
-          // Progi dobrane tak, żeby dym zapalał mniej więcej co szósty znak:
-          // reszta ekranu zostaje ciemna i kłęby mają kształt, zamiast zlewać
-          // się w jednolitą ścianę.
-          let level = smoothstep(0.56, 0.72, smoke(nx, ny, t, seed))
+          // Szeroki, miękki próg: brzegi dymu przechodzą w tło stopniowo,
+          // a większość ekranu zostaje ciemna, więc smugi mają kształt.
+          let level = smoothstep(0.4, 0.72, smoke(nx, ny, rise, t, seed))
 
           if (pointer.active) {
             const dx = px - pointer.x
@@ -177,7 +193,8 @@ export default function GlyphField({ intensity = 1 }) {
           const h = Math.max(level, heat[idx] * 0.955)
           heat[idx] = h
 
-          if (Math.random() < 0.002 + h * 0.045) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
+          // znaki w dymie podmieniają się rzadko – migotanie wyglądało jak deszcz
+          if (Math.random() < 0.001 + h * 0.018) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
 
           // Kontrast robi różnica między warstwami: znaki poza dymem są ledwie
           // widoczne, rozświetlone – wyraźnie jasne. Dzięki temu dym ma kształt,
@@ -187,9 +204,8 @@ export default function GlyphField({ intensity = 1 }) {
           const base = 0.016 + hash(col, row, seed + 3) * 0.026
           ctx.globalAlpha = Math.min(1, base * (1 - density * 0.85) * intensity)
           ctx.drawImage(dim, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
-          if (density > 0.06) {
-            const q = Math.min(LEVELS, Math.ceil(density * LEVELS)) / LEVELS
-            ctx.globalAlpha = Math.min(0.92, Math.pow(q, 1.6) * 0.9 * intensity)
+          if (density > 0.04) {
+            ctx.globalAlpha = Math.min(0.85, Math.pow(density, 1.5) * 0.9 * intensity)
             ctx.drawImage(glow, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
           }
         }
