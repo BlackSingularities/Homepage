@@ -1424,3 +1424,19 @@
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px); }
 }
+
+/* Teksty ciągłe są justowane; dzielenie wyrazów (lang="pl") nie pozwala
+   rozjechać się odstępom w wąskich kolumnach. Nagłówki zostają do lewej. */
+.site p,
+.site dd,
+.site li {
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.site .about-strengths li,
+.site .footer-legal,
+.site .works-meta,
+.site .form-hint,
+.site .form-privacy { text-align: left; hyphens: manual; }
