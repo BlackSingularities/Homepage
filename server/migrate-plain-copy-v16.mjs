@@ -1,6 +1,6 @@
 /**
  * Upraszcza teksty strony głównej dla osób spoza branży: zakres oferty,
- * kompetencje w „O mnie”, kroki procesu i FAQ. Te same teksty są w
+ * tekst i kompetencje w „O mnie”, kroki procesu i FAQ. Te same teksty są w
  * content.default.json; tu trafiają do treści zapisanych przez panel.
  *
  * Działa raz (znacznik w katalogu danych), więc późniejsze zmiany
@@ -23,7 +23,7 @@ if (await exists(markerFile)) process.exit(0)
 if (await exists(contentFile)) {
   const content = JSON.parse(await fs.readFile(contentFile, 'utf8'))
   content.scope = { ...content.scope, ...copy.scope }
-  content.about = { ...content.about, strengths: copy.strengths }
+  content.about = { ...content.about, text: copy.aboutText, strengths: copy.strengths }
   content.process = { ...content.process, items: copy.process }
   content.faq = { ...content.faq, items: copy.faq }
   const temp = `${contentFile}.tmp`

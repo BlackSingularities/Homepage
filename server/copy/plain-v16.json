@@ -52,20 +52,65 @@
     "Sieć domowa, serwery i inteligentny dom"
   ],
   "process": [
-    { "no": "01", "title": "Rozmowa", "text": "Opowiadasz, czego potrzebujesz i jak dziś pracujesz. Wspólnie ustalamy, co naprawdę warto zrobić." },
-    { "no": "02", "title": "Plan", "text": "Przygotowuję projekt: co ma się znaleźć w rozwiązaniu, jak będzie działać i wyglądać. Zanim zacznę budować, wiesz dokładnie, co dostaniesz." },
-    { "no": "03", "title": "Budowa", "text": "Tworzę działającą wersję i pokazuję ją na bieżąco, żebyś mógł ją sprawdzić na prawdziwych przykładach." },
-    { "no": "04", "title": "Uruchomienie", "text": "Wstawiam gotowe rozwiązanie do sieci albo instaluję je u Ciebie, zabezpieczam je i pokazuję, jak z niego korzystać." },
-    { "no": "05", "title": "Opieka", "text": "Pilnuję, żeby wszystko działało, pomagam w razie pytań i dodaję nowe funkcje, gdy pojawią się nowe potrzeby." }
+    {
+      "no": "01",
+      "title": "Rozmowa",
+      "text": "Opowiadasz, czego potrzebujesz i jak dziś pracujesz. Wspólnie ustalamy, co naprawdę warto zrobić."
+    },
+    {
+      "no": "02",
+      "title": "Plan",
+      "text": "Przygotowuję projekt: co ma się znaleźć w rozwiązaniu, jak będzie działać i wyglądać. Zanim zacznę budować, wiesz dokładnie, co dostaniesz."
+    },
+    {
+      "no": "03",
+      "title": "Budowa",
+      "text": "Tworzę działającą wersję i pokazuję ją na bieżąco, żebyś mógł ją sprawdzić na prawdziwych przykładach."
+    },
+    {
+      "no": "04",
+      "title": "Uruchomienie",
+      "text": "Wstawiam gotowe rozwiązanie do sieci albo instaluję je u Ciebie, zabezpieczam je i pokazuję, jak z niego korzystać."
+    },
+    {
+      "no": "05",
+      "title": "Opieka",
+      "text": "Pilnuję, żeby wszystko działało, pomagam w razie pytań i dodaję nowe funkcje, gdy pojawią się nowe potrzeby."
+    }
   ],
   "faq": [
-    { "q": "Czy muszę dokładnie wiedzieć, czego chcę?", "a": "Nie. Wystarczy opisać problem albo pomysł. Pomogę uporządkować potrzeby i zamienić je w konkretny plan." },
-    { "q": "Ile to trwa?", "a": "Prosta strona albo blog to zwykle kilka tygodni. Większy program powstaje etapami. Po pierwszej rozmowie podam realny termin." },
-    { "q": "Ile to kosztuje?", "a": "Cena zależy od tego, co ma powstać. Przed startem dostajesz opis prac, terminy i koszt. Jeśli da się zacząć od mniejszej wersji i rozbudować ją później, powiem to wprost." },
-    { "q": "Czy sam będę mógł zmieniać treści na stronie?", "a": "Tak. Jeśli tego potrzebujesz, dostaniesz prosty panel, w którym zmienisz teksty, zdjęcia czy ceny bez znajomości programowania." },
-    { "q": "Czy to połączy się z programami, których już używam?", "a": "Zwykle tak – na przykład z płatnościami, pocztą, programem do faktur czy bazą klientów. Zanim obiecam, sprawdzam, czy takie połączenie będzie działać niezawodnie." },
-    { "q": "Czy możesz poprawić stronę albo program, który już mam?", "a": "Tak. Najpierw sprawdzam, w jakim jest stanie, i mówię uczciwie, czy lepiej go rozwijać, czy zbudować od nowa." },
-    { "q": "Czy strona będzie moja?", "a": "Tak. Przed startem ustalamy, co dokładnie przekazuję – kod, hasła i dostępy – tak, żebyś nie był uzależniony ode mnie." },
-    { "q": "Co po uruchomieniu?", "a": "Mogę dalej dbać o stronę lub program, odpowiadać na pytania i dodawać nowe rzeczy. Zakres opieki ustalamy indywidualnie." }
-  ]
+    {
+      "q": "Czy muszę dokładnie wiedzieć, czego chcę?",
+      "a": "Nie. Wystarczy opisać problem albo pomysł. Pomogę uporządkować potrzeby i zamienić je w konkretny plan."
+    },
+    {
+      "q": "Ile to trwa?",
+      "a": "Prosta strona albo blog to zwykle kilka tygodni. Większy program powstaje etapami. Po pierwszej rozmowie podam realny termin."
+    },
+    {
+      "q": "Ile to kosztuje?",
+      "a": "Cena zależy od tego, co ma powstać. Przed startem dostajesz opis prac, terminy i koszt. Jeśli da się zacząć od mniejszej wersji i rozbudować ją później, powiem to wprost."
+    },
+    {
+      "q": "Czy sam będę mógł zmieniać treści na stronie?",
+      "a": "Tak. Jeśli tego potrzebujesz, dostaniesz prosty panel, w którym zmienisz teksty, zdjęcia czy ceny bez znajomości programowania."
+    },
+    {
+      "q": "Czy to połączy się z programami, których już używam?",
+      "a": "Zwykle tak – na przykład z płatnościami, pocztą, programem do faktur czy bazą klientów. Zanim obiecam, sprawdzam, czy takie połączenie będzie działać niezawodnie."
+    },
+    {
+      "q": "Czy możesz poprawić stronę albo program, który już mam?",
+      "a": "Tak. Najpierw sprawdzam, w jakim jest stanie, i mówię uczciwie, czy lepiej go rozwijać, czy zbudować od nowa."
+    },
+    {
+      "q": "Czy strona będzie moja?",
+      "a": "Tak. Przed startem ustalamy, co dokładnie przekazuję – kod, hasła i dostępy – tak, żebyś nie był uzależniony ode mnie."
+    },
+    {
+      "q": "Co po uruchomieniu?",
+      "a": "Mogę dalej dbać o stronę lub program, odpowiadać na pytania i dodawać nowe rzeczy. Zakres opieki ustalamy indywidualnie."
+    }
+  ],
+  "aboutText": "Sam prowadzę projekt od pierwszej rozmowy, przez plan, wygląd i programowanie, aż po uruchomienie. Buduję strony internetowe, programy dla firm, panele do samodzielnej edycji stron oraz aplikacje na komputer i telefon – zawsze od zera i pod konkretne potrzeby.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu drogowym albo rozpoznać gwiazdy na zdjęciu nieba. Dlatego wiem, jak wygląda program, z którego korzysta się na co dzień.\n\nFotografia to mój drugi sposób opowiadania o miejscach i ludziach. Po uruchomieniu projektu mogę dalej o niego dbać, pomagać w obsłudze i rozwijać go."
 }
