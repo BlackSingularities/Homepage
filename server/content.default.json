@@ -31,45 +31,45 @@
     "filterApp": "Aplikacje"
   },
   "scope": {
-    "title": "Co dokładnie",
-    "accent": "mogę zrobić.",
-    "lead": "Zakres wynika z celu, nie z gotowego pakietu. Czasem to jeden serwis, czasem system, który porządkuje codzienną pracę firmy.",
+    "title": "W czym",
+    "accent": "mogę pomóc.",
+    "lead": "Nie sprzedaję gotowych pakietów. Najpierw ustalamy, czego potrzebujesz, a potem dobieram rozwiązanie – czasem to jedna strona, czasem program, który ułatwia codzienną pracę w firmie.",
     "items": [
       {
         "id": "sc-web",
-        "title": "Strony i serwisy",
-        "lead": "Projekt z własnym charakterem i konkretną funkcją.",
-        "detail": "Serwisy firmowe, portfolia, sklepy, magazyny i rozbudowane blogi. Architektura informacji, grafika, treść, interfejs, analityka, SEO i wdrożenie – bez ograniczeń narzuconych przez gotowy motyw."
+        "title": "Strony internetowe",
+        "lead": "Strona, która wygląda po Twojemu i robi to, czego od niej oczekujesz.",
+        "detail": "Strony firmowe, portfolia, sklepy internetowe i blogi. Zajmuję się wszystkim: układem, grafiką, tekstami, tym, żeby strona była łatwa do znalezienia w Google, i jej uruchomieniem. Nie korzystam z gotowych szablonów, więc nic nie ogranicza projektu."
       },
       {
         "id": "sc-apps",
-        "title": "Aplikacje webowe i CMS-y",
-        "lead": "Oprogramowanie ułożone pod Twój sposób pracy, nie odwrotnie.",
-        "detail": "Aplikacje, portale klienta i autorskie panele z dokładnie takim zakresem, jakiego wymaga projekt: role użytkowników, obieg zleceń, dokumenty, raporty, baza danych, integracje i wygodna obsługa."
+        "title": "Programy dla firm i panel do edycji strony",
+        "lead": "Narzędzie dopasowane do tego, jak pracujesz – a nie odwrotnie.",
+        "detail": "Systemy dla firmy, które działają w przeglądarce: obsługa zamówień i klientów, dokumenty, zestawienia, konta dla pracowników. Do stron buduję też prosty panel, w którym samodzielnie zmienisz teksty i zdjęcia – bez wołania programisty."
       },
       {
         "id": "sc-desktop",
-        "title": "Programy na komputer i telefon",
-        "lead": "Aplikacje, które się instaluje, a nie tylko otwiera.",
-        "detail": "Wydaję narzędzia na Windows, Androida i macOS – z instalatorami, wersjami i aktualizacjami. Część z nich stoi otwarcie na GitHubie, razem z historią wydań i kodem."
+        "title": "Aplikacje na komputer i telefon",
+        "lead": "Programy, które instaluje się na urządzeniu.",
+        "detail": "Tworzę aplikacje na Windows, Androida i macOS – z instalatorem i automatycznymi aktualizacjami. Kilka z nich można pobrać za darmo z mojego portfolio."
       },
       {
         "id": "sc-data",
-        "title": "Dane i raportowanie",
-        "lead": "Informacje, które prowadzą do decyzji, zamiast zajmować miejsce.",
-        "detail": "Porządkuję źródła, definiuję właściwe wskaźniki i projektuję czytelne pulpity oraz raporty. Łączę dane z różnych systemów i automatyzuję ich przepływ."
+        "title": "Zestawienia i raporty",
+        "lead": "Liczby, z których od razu widać, co się dzieje w firmie.",
+        "detail": "Zbieram dane z różnych miejsc – arkuszy, sklepu, programu księgowego – i układam je w czytelne wykresy i raporty, które same się aktualizują. Koniec z ręcznym przepisywaniem tabelek."
       },
       {
         "id": "sc-ai",
-        "title": "Automatyzacja i AI",
-        "lead": "AI tam, gdzie naprawdę skraca pracę.",
-        "detail": "Włączam ją wtedy, gdy daje mierzalną wartość: pomaga opracować i uporządkować treści, przeanalizować dokumenty, odnaleźć wiedzę, zaklasyfikować sprawę albo wykonać konkretną czynność w systemie. Jeśli wystarczy prostsza automatyzacja, proponuję ją."
+        "title": "Automatyzacja i sztuczna inteligencja",
+        "lead": "Mniej powtarzalnej, ręcznej pracy.",
+        "detail": "Ustawiam programy tak, żeby same wykonywały nudne czynności: porządkowały dokumenty, odpowiadały na typowe pytania, przygotowywały teksty albo przenosiły dane między systemami. Sztuczną inteligencję proponuję tylko tam, gdzie naprawdę oszczędza czas."
       },
       {
         "id": "sc-infra",
-        "title": "Infrastruktura i smart home",
-        "lead": "Sieć, serwer i dom, które po prostu działają.",
-        "detail": "Serwery domowe i self-hosting na Dockerze oraz Proxmoksie, NAS-y, kopie zapasowe, DNS z AdGuard Home blokującym reklamy w całej sieci, smart home w Home Assistant i bezpieczny dostęp przez VPN – bez wystawiania portów na świat."
+        "title": "Sieć, serwer i inteligentny dom",
+        "lead": "Domowa i firmowa technika, która po prostu działa.",
+        "detail": "Konfiguruję domowe serwery i dyski sieciowe, automatyczne kopie zapasowe, blokowanie reklam w całej sieci, sterowanie światłem i ogrzewaniem oraz bezpieczny dostęp do domowych plików spoza domu."
       }
     ]
   },
@@ -78,11 +78,31 @@
     "accent": "po stałą opiekę.",
     "lead": "Prowadzę cały proces osobiście, więc decyzje biznesowe, projektowe i techniczne nie rozjeżdżają się między działami.",
     "items": [
-      { "no": "01", "title": "Rozpoznanie", "text": "Poznaję cel, użytkowników, dane i sposób pracy. Ustalamy, co naprawdę warto zbudować." },
-      { "no": "02", "title": "Koncepcja", "text": "Projektuję architekturę, funkcje, przepływy i kierunek wizualny. Zanim powstanie kod, wiadomo, co i po co budujemy." },
-      { "no": "03", "title": "Budowa", "text": "Tworzę działającą wersję i rozwijam ją na realnych scenariuszach, nie na domysłach." },
-      { "no": "04", "title": "Wdrożenie", "text": "Uruchamiam produkt, konfiguruję środowisko, zabezpieczenia, pomiary i sposób obsługi." },
-      { "no": "05", "title": "Opieka", "text": "Monitoruję, wspieram użytkowników i rozwijam system wraz z nowymi potrzebami." }
+      {
+        "no": "01",
+        "title": "Rozmowa",
+        "text": "Opowiadasz, czego potrzebujesz i jak dziś pracujesz. Wspólnie ustalamy, co naprawdę warto zrobić."
+      },
+      {
+        "no": "02",
+        "title": "Plan",
+        "text": "Przygotowuję projekt: co ma się znaleźć w rozwiązaniu, jak będzie działać i wyglądać. Zanim zacznę budować, wiesz dokładnie, co dostaniesz."
+      },
+      {
+        "no": "03",
+        "title": "Budowa",
+        "text": "Tworzę działającą wersję i pokazuję ją na bieżąco, żebyś mógł ją sprawdzić na prawdziwych przykładach."
+      },
+      {
+        "no": "04",
+        "title": "Uruchomienie",
+        "text": "Wstawiam gotowe rozwiązanie do sieci albo instaluję je u Ciebie, zabezpieczam je i pokazuję, jak z niego korzystać."
+      },
+      {
+        "no": "05",
+        "title": "Opieka",
+        "text": "Pilnuję, żeby wszystko działało, pomagam w razie pytań i dodaję nowe funkcje, gdy pojawią się nowe potrzeby."
+      }
     ]
   },
   "about": {
@@ -91,12 +111,13 @@
     "lead": "Jestem analitykiem danych, projektantem i programistą. Łączę kompetencje, które w większych realizacjach rozkłada się na kilka osób.",
     "text": "Samodzielnie przechodzę od rozmowy o potrzebie do architektury, grafiki, interfejsu, kodu i uruchomienia. Buduję autorskie CMS-y, serwisy, aplikacje webowe oraz programy na komputer i telefon – zawsze od zera i pod konkretny sposób działania.\n\nDuża część tych rzeczy powstała z własnej potrzeby: chciałem uporządkować podróże, zrozumieć dane o ruchu albo rozpoznać gwiazdy na zdjęciu nieba. To dlatego wiem, jak wygląda produkt używany codziennie, a nie tylko odebrany.\n\nFotografia jest drugim sposobem, w jaki opowiadam o miejscach i ludziach. Po wdrożeniu mogę odpowiadać za utrzymanie, wsparcie i kolejne etapy rozwoju.",
     "strengths": [
-      "Analityka danych i raportowanie",
-      "Grafika i projektowanie interfejsów",
-      "Aplikacje oraz systemy webowe",
-      "Programy na Windows, Androida i macOS",
-      "Autorskie CMS-y i panele zarządzania",
-      "Serwery, sieć i smart home"
+      "Strony internetowe",
+      "Projektowanie wyglądu i wygody obsługi",
+      "Programy dla firm działające w przeglądarce",
+      "Aplikacje na Windows, Androida i macOS",
+      "Panele do samodzielnej edycji strony",
+      "Zestawienia i raporty z danych",
+      "Sieć domowa, serwery i inteligentny dom"
     ]
   },
   "pagesSection": {
@@ -108,14 +129,38 @@
     "title": "Zanim",
     "accent": "zaczniemy.",
     "items": [
-      { "q": "Czy muszę mieć gotową specyfikację?", "a": "Nie. Wystarczy problem, pomysł albo proces, który dziś nie działa tak, jak powinien. Pomogę uporządkować potrzeby, ustalić priorytety i zamienić je w konkretny plan." },
-      { "q": "Ile trwa realizacja?", "a": "Skupiona strona lub blog mogą powstać w kilka tygodni. Aplikacja, autorski CMS albo system z integracjami wymagają pracy etapowej. Po krótkiej analizie przedstawiam realistyczny harmonogram, bez terminu oderwanego od zakresu." },
-      { "q": "Jak wygląda wycena?", "a": "Wyceniam zakres, odpowiedzialność i oczekiwany rezultat, a nie liczbę ekranów. Przed startem dostajesz opis prac, etapów i kosztów. Jeśli projekt warto podzielić na wersję podstawową i dalszy rozwój, powiem to wprost." },
-      { "q": "Czy dostanę panel do samodzielnej obsługi?", "a": "Tak, jeśli projekt tego potrzebuje. Panel projektuję pod rzeczywiste zadania: publikowanie, zarządzanie danymi, obsługę klientów, raportowanie. Nie dokładam funkcji tylko dlatego, że są w gotowym CMS-ie." },
-      { "q": "Czy system połączy się z narzędziami, których już używam?", "a": "Tak – z zewnętrznymi API, bazami danych, analityką, płatnościami, pocztą czy CRM-em. Najpierw sprawdzam jakość i ograniczenia integracji, żeby kluczowy proces nie stanął na niestabilnym założeniu." },
-      { "q": "Czy możesz rozwinąć istniejący produkt?", "a": "Tak, po audycie kodu, danych i wdrożenia. Oceniam, co warto zachować, co wymaga przebudowy i czy bezpieczniej rozwijać obecną bazę, czy zbudować nowy fundament. Rekomendację uzasadniam technicznie i biznesowo." },
-      { "q": "Kto ma prawa do projektu i dostęp do kodu?", "a": "Zasady własności, przekazania kodu i dostępów ustalamy przed rozpoczęciem. Projekt nie powinien uzależniać Cię od jednej osoby przez brak dokumentacji albo dostępu do infrastruktury." },
-      { "q": "Co dzieje się po uruchomieniu?", "a": "Mogę dalej utrzymywać, monitorować i rozwijać produkt oraz wspierać osoby, które z niego korzystają. Zakres opieki ustalamy równie indywidualnie jak sam system." }
+      {
+        "q": "Czy muszę dokładnie wiedzieć, czego chcę?",
+        "a": "Nie. Wystarczy opisać problem albo pomysł. Pomogę uporządkować potrzeby i zamienić je w konkretny plan."
+      },
+      {
+        "q": "Ile to trwa?",
+        "a": "Prosta strona albo blog to zwykle kilka tygodni. Większy program powstaje etapami. Po pierwszej rozmowie podam realny termin."
+      },
+      {
+        "q": "Ile to kosztuje?",
+        "a": "Cena zależy od tego, co ma powstać. Przed startem dostajesz opis prac, terminy i koszt. Jeśli da się zacząć od mniejszej wersji i rozbudować ją później, powiem to wprost."
+      },
+      {
+        "q": "Czy sam będę mógł zmieniać treści na stronie?",
+        "a": "Tak. Jeśli tego potrzebujesz, dostaniesz prosty panel, w którym zmienisz teksty, zdjęcia czy ceny bez znajomości programowania."
+      },
+      {
+        "q": "Czy to połączy się z programami, których już używam?",
+        "a": "Zwykle tak – na przykład z płatnościami, pocztą, programem do faktur czy bazą klientów. Zanim obiecam, sprawdzam, czy takie połączenie będzie działać niezawodnie."
+      },
+      {
+        "q": "Czy możesz poprawić stronę albo program, który już mam?",
+        "a": "Tak. Najpierw sprawdzam, w jakim jest stanie, i mówię uczciwie, czy lepiej go rozwijać, czy zbudować od nowa."
+      },
+      {
+        "q": "Czy strona będzie moja?",
+        "a": "Tak. Przed startem ustalamy, co dokładnie przekazuję – kod, hasła i dostępy – tak, żebyś nie był uzależniony ode mnie."
+      },
+      {
+        "q": "Co po uruchomieniu?",
+        "a": "Mogę dalej dbać o stronę lub program, odpowiadać na pytania i dodawać nowe rzeczy. Zakres opieki ustalamy indywidualnie."
+      }
     ]
   },
   "contact": {
