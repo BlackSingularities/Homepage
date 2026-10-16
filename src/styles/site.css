@@ -43,7 +43,7 @@
   color: var(--ink-2);
 }
 
-.pv-head-side { display: grid; justify-items: start; gap: 12px; }
+.pv-head-side { display: grid; justify-items: end; gap: 12px; text-align: right; }
 .pv-host { font-size: 12px; color: var(--ink-3); }
 .pv-host.is-quiet { max-width: 34ch; line-height: 1.5; color: var(--ink-4); }
 .pv-repo { font-size: 12px; color: var(--ink-3); transition: color .2s; }
@@ -246,6 +246,7 @@
   .pv-head,
   .pv-body { grid-template-columns: minmax(0, 1fr); }
   .pv-head { align-items: start; }
+  .pv-head-side { justify-items: start; text-align: left; }
 }
 .contact-direct { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; font-weight: 700; color: var(--gold); }
 
