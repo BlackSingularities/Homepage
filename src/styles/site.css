@@ -73,7 +73,7 @@
 
 .pv-gallery button {
   flex: 0 0 auto;
-  height: clamp(220px, 34vw, 460px);
+  height: clamp(150px, 22.5vw, 306px);
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--line);
