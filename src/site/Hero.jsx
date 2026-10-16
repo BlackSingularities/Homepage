@@ -11,7 +11,6 @@ import { CATALOG_PATH, KIND_LABEL, plural } from '../lib/projects'
  */
 export default function Hero({ hero, labels, featured = [], total = 0, onNavigate }) {
   const [current, setCurrent] = useState(0)
-  const shown = featured[current] || featured[0]
   const rest = total - featured.length
 
   // Wejście robi CSS (.rise), więc treść jest widoczna nawet bez JS-owej animacji.
@@ -73,7 +72,11 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
                   ? <img key={project.id} src={project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
                   : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
               ))}
-              {shown?.tagline && <figcaption>{shown.tagline}</figcaption>}
+              {/* Wszystkie podpisy leżą w jednej komórce siatki, więc jej wysokość
+                  wyznacza najdłuższy z nich i podgląd nie skacze przy przełączaniu. */}
+              {featured.map((project, index) => (
+                <figcaption key={project.id} className={index === current ? 'is-current' : ''}>{project.tagline}</figcaption>
+              ))}
             </figure>
           </div>
 

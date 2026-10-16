@@ -1102,7 +1102,10 @@
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--ink-2);
+  visibility: hidden;
 }
+
+.works-preview figcaption.is-current { visibility: visible; }
 
 .works-more {
   display: inline-block;

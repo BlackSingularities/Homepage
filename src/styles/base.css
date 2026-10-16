@@ -25,14 +25,14 @@
   --ink-4: #5c574f;
 
   /* akcent */
-  --accent: #e2bf7e;
-  --accent-rgb: 226, 191, 126;
+  --accent: #e7c68a;
+  --accent-rgb: 231, 198, 138;
   --accent-2: #c1913f;
   --accent-ink: #14100a;
   --accent-glow: rgba(231, 198, 138, .18);
   --good: #5fd39a;
   --gold: var(--accent);
-  --gradient-gold: linear-gradient(var(--accent), var(--accent));
+  --gradient-gold: linear-gradient(112deg, #a9782e 0%, #f3d69b 42%, #c1913f 70%, #f0d093 100%);
 
   /* geometria */
   --radius-xl: 14px;
@@ -44,7 +44,7 @@
      nimi to dwa razy tyle — stąd ta wartość jest połową docelowego rytmu. */
   --section-y: clamp(38px, 3.2vw, 58px);
   --maxw: 1240px;
-  --line-gold: rgba(226, 191, 126, .32);
+  --line-gold: rgba(231, 198, 138, .36);
 
   /* głębia */
   --shadow-sm: 0 6px 18px rgba(0, 0, 0, .32);
@@ -259,11 +259,14 @@ em.accent,
 .btn:active { transform: translateY(1px); }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--gradient-gold);
+  background-size: 160% 100%;
   color: var(--accent-ink);
+  box-shadow: 0 10px 30px rgba(var(--accent-rgb), .18);
+  transition: background-position .5s var(--ease), box-shadow .25s;
 }
 
-.btn-primary:hover { background: #edd09a; }
+.btn-primary:hover { background-position: 100% 0; box-shadow: 0 14px 36px rgba(var(--accent-rgb), .28); }
 
 .btn-primary:disabled { opacity: .55; cursor: wait; transform: none; }
 
