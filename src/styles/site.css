@@ -967,12 +967,12 @@
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
   gap: clamp(28px, 5vw, 80px);
-  align-items: end;
+  align-items: center;
 }
 
 .hero-title { max-width: 13ch; }
 
-.hero-side { display: grid; gap: 28px; padding-bottom: .6em; }
+.hero-side { display: grid; gap: 28px; }
 
 .hero-side > p {
   max-width: 42ch;
