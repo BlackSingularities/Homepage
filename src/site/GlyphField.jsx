@@ -6,9 +6,11 @@ import { useEffect, useRef } from 'react'
  * (szum wartości w 3D, z czasem jako trzecim wymiarem). Kliknięcie w puste tło wypuszcza falę, która
  * rozjaśnia i przetasowuje znaki po drodze, a kursor podświetla otoczenie.
  *
- * Rysujemy przez `drawImage` z przygotowanego atlasu glifów – to wielokrotnie
- * szybsze niż `fillText` dla kilku tysięcy znaków na klatkę. Animacja chodzi
- * w ~30 fps, zatrzymuje się w ukrytej karcie, a przy `prefers-reduced-motion`
+ * Wydajność: ciemne, nieruchome znaki rysujemy raz do bufora i co klatkę
+ * kopiujemy go jednym `drawImage`. Na bieżąco liczymy tylko szum na rzadszej
+ * siatce i rysujemy jasne znaki w dymie (z atlasu glifów, nie `fillText`).
+ * Animacja chodzi w ~30 fps, staje w ukrytej karcie i wtedy, gdy pierwszy
+ * ekran jest przewinięty, a tło zasłania treść. Przy `prefers-reduced-motion`
  * rysujemy tylko pojedyncze klatki po kliknięciu.
  */
 
@@ -17,6 +19,9 @@ const CELL_W = 11
 const CELL_H = 15
 const FONT_PX = 11
 const FRAME_MS = 1000 / 30
+// Szum liczymy co drugą kolumnę i wiersz, a między punktami interpolujemy:
+// dym jest i tak miękki, a obliczeń jest czterokrotnie mniej.
+const STEP = 2
 
 // deterministyczny hash siatki → [0, 1)
 function hash(ix, iy, seed) {
@@ -116,8 +121,12 @@ export default function GlyphField({ intensity = 1 }) {
     let height = 0
     let glyphs = new Uint8Array(0)
     let heat = new Float32Array(0)
-    let dim = null
     let glow = null
+    let dimLayer = null
+    let fw = 0
+    let fh = 0
+    let field = new Float32Array(0)
+    let paused = false
     const ripples = []
     const pointer = { x: -9999, y: -9999, active: false }
     let raf = 0
@@ -137,16 +146,49 @@ export default function GlyphField({ intensity = 1 }) {
       glyphs = new Uint8Array(cols * rows)
       for (let i = 0; i < glyphs.length; i += 1) glyphs[i] = Math.floor(Math.random() * CHARS.length)
       heat = new Float32Array(cols * rows)
-      dim = buildAtlas('#a3998a', dpr)
+      fw = Math.ceil(cols / STEP) + 1
+      fh = Math.ceil(rows / STEP) + 1
+      field = new Float32Array(fw * fh)
+      const dim = buildAtlas('#a3998a', dpr)
       glow = buildAtlas('#e0b773', dpr)
+
+      // nieruchoma warstwa ciemnych znaków – rysowana raz, nie co klatkę
+      dimLayer = document.createElement('canvas')
+      dimLayer.width = canvas.width
+      dimLayer.height = canvas.height
+      const layer = dimLayer.getContext('2d')
+      if (!layer) return
+      layer.setTransform(dpr, 0, 0, dpr, 0, 0)
+      const sw = CELL_W * dpr
+      const sh = CELL_H * dpr
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          layer.globalAlpha = Math.min(1, (0.016 + hash(col, row, seed + 3) * 0.026) * intensity)
+          layer.drawImage(dim, glyphs[row * cols + col] * sw, 0, sw, sh, col * CELL_W, row * CELL_H, CELL_W, CELL_H)
+        }
+      }
     }
 
     const draw = now => {
-      if (!dim || !glow) return
+      if (!dimLayer || !glow) return
       const t = (now - start) / 1000
       ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.globalAlpha = 1
       ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(dimLayer, 0, 0)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      // Szeroki, miękki próg: brzegi dymu przechodzą w tło stopniowo,
+      // a większość ekranu zostaje ciemna, więc smugi mają kształt.
+      for (let fy = 0; fy < fh; fy += 1) {
+        const row = fy * STEP
+        // kolumny czytamy gęściej niż wiersze, więc smugi są wyższe niż szersze
+        const ny = row / 24
+        const rise = Math.max(0, 1 - row / rows)
+        for (let fx = 0; fx < fw; fx += 1) {
+          field[fy * fw + fx] = smoothstep(0.4, 0.72, smoke((fx * STEP) / 26, ny, rise, t, seed))
+        }
+      }
 
       // aktywne fale z kliknięć: promień rośnie liniowo, pierścień gaśnie z czasem
       for (let i = ripples.length - 1; i >= 0; i -= 1) if (now - ripples[i].t0 > 2600) ripples.splice(i, 1)
@@ -159,17 +201,17 @@ export default function GlyphField({ intensity = 1 }) {
       const sh = CELL_H * dpr
       for (let row = 0; row < rows; row += 1) {
         const py = row * CELL_H
-        // kolumny czytamy gęściej niż wiersze, więc smugi są wyższe niż szersze
-        const ny = row / 24
-        const rise = 1 - row / rows
+        const fy = Math.floor(row / STEP)
+        const ty = (row % STEP) / STEP
         for (let col = 0; col < cols; col += 1) {
           const idx = row * cols + col
           const px = col * CELL_W
-          const nx = col / 26
-
-          // Szeroki, miękki próg: brzegi dymu przechodzą w tło stopniowo,
-          // a większość ekranu zostaje ciemna, więc smugi mają kształt.
-          let level = smoothstep(0.4, 0.72, smoke(nx, ny, rise, t, seed))
+          const fx = Math.floor(col / STEP)
+          const tx = (col % STEP) / STEP
+          const i0 = fy * fw + fx
+          const top = field[i0] + (field[i0 + 1] - field[i0]) * tx
+          const bottom = field[i0 + fw] + (field[i0 + fw + 1] - field[i0 + fw]) * tx
+          let level = top + (bottom - top) * ty
 
           if (pointer.active) {
             const dx = px - pointer.x
@@ -193,18 +235,14 @@ export default function GlyphField({ intensity = 1 }) {
           const h = Math.max(level, heat[idx] * 0.955)
           heat[idx] = h
 
-          // znaki w dymie podmieniają się rzadko – migotanie wyglądało jak deszcz
-          if (Math.random() < 0.001 + h * 0.018) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
-
-          // Kontrast robi różnica między warstwami: znaki poza dymem są ledwie
-          // widoczne, rozświetlone – wyraźnie jasne. Dzięki temu dym ma kształt,
-          // zamiast rozmywać się w równomierną szarość.
+          // Poza dymem zostaje gotowa ciemna warstwa – nic tu nie rysujemy.
           const density = Math.min(1, h)
-          const sx = glyphs[idx] * sw
-          const base = 0.016 + hash(col, row, seed + 3) * 0.026
-          ctx.globalAlpha = Math.min(1, base * (1 - density * 0.85) * intensity)
-          ctx.drawImage(dim, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
           if (density > 0.04) {
+            // znaki w dymie podmieniają się rzadko – migotanie wyglądało jak deszcz
+            if (Math.random() < h * 0.018) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
+            // ciemny znak spod spodu znika, żeby nie nakładał się na jasny
+            ctx.clearRect(px, py, CELL_W, CELL_H)
+            const sx = glyphs[idx] * sw
             ctx.globalAlpha = Math.min(0.85, Math.pow(density, 1.5) * 0.9 * intensity)
             ctx.drawImage(glow, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
           }
@@ -214,6 +252,7 @@ export default function GlyphField({ intensity = 1 }) {
     }
 
     const loop = now => {
+      if (paused) { raf = 0; return }
       raf = requestAnimationFrame(loop)
       if (now - last < FRAME_MS) return
       last = now
@@ -255,8 +294,19 @@ export default function GlyphField({ intensity = 1 }) {
     const onPointerLeave = () => { pointer.active = false }
     const onVisibility = () => {
       if (reduced) return
-      if (document.hidden) cancelAnimationFrame(raf)
-      else {
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0 }
+      else if (!paused) {
+        last = 0
+        raf = requestAnimationFrame(loop)
+      }
+    }
+    // Pod pierwszym ekranem tło zasłania nieprzezroczysta treść, więc nie ma
+    // sensu go animować – stoi, dopóki czytelnik nie wróci na górę.
+    const onScroll = () => {
+      const hidden = window.scrollY > window.innerHeight * 1.2
+      if (hidden === paused) return
+      paused = hidden
+      if (!paused && !reduced && !document.hidden && !raf) {
         last = 0
         raf = requestAnimationFrame(loop)
       }
@@ -271,7 +321,8 @@ export default function GlyphField({ intensity = 1 }) {
       resize()
       start = performance.now()
       draw(start)
-      if (!reduced) raf = requestAnimationFrame(loop)
+      paused = window.scrollY > window.innerHeight * 1.2
+      if (!reduced && !paused) raf = requestAnimationFrame(loop)
     }
     // atlas korzysta z fontu mono, więc czekamy aż się wczyta (z bezpiecznym limitem)
     let cancelled = false
@@ -285,7 +336,9 @@ export default function GlyphField({ intensity = 1 }) {
     document.documentElement.addEventListener('pointerleave', onPointerLeave)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('resize', onResize)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
+      window.removeEventListener('scroll', onScroll)
       cancelled = true
       cancelAnimationFrame(raf)
       window.clearTimeout(settleTimer)
