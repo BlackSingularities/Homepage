@@ -22,7 +22,7 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
     <section className="hero" id="start">
       <div className="hero-top">
         <h1 className="hero-title rise" {...enter(0.05)}>
-          {hero.titleTop} {hero.titleAccent}
+          <span className="hero-title-lead">{hero.titleTop}</span> {hero.titleAccent}
         </h1>
         <div className="hero-side rise" {...enter(0.2)}>
           <p>{hero.lead}</p>

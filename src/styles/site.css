@@ -1571,3 +1571,6 @@
    ze strony głównej był tu pustym pasem nad tytułem. */
 .project-view > .section:first-child,
 .catalog > .section:first-child { padding-top: clamp(24px, 3vw, 40px); }
+
+/* Pierwsza część tytułu (z panelu: „titleTop”) jest złota. */
+.hero-title-lead { color: var(--accent); }
