@@ -1557,7 +1557,11 @@
 .hero-side {
   padding: clamp(20px, 2.4vw, 30px);
   border-radius: var(--radius);
-  background: rgba(12, 11, 10, .12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(12, 11, 10, .04);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* Oba wezwania stoją na środku panelu – także gdy zawiną się w dwie linie. */
+.hero-side .hero-actions { justify-content: center;
 }
