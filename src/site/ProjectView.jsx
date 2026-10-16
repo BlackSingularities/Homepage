@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
 import {
   CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL,
   formatBytes, formatReleaseDate, hostOf,
@@ -74,9 +74,14 @@ function Downloads({ project }) {
 function Gallery({ shots, name, onZoom }) {
   if (!shots.length) return null
   return (
-    <Reveal className={`pv-gallery ${shots.length === 1 ? 'is-single' : ''}`} amount={0.1}>
+    <Reveal
+      className={`pv-gallery ${shots.length === 1 ? 'is-single' : ''}`}
+      tabIndex={shots.length > 1 ? 0 : undefined}
+      role="region"
+      aria-label={`Zrzuty ekranu: ${name}`}
+    >
       {shots.map((shot, index) => (
-        <button type="button" key={shot.src} onClick={() => onZoom(shot.src)}>
+        <button type="button" key={shot.src} onClick={() => onZoom(index)}>
           <img
             src={shot.src}
             alt={shot.alt || `${name} – ekran ${index + 1}`}
@@ -88,10 +93,58 @@ function Gallery({ shots, name, onZoom }) {
   )
 }
 
+/**
+ * Podgląd zdjęcia na pełnym ekranie. Strzałki po bokach, klawisze ← →
+ * i przesunięcie palcem przechodzą do sąsiednich zrzutów; licznik mówi,
+ * ile ich jest. Kliknięcie w tło albo Esc zamyka.
+ */
+function Lightbox({ shots, index, name, onClose, onStep }) {
+  const [touchX, setTouchX] = useState(null)
+  const shot = shots[index]
+  const many = shots.length > 1
+  const stop = handler => event => { event.stopPropagation(); handler() }
+
+  return (
+    <div
+      className="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${name}: zrzut ${index + 1} z ${shots.length}`}
+      onClick={onClose}
+      onTouchStart={event => setTouchX(event.touches[0].clientX)}
+      onTouchEnd={event => {
+        if (touchX === null) return
+        const dx = event.changedTouches[0].clientX - touchX
+        if (Math.abs(dx) > 40) onStep(dx < 0 ? 1 : -1)
+        setTouchX(null)
+      }}
+    >
+      <button type="button" className="lightbox-close" aria-label="Zamknij" onClick={stop(onClose)} autoFocus><X size={20} /></button>
+      {many && (
+        <button type="button" className="lightbox-nav is-prev" aria-label="Poprzednie zdjęcie" onClick={stop(() => onStep(-1))}>
+          <ChevronLeft size={26} />
+        </button>
+      )}
+      <figure onClick={event => event.stopPropagation()}>
+        <img key={shot.src} src={shot.src} alt={shot.alt || `${name} – ekran ${index + 1}`} />
+        <figcaption>
+          {shot.alt && <span>{shot.alt}</span>}
+          {many && <span className="lightbox-count">{index + 1} / {shots.length}</span>}
+        </figcaption>
+      </figure>
+      {many && (
+        <button type="button" className="lightbox-nav is-next" aria-label="Następne zdjęcie" onClick={stop(() => onStep(1))}>
+          <ChevronRight size={26} />
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function ProjectView({ slug, onNavigate }) {
   const [data, setData] = useState(null)
   const [status, setStatus] = useState('loading')
-  const [zoom, setZoom] = useState('')
+  const [zoom, setZoom] = useState(-1)
 
   useEffect(() => {
     let active = true
@@ -107,11 +160,24 @@ export default function ProjectView({ slug, onNavigate }) {
     if (data?.project) document.title = `${data.project.name} – Adam Rędzikowski`
   }, [data])
 
+  const shotCount = data?.project?.shots?.length || 0
+  // Przewijanie w podglądzie zawija się: za ostatnim zdjęciem jest pierwsze.
+  const step = delta => setZoom(current => (current < 0 ? current : (current + delta + shotCount) % shotCount))
+
   useEffect(() => {
-    const onKey = event => event.key === 'Escape' && setZoom('')
+    if (zoom < 0) return undefined
+    const onKey = event => {
+      if (event.key === 'Escape') setZoom(-1)
+      if (event.key === 'ArrowRight') step(1)
+      if (event.key === 'ArrowLeft') step(-1)
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+    document.body.classList.add('no-scroll')
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.classList.remove('no-scroll')
+    }
+  }, [zoom >= 0, shotCount]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (status === 'loading') {
     return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>Wczytuję realizację…</span></main>
@@ -241,27 +307,15 @@ export default function ProjectView({ slug, onNavigate }) {
         )}
       </div>
 
-      <AnimatePresence>
-        {zoom && (
-          <motion.div
-            className="lightbox"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setZoom('')}
-          >
-            <button aria-label="Zamknij"><X size={20} /></button>
-            <motion.img
-              src={zoom}
-              alt=""
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.97, opacity: 0 }}
-              transition={{ duration: 0.28, ease }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {zoom >= 0 && project.shots[zoom] && (
+        <Lightbox
+          shots={project.shots}
+          index={zoom}
+          name={project.name}
+          onClose={() => setZoom(-1)}
+          onStep={step}
+        />
+      )}
     </main>
   )
 }
