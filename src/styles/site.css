@@ -1547,3 +1547,13 @@
 
 .pv-nav a:hover,
 .pv-nav a:hover strong { color: var(--accent); }
+
+/* Wprowadzenie na pierwszym ekranie stoi na lekko rozmytej szybie, żeby
+   znaki z tła nie wchodziły między litery. Bez obwódki – samo tło. */
+.hero-side {
+  padding: clamp(20px, 2.4vw, 30px);
+  border-radius: var(--radius-lg);
+  background: rgba(12, 11, 10, .55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
