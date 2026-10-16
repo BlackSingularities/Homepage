@@ -176,7 +176,7 @@ em.accent,
 
 .glyph-field { position: absolute; inset: 0; display: block; }
 
-.site > *:not(.glyph-backdrop) { position: relative; z-index: 1; }
+.site > *:not(.glyph-backdrop):not(.masthead):not(.mobile-sheet) { position: relative; z-index: 1; }
 
 /*
  * Tło widać w pełni tylko na pierwszym ekranie. Dalej treść leży na
