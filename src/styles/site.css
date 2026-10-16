@@ -1014,11 +1014,11 @@
   border-bottom: 1px solid var(--line-strong);
 }
 
+.works-head { justify-content: center; text-align: center; }
+
 .works-head h2 {
-  font-family: var(--font);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0;
+  font-size: clamp(28px, 3vw, 44px);
+  font-weight: 300;
   color: var(--ink);
 }
 
