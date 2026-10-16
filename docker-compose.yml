@@ -24,6 +24,9 @@ services:
       - ${HOMEPAGE_DATA_DIR:-./data}:/app/data
     networks:
       - homepage_internal
+      # Tylko ruch wychodzący (GitHub z wydaniami aplikacji, poczta).
+      # Sieć wewnętrzna nie ma wyjścia do internetu; ta nie wystawia portów.
+      - homepage_egress
 
   homepage_gallery:
     build:
@@ -54,3 +57,5 @@ networks:
     external: true
   homepage_internal:
     internal: true
+  homepage_egress:
+    driver: bridge
