@@ -39,7 +39,6 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
         <div className="works rise" id="portfolio" {...enter(0.35)}>
           <div className="works-head">
             <h2>{labels.title} {labels.accent}</h2>
-            <span>{total} {plural(total, 'realizacja', 'realizacje', 'realizacji')}</span>
           </div>
 
           <div className="works-body">

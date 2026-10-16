@@ -882,14 +882,23 @@
 
 .nav-pages { position: relative; }
 
+/* Niewidzialny mostek nad szczeliną między przyciskiem a listą — kursor
+   przechodzący w dół nie opuszcza menu, więc lista nie znika. */
+.nav-pages.is-open::after {
+  content: "";
+  position: absolute;
+  inset: 100% -8px auto;
+  height: 10px;
+}
+
 .nav-dropdown {
   position: absolute;
-  top: 100%;
-  left: -8px;
+  top: calc(100% + 8px);
+  right: -8px;
   display: grid;
-  width: 320px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
   padding: 8px;
-  margin-top: 6px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #131110;
