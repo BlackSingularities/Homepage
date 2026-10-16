@@ -1,9 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════
    FUNDAMENT — tokeny, reset, typografia, wspólne kontrolki
 
-   Paleta i fonty są wspólne z Arcadią, żeby obie strony czytało się
-   jak jeden system: ciemne tło ze znakami i złoty akcent. `--gold` jest
-   aliasem `--accent` — korzysta z niego arkusz panelu.
+   Tło ze znaków jest wspólne z Arcadią; reszta to własny system strony:
+   ciepła czerń, płaskie złoto, szeryf Newsreader w nagłówkach i Hanken
+   Grotesk w tekście. `--gold` jest aliasem `--accent` dla panelu.
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -19,31 +19,32 @@
   --line-strong: rgba(255, 255, 255, .17);
 
   /* tekst */
-  --ink: #e9ecf2;
-  --ink-2: #9aa1ae;
-  --ink-3: #747c8a;
-  --ink-4: #545b68;
+  --ink: #ede7dc;
+  --ink-2: #a7a094;
+  --ink-3: #7f796f;
+  --ink-4: #5c574f;
 
   /* akcent */
-  --accent: #e7c68a;
-  --accent-rgb: 231, 198, 138;
+  --accent: #e2bf7e;
+  --accent-rgb: 226, 191, 126;
   --accent-2: #c1913f;
   --accent-ink: #14100a;
   --accent-glow: rgba(231, 198, 138, .18);
   --good: #5fd39a;
   --gold: var(--accent);
-  --gradient-gold: linear-gradient(112deg, #a9782e 0%, #f3d69b 42%, #c1913f 70%, #f0d093 100%);
+  --gradient-gold: linear-gradient(var(--accent), var(--accent));
 
   /* geometria */
-  --radius-xl: 22px;
-  --radius-lg: 16px;
-  --radius: 12px;
-  --radius-sm: 8px;
+  --radius-xl: 14px;
+  --radius-lg: 10px;
+  --radius: 8px;
+  --radius-sm: 5px;
   --gutter: clamp(18px, 5vw, 76px);
   /* Sąsiednie sekcje dokładają swoje paddingi do siebie, więc odstęp między
      nimi to dwa razy tyle — stąd ta wartość jest połową docelowego rytmu. */
   --section-y: clamp(38px, 3.2vw, 58px);
-  --maxw: 1320px;
+  --maxw: 1240px;
+  --line-gold: rgba(226, 191, 126, .32);
 
   /* głębia */
   --shadow-sm: 0 6px 18px rgba(0, 0, 0, .32);
@@ -51,8 +52,8 @@
   --shadow-lg: 0 34px 80px rgba(0, 0, 0, .52);
   --ring: 0 0 0 1px var(--line);
 
-  --font: 'Inter Tight', system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', 'Inter Tight', system-ui, sans-serif;
+  --font: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
 
   --ease: cubic-bezier(.22, .72, .24, 1);
@@ -109,32 +110,31 @@ p { margin: 0; }
 
 /* ── typografia ─────────────────────────────────────────────────── */
 
+/* Nagłówki niesie szeryf o optycznym rozmiarze — lekki w dużych stopniach,
+   żeby złoto i znaki w tle miały przeciwwagę, a nie konkurencję. */
 h1, h2, h3, h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -.035em;
-  line-height: 1.04;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: -.018em;
+  line-height: 1.06;
   color: var(--ink);
   text-wrap: balance;
 }
 
-h1 { font-size: clamp(42px, 5.6vw, 86px); letter-spacing: -.042em; }
-h2 { font-size: clamp(30px, 3.6vw, 54px); }
-h3 { font-size: clamp(20px, 1.9vw, 27px); letter-spacing: -.03em; }
+h1 { font-size: clamp(44px, 6.4vw, 96px); font-weight: 300; letter-spacing: -.03em; line-height: 1; }
+h2 { font-size: clamp(32px, 3.8vw, 56px); font-weight: 300; letter-spacing: -.025em; }
+h3 { font-size: clamp(21px, 1.8vw, 26px); }
 
+/* Akcent w tytułach z panelu nie zmienia już koloru — dopisuje się do zdania. */
 em.accent,
 .accent {
   font-style: normal;
-  background: var(--gradient-gold);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding-right: .06em;
+  color: inherit;
 }
 
-.text-new-line,
-.section-head .accent.is-new-line { display: block; }
+.text-new-line { display: block; }
 
 .kinetic-word { display: inline-block; white-space: pre; }
 
@@ -179,68 +179,62 @@ em.accent,
 .site > *:not(.glyph-backdrop) { position: relative; z-index: 1; }
 
 /*
- * Treść stoi na jednej płycie obrysowanej cienką linią, a dym zostaje pod nią
- * i dookoła. Dzięki temu kolumna ma wyraźny początek i koniec, a tło nie
- * przechodzi pod literami.
+ * Tło widać w pełni tylko na pierwszym ekranie. Dalej treść leży na
+ * pełnoszerokim, prawie czarnym pasie — znaki prześwitują, ale nie wchodzą
+ * pod litery.
  */
 .page-slab,
 .catalog,
 .project-view,
-.page-view,
-.site-footer {
-  /* zawsze zostaje margines, więc obwódkę płyty widać przy każdej szerokości */
-  width: min(var(--maxw), calc(100% - 2 * clamp(10px, 2vw, 30px)));
-  margin: 0 auto clamp(26px, 3vw, 44px);
-  border: 1px solid var(--line);
-  border-radius: clamp(14px, 1.6vw, 24px);
-  background: rgba(12, 11, 10, .93);
-  box-shadow: var(--shadow);
+.page-view {
+  background: rgba(12, 11, 10, .94);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-
-.page-slab > .section,
-.catalog > .section,
-.project-view > .section { max-width: none; }
-
-.site-footer { border-radius: clamp(14px, 1.6vw, 24px); }
 
 .section {
   position: relative;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: var(--section-y) var(--gutter);
+  padding: clamp(64px, 8vw, 120px) var(--gutter);
 }
 
-/* Nagłówek sekcji: tytuł po lewej, wprowadzenie po prawej, cienka linia pod. */
-.section-head {
+.section + .section { border-top: 1px solid var(--line-soft); }
+
+/*
+ * Nagłówek sekcji w układzie rejestru: tytuł w lewej kolumnie, a pod nim
+ * wprowadzenie. Treść sekcji stoi w prawej kolumnie (.rail-body).
+ */
+.rail {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-  gap: clamp(20px, 3.4vw, 56px);
-  align-items: end;
-  padding-bottom: 20px;
-  margin-bottom: clamp(22px, 2.4vw, 36px);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(28px, 5vw, 88px);
+  align-items: start;
 }
 
-.section-head h2 { max-width: 20ch; }
+.section-head { display: grid; gap: 18px; align-content: start; }
+
+.rail > .section-head { position: sticky; top: 104px; }
+
+.section-head h2 { max-width: 14ch; }
 
 .section-head-lead {
-  max-width: 52ch;
+  max-width: 40ch;
   color: var(--ink-2);
   font-size: 15.5px;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .section-head-count {
   display: block;
-  margin-top: 14px;
   color: var(--ink-4);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: -.01em;
+  font-size: 13px;
 }
 
-@media (max-width: 880px) {
-  .section-head { grid-template-columns: 1fr; align-items: start; }
+@media (max-width: 900px) {
+  .rail { grid-template-columns: minmax(0, 1fr); }
+  .rail > .section-head { position: static; }
+  .section-head h2 { max-width: 20ch; }
 }
 
 /* ── kontrolki ──────────────────────────────────────────────────── */
@@ -255,9 +249,9 @@ em.accent,
   padding: 0 22px;
   border: 1px solid transparent;
   border-radius: var(--radius);
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: -.012em;
+  letter-spacing: 0;
   white-space: nowrap;
   transition: transform .25s var(--ease), box-shadow .25s, background .25s, color .25s, border-color .25s;
 }
@@ -267,29 +261,19 @@ em.accent,
 .btn-primary {
   background: var(--accent);
   color: var(--accent-ink);
-  box-shadow: 0 10px 30px rgba(var(--accent-rgb), .22);
 }
 
-.btn-primary:hover {
-  background: #f3d69b;
-  transform: translateY(-2px);
-  box-shadow: 0 16px 40px rgba(var(--accent-rgb), .3);
-}
+.btn-primary:hover { background: #edd09a; }
 
 .btn-primary:disabled { opacity: .55; cursor: wait; transform: none; }
 
 .btn-ghost {
-  background: var(--panel);
-  border-color: var(--line);
+  background: transparent;
+  border-color: var(--line-strong);
   color: var(--ink);
-  backdrop-filter: blur(14px);
 }
 
-.btn-ghost:hover {
-  border-color: var(--line-strong);
-  background: var(--panel-2);
-  transform: translateY(-2px);
-}
+.btn-ghost:hover { border-color: var(--line-gold); color: var(--accent); }
 
 .chip {
   display: inline-flex;

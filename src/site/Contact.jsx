@@ -1,13 +1,11 @@
-import { Reveal } from '../lib/ui'
 import ContactForm from './ContactForm'
 
 export default function Contact({ data, brand, scopeOptions }) {
   return (
     <section className="section contact" id="kontakt">
-      <div className="contact-glow" aria-hidden="true" />
       <div className="contact-head">
-        <Reveal as="h2" className="contact-title">{data.title}<br /><em className="accent">{data.accent}</em></Reveal>
-        <Reveal className="contact-side" delay={0.08}>
+        <h2 className="contact-title">{data.title} {data.accent}</h2>
+        <div className="contact-side">
           <p>{data.lead}</p>
           {(brand.email || brand.phone) && (
             <div className="contact-direct">
@@ -15,12 +13,12 @@ export default function Contact({ data, brand, scopeOptions }) {
               {brand.phone && <a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a>}
             </div>
           )}
-        </Reveal>
+        </div>
       </div>
 
-      <Reveal className="contact-panel" id="formularz" amount={0.1}>
+      <div className="contact-panel" id="formularz">
         <ContactForm scopeOptions={scopeOptions} />
-      </Reveal>
+      </div>
     </section>
   )
 }

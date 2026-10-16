@@ -13,26 +13,15 @@ export const stagger = (delay = 0.07) => ({
   show: { transition: { staggerChildren: delay } },
 })
 
-/** Scroll-triggered entrance used by every section. */
-export function Reveal({ children, delay = 0, y = 26, className, as = 'div', amount = 0.25, ...rest }) {
-  const Component = motion[as] || motion.div
-  const reduce = useReducedMotion()
-  if (reduce) {
-    const Plain = as
-    return <Plain className={className} {...rest}>{children}</Plain>
-  }
-  return (
-    <Component
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount }}
-      transition={{ duration: 0.75, ease, delay }}
-      {...rest}
-    >
-      {children}
-    </Component>
-  )
+/**
+ * Dawniej wjazd każdej sekcji przy przewijaniu. Strona ma teraz jeden
+ * moment ruchu — wejście pierwszego ekranu — więc Reveal zostaje tylko
+ * jako zwykły kontener, żeby widoki z niego korzystające się nie zmieniały.
+ */
+// eslint-disable-next-line no-unused-vars
+export function Reveal({ children, delay, y, amount, as = 'div', ...rest }) {
+  const Plain = as
+  return <Plain {...rest}>{children}</Plain>
 }
 
 /**

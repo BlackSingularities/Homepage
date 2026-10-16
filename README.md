@@ -4,7 +4,7 @@ Strona ofertowa (React + Vite) i lekki CMS na Node/Express. Treści strony głó
 portfolio i dowolna liczba podstron są edytowalne z panelu `/admin`.
 
 Oprawa wizualna jest wspólna z Arcadią: tło `GlyphField` (siatka znaków z falami po
-kliknięciu), chłodna paleta z niebieskim akcentem i fonty Space Grotesk / Inter Tight /
+kliknięciu). Reszta to własny system: ciepła czerń, płaskie złoto, Newsreader / Hanken Grotesk /
 JetBrains Mono. Font monospace niesie wyłącznie dane techniczne — wersje, rozmiary
 plików, platformy i daty wydań.
 
