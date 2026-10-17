@@ -208,7 +208,7 @@ export default function ProjectView({ slug, onNavigate }) {
           <aside className="pv-side">
             {project.features.length > 0 && (
               <div className="pv-panel">
-                <h2>Co potrafi</h2>
+                <h2>Funkcje</h2>
                 <ul className="pv-features">
                   {project.features.map(feature => (
                     <li key={feature}><Check size={13} aria-hidden="true" />{feature}</li>

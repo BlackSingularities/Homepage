@@ -274,7 +274,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
         placeholder="Analiza, projekt, wykonanie, wdrożenie i utrzymanie" />
 
       <div className="ap-grid-2">
-        <Lines label="Co potrafi" value={project.features} onChange={features => update({ features })} rows={5} />
+        <Lines label="Funkcje" value={project.features} onChange={features => update({ features })} rows={5} />
         <Lines label="Technologie" value={project.stack} onChange={stack => update({ stack })} rows={5} />
       </div>
 
