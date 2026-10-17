@@ -1575,3 +1575,8 @@
   }
   .pv-copy { max-width: none; }
 }
+
+/* Numery kroków formularza są białe – także na złotym tle aktywnego kroku. */
+.form-step i,
+.form-step.is-active i,
+.form-step.is-done i { color: #fff; }

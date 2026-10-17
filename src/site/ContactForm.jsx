@@ -80,7 +80,6 @@ export default function ContactForm({ scopeOptions = [] }) {
     <form className="contact-form" onSubmit={submit} noValidate>
       <aside className="form-steps">
         <div className="form-steps-intro">
-          <span>Brief projektu</span>
           <h3>Kilka konkretów wystarczy.</h3>
           <p>Nie potrzebujesz gotowej specyfikacji. Opisz cel albo problem – resztę uporządkujemy wspólnie.</p>
         </div>
