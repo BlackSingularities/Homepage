@@ -1578,3 +1578,13 @@
 .pb-features-grid h3 { margin: 0 0 10px; color: var(--accent); }
 .pb-features-grid p { font-size: 14.5px; color: var(--ink-2); }
 .pb-gallery button:hover { transform: none; border-color: var(--line-gold); }
+
+/* Opis i panele boczne stoją blisko siebie: tekst wypełnia kolumnę aż do
+   paneli, więc między nimi nie zostaje pusty pas. */
+@media (min-width: 921px) {
+  .pv-body {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    gap: clamp(24px, 3vw, 40px);
+  }
+  .pv-copy { max-width: none; }
+}
