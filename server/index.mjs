@@ -7,8 +7,9 @@ import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
-import { PLATFORMS, projectSummary, publicProject, sanitizeProject } from './projects.mjs'
+import { PLATFORMS, downloadsFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
+import { createAnalytics } from './analytics.mjs'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -20,6 +21,8 @@ const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
 const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
 const RELEASES_FILE = path.join(DATA_DIR, 'releases.json')
+const DOWNLOAD_COUNTS_FILE = path.join(DATA_DIR, 'download-counts.json')
+const ANALYTICS_DIR = path.join(DATA_DIR, 'analytics')
 const INTEGRATIONS_FILE = path.join(DATA_DIR, 'integrations.json')
 const ADMIN_FILE = path.join(DATA_DIR, 'admin.json')
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
@@ -296,6 +299,15 @@ const releases = createReleaseService({
   updateJson,
   getToken: getGithubToken,
 })
+
+const analytics = createAnalytics({
+  dir: ANALYTICS_DIR,
+  readJson,
+  updateJson,
+  countsFile: DOWNLOAD_COUNTS_FILE,
+})
+await analytics.init()
+const trackLimits = new Map()
 
 async function readProjects() {
   const stored = await readJson(PROJECTS_FILE, [])
@@ -593,16 +605,17 @@ app.post('/api/auth/logout', enforceSameOrigin, (_req, res) => {
 app.get('/health', (_req, res) => res.json({ ok: true }))
 
 app.get('/api/content', async (_req, res) => {
-  const [content, pages, projects] = await Promise.all([
+  const [content, pages, projects, counts] = await Promise.all([
     getContent(),
     readJson(PAGES_FILE, []),
     publishedProjects(),
+    analytics.counts(),
   ])
   res.set('Cache-Control', 'no-cache')
   res.json({
     content,
     pages: pages.filter(page => page.published !== false).sort(byOrder).map(publicPageSummary),
-    projects: projects.map(({ project, release }) => projectSummary(project, release)),
+    projects: projects.map(({ project, release }) => projectSummary(project, release, counts)),
   })
 })
 
@@ -618,6 +631,7 @@ app.get('/api/projects/:slug', async (req, res) => {
   const index = entries.findIndex(entry => entry.project.slug === req.params.slug)
   if (index === -1) return res.status(404).json({ error: 'Nie znaleziono realizacji.' })
   const { project, release } = entries[index]
+  const counts = await analytics.counts()
   const neighbour = step => {
     const target = entries[(index + step + entries.length) % entries.length]
     return target && target.project.slug !== project.slug
@@ -625,7 +639,7 @@ app.get('/api/projects/:slug', async (req, res) => {
       : null
   }
   res.set('Cache-Control', 'no-cache')
-  res.json({ project: publicProject(project, release), previous: neighbour(-1), next: neighbour(1) })
+  res.json({ project: publicProject(project, release, counts), previous: neighbour(-1), next: neighbour(1) })
 })
 
 /** Proxy pobierania dla prywatnych wydań – token nie opuszcza serwera. */
@@ -650,6 +664,24 @@ app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
     if (error.status) return res.status(error.status).json({ error: error.message })
     next(error)
   }
+})
+
+/**
+ * Zdarzenia analityki z przeglądarki. Wysyłane przez `sendBeacon`, więc
+ * odpowiedź jest pusta; limit chroni pliki przed zalaniem.
+ */
+app.post('/api/track', express.text({ type: '*/*', limit: '4kb' }), async (req, res) => {
+  const ip = req.ip || 'unknown'
+  const now = Date.now()
+  const recent = (trackLimits.get(ip) || []).filter(timestamp => now - timestamp < 60 * 1000)
+  if (recent.length >= 120) return res.status(429).end()
+  trackLimits.set(ip, [...recent, now])
+  if (trackLimits.size > 5000) trackLimits.clear()
+  try {
+    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body
+    await analytics.record(body, { agent: req.get('user-agent'), host: req.get('host') })
+  } catch { /* złe dane – po cichu ignorujemy */ }
+  res.status(204).end()
 })
 
 app.post('/api/contact', async (req, res) => {
@@ -751,6 +783,29 @@ app.post('/api/contact', async (req, res) => {
 app.use('/api/admin', requireAdmin)
 
 /* ── admin: submissions ──────────────────────────────────────────────── */
+
+app.get('/api/admin/analytics', async (req, res) => {
+  const [report, projects, counts] = await Promise.all([
+    analytics.report({ days: req.query.days }),
+    readProjects(),
+    analytics.counts(),
+  ])
+  const apps = projects.filter(project => project.kind === 'app')
+  const releaseMap = await releases.getMany(apps.filter(p => p.releaseSource === 'github').map(p => p.repo))
+  res.json({
+    ...report,
+    apps: apps.map(project => {
+      const files = downloadsFor(project, releaseMap[project.repo], counts)
+      return {
+        slug: project.slug,
+        name: project.name,
+        source: project.releaseSource,
+        total: totalDownloads(files),
+        files: files.map(file => ({ id: file.id, platform: file.platform, label: file.label, version: file.version, count: file.count })),
+      }
+    }).sort((a, b) => b.total - a.total),
+  })
+})
 
 app.get('/api/admin/submissions', async (_req, res) => {
   res.json(await readJson(SUBMISSIONS_FILE, []))

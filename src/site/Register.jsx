@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
-import { CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
+import { CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL, formatDownloads, hostOf } from '../lib/projects'
 import { Reveal } from '../lib/ui'
 
 /**
@@ -24,6 +24,7 @@ function Platforms({ project }) {
             </span>
           )
         })}
+        {project.downloadCount > 0 && <span className="reg-downloads mono">{formatDownloads(project.downloadCount)}</span>}
       </span>
     )
   }

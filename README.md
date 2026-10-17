@@ -57,6 +57,7 @@ drugiego logowania i bez osobnego hasła galerii.
 | Zakładka | Do czego służy |
 | --- | --- |
 | Pulpit | Liczby, ostatnie zgłoszenia, skróty |
+| Analityka | Odsłony, unikalni odwiedzający, sesje, odrzucenia, czas, źródła, urządzenia, pora dnia i pobrania aplikacji |
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
 | Portfolio | Prace: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
@@ -128,3 +129,14 @@ Publiczne: `GET /api/content`, `GET /api/pages/:slug`, `GET /api/projects/:slug`
 Uwierzytelnianie: `/api/auth/status`, `/api/auth/setup`, `/api/auth/login`, `/api/auth/logout`.
 Administracyjne (za sesją): `/api/admin/*` – zgłoszenia, treści, realizacje, podstrony,
 media, poczta i token GitHuba.
+
+## Analityka i pobrania
+
+Statystyki zbiera własne API (`POST /api/track`) – bez zewnętrznych skryptów. Zdarzenia leżą
+w `data/analytics/events-RRRR-MM.jsonl` (13 miesięcy wstecz), adresów IP nie zapisujemy.
+Baner prywatności pyta o zgodę: bez niej liczone są tylko anonimowe odsłony i pobrania,
+po zgodzie dochodzi losowy identyfikator przeglądarki, źródło wejścia, język, ekran i czas.
+Zgodę można zmienić linkiem „Ustawienia prywatności” w stopce.
+
+Liczby pobrań przy aplikacjach pochodzą z GitHuba (`download_count` z wydania); dla plików
+wpisanych ręcznie liczone są kliknięcia na stronie (`data/download-counts.json`).

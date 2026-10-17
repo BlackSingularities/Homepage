@@ -11,6 +11,8 @@ import { detectPlatform } from './projects.mjs'
  */
 
 const TTL_MS = 30 * 60 * 1000
+// Podbijane, gdy zmienia się kształt wpisu – stare wpisy odświeżają się od razu.
+const CACHE_VERSION = 2
 const API = 'https://api.github.com'
 const USER_AGENT = 'redzikowski-homepage'
 
@@ -74,6 +76,7 @@ async function fetchEntry(repo, token) {
     fetchRelease(repo, token),
   ])
   return {
+    v: CACHE_VERSION,
     repo,
     fetchedAt: new Date().toISOString(),
     private: meta?.private === true,
@@ -88,6 +91,7 @@ async function fetchEntry(repo, token) {
       label: assetLabel(asset.name),
       platform: detectPlatform(asset.name),
       size: Number(asset.size) || 0,
+      downloadCount: Number(asset.download_count) || 0,
       version: release.tag_name || '',
       directUrl: asset.browser_download_url || '',
     })),
@@ -113,6 +117,7 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
         const cached = (await read())[repo]
         const failure = {
           ...(cached || { repo, private: false, tag: '', name: '', publishedAt: '', url: `https://github.com/${repo}/releases`, assets: [] }),
+          v: CACHE_VERSION,
           checkedAt: new Date().toISOString(),
           error: error.message,
         }
@@ -131,8 +136,8 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     if (!repo) return null
     const cached = (await read())[repo]
     const stale = !cached?.fetchedAt || Date.now() - Date.parse(cached.fetchedAt) > TTL_MS
-    if (!stale) return cached
-    if (wait || !cached) return refresh(repo)
+    if (!stale && cached.v === CACHE_VERSION) return cached
+    if (wait || !cached || cached.v !== CACHE_VERSION) return refresh(repo)
     refresh(repo).catch(() => undefined)
     return cached
   }

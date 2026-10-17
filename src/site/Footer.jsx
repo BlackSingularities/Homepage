@@ -1,3 +1,4 @@
+import { openConsent } from '../lib/analytics'
 import { CATALOG_PATH } from '../lib/projects'
 
 export default function Footer({ brand, pages = [], onNavigate, home = true }) {
@@ -35,6 +36,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
 
         <p className="footer-legal">
           © {year} {brand.name}. {brand.location}.
+          {' '}<button type="button" className="footer-consent" onClick={openConsent}>Ustawienia prywatności</button>
         </p>
       </div>
     </footer>

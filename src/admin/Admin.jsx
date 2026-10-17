@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, Boxes, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, BarChart3, Boxes, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
@@ -9,10 +9,12 @@ import { Card, Empty, Notice, Text, Toggle } from './parts'
 import PagesManager from './PagesManager'
 import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
+import AnalyticsPanel from './AnalyticsPanel'
 import '../styles/admin.css'
 
 const TABS = [
   ['dashboard', 'Pulpit', LayoutDashboard],
+  ['analytics', 'Analityka', BarChart3],
   ['submissions', 'Zgłoszenia', MessageSquareText],
   ['projects', 'Portfolio', Boxes],
   ['pages', 'Podstrony', Files],
@@ -345,6 +347,7 @@ function AdminPanel({ admin, onLogout }) {
   const [settings, setSettings] = useState(EMPTY_SETTINGS)
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
   const [error, setError] = useState('')
 
   const notify = useCallback(message => {
@@ -379,6 +382,7 @@ function AdminPanel({ admin, onLogout }) {
 
   const refresh = () => {
     if (tab === 'dashboard') return loadOverview()
+    if (tab === 'analytics') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
     if (tab === 'inbox') return run(async () => setInbox(await api('/api/admin/inbox')))
     if (tab === 'outbox') return run(async () => setOutbox(await api('/api/admin/outbox')))
@@ -474,6 +478,7 @@ function AdminPanel({ admin, onLogout }) {
             <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} />
           )}
 
+          {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
           {tab === 'projects' && <ProjectsManager notify={notify} />}
 
           {tab === 'pages' && <PagesManager notify={notify} />}

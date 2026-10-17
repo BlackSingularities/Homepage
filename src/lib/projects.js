@@ -60,3 +60,14 @@ export function plural(count, one, few, many) {
   if (rest >= 2 && rest <= 4 && (teens < 12 || teens > 14)) return few
   return many
 }
+
+/** „1 pobranie”, „3 pobrania”, „12 pobrań” – polska odmiana liczebnika. */
+export function formatDownloads(count) {
+  const n = Number(count) || 0
+  const mod10 = n % 10
+  const mod100 = n % 100
+  const word = n === 1 ? 'pobranie'
+    : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? 'pobrania'
+      : 'pobrań'
+  return `${new Intl.NumberFormat('pl-PL').format(n)} ${word}`
+}

@@ -3,8 +3,9 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
 import {
   CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL,
-  formatBytes, formatReleaseDate, hostOf,
+  formatBytes, formatDownloads, formatReleaseDate, hostOf,
 } from '../lib/projects'
+import { trackDownload } from '../lib/analytics'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
 
@@ -36,6 +37,9 @@ function Downloads({ project }) {
     <div className="pv-downloads">
       <div className="pv-downloads-head">
         <h2>Do pobrania</h2>
+        {project.downloadCount > 0 && (
+          <p className="pv-download-total mono">{formatDownloads(project.downloadCount)}</p>
+        )}
         {project.release && (
           <p className="pv-release">
             <span className="mono">{project.release.tag}</span>
@@ -52,7 +56,11 @@ function Downloads({ project }) {
           const Icon = PLATFORM_ICON[file.platform] || PLATFORM_ICON.other
           return (
             <li key={file.id}>
-              <a href={file.url} download>
+              <a
+                href={file.url}
+                download
+                onClick={() => trackDownload({ project: project.slug, asset: file.id, platform: file.platform })}
+              >
                 <Icon size={18} aria-hidden="true" />
                 <span className="pv-file-main">
                   <strong>{PLATFORM_LABEL[file.platform] || file.platform}</strong>
@@ -61,6 +69,7 @@ function Downloads({ project }) {
                 <span className="pv-file-meta mono">
                   {file.version && <i>{file.version}</i>}
                   {formatBytes(file.size) && <i>{formatBytes(file.size)}</i>}
+                  {file.count > 0 && <i title="Liczba pobrań">↓ {new Intl.NumberFormat('pl-PL').format(file.count)}</i>}
                 </span>
                 <Download size={17} aria-hidden="true" />
               </a>

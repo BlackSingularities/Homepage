@@ -108,7 +108,7 @@ export function sanitizeProject(input, existing = {}) {
 }
 
 /** Wiersz listy na stronie głównej i w portfolio – bez pełnego opisu i galerii. */
-export function projectSummary(project, release) {
+export function projectSummary(project, release, counts = {}) {
   return {
     id: project.id,
     slug: project.slug,
@@ -123,6 +123,7 @@ export function projectSummary(project, release) {
     platforms: [...new Set(downloadsFor(project, release).map(item => item.platform))]
       .sort((a, b) => (PLATFORM_ORDER.get(a) ?? 99) - (PLATFORM_ORDER.get(b) ?? 99)),
     shots: project.shots.length,
+    downloadCount: totalDownloads(downloadsFor(project, release, counts)),
   }
 }
 
@@ -131,9 +132,12 @@ export function projectSummary(project, release) {
  * Pliki z prywatnego repozytorium nie mają publicznego adresu, więc kierujemy
  * je przez proxy serwera, które dokłada token.
  */
-export function downloadsFor(project, release) {
+export function downloadsFor(project, release, counts = {}) {
   if (project.kind !== 'app') return []
-  if (project.releaseSource === 'manual') return [...project.downloads].sort(sortByPlatform)
+  const local = id => Number(counts[`${project.slug}/${id}`]) || 0
+  if (project.releaseSource === 'manual') {
+    return project.downloads.map(item => ({ ...item, count: local(item.id) })).sort(sortByPlatform)
+  }
   if (project.releaseSource !== 'github' || !release) return []
   return (release.assets || [])
     .map(asset => ({
@@ -142,6 +146,9 @@ export function downloadsFor(project, release) {
       label: asset.label,
       version: asset.version,
       size: asset.size,
+      // GitHub liczy każde pobranie (także te spoza strony); proxy prywatnych
+      // wydań też przechodzi przez GitHuba, więc lokalny licznik to tylko zapas.
+      count: Math.max(Number(asset.downloadCount) || 0, local(asset.id)),
       url: release.private || !asset.directUrl
         ? `/api/projects/${project.slug}/asset/${asset.id}`
         : asset.directUrl,
@@ -149,13 +156,16 @@ export function downloadsFor(project, release) {
     .sort(sortByPlatform)
 }
 
-export function publicProject(project, release) {
-  const downloads = downloadsFor(project, release)
+export const totalDownloads = downloads => downloads.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
+
+export function publicProject(project, release, counts = {}) {
+  const downloads = downloadsFor(project, release, counts)
   return {
     ...project,
     siteUrl: project.siteHidden ? '' : project.siteUrl,
     repo: project.repoHidden ? '' : project.repo,
     downloads,
+    downloadCount: totalDownloads(downloads),
     release: project.releaseSource === 'github' && release
       ? { tag: release.tag, name: release.name, publishedAt: release.publishedAt, url: release.url }
       : null,

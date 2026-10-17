@@ -7,6 +7,8 @@ import Home from './site/Home'
 import Catalog from './site/Catalog'
 import ProjectView from './site/ProjectView'
 import PageView from './site/PageView'
+import CookieBanner from './site/CookieBanner'
+import { trackPageview } from './lib/analytics'
 import { CATALOG_PATH } from './lib/projects'
 import { useSiteData } from './lib/useSiteData'
 
@@ -37,6 +39,10 @@ function routeOf(path) {
 export default function App() {
   const [path, setPath] = usePath()
   const { content, pages, projects } = useSiteData()
+
+  useEffect(() => {
+    if (!path.startsWith('/admin')) trackPageview(path)
+  }, [path])
 
   const navigate = useCallback(target => {
     const [pathname, hash] = target.split('#')
@@ -72,6 +78,7 @@ export default function App() {
       {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
       {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
       <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
+      <CookieBanner />
     </div>
   )
 }
