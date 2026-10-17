@@ -1580,3 +1580,16 @@
 .form-step i,
 .form-step.is-active i,
 .form-step.is-done i { color: #fff; }
+
+/* Formularz: drobne teksty były za małe i za ciemne, żeby je wygodnie czytać. */
+.contact-panel .chip { font-size: 14px; color: var(--ink-2); }
+.contact-panel .chip.is-active { color: var(--ink); }
+.contact-panel .method-choice button { font-size: 14.5px; }
+.form-steps-intro p { font-size: 14px; color: var(--ink-2); }
+.form-step { font-size: 14px; }
+.form-step small { font-size: 13px; color: var(--ink-3); }
+.form-privacy { font-size: 13px; color: var(--ink-3); }
+.consent span { font-size: 14px; }
+.form-hint { font-size: 13px; color: var(--ink-3); }
+.field-error,
+.form-error { font-size: 13px; }
