@@ -1,0 +1,15 @@
+{
+  "name": "Adam Rędzikowski – strony i aplikacje na zamówienie",
+  "short_name": "Rędzikowski",
+  "description": "Strony internetowe, aplikacje webowe i programy na komputer oraz telefon – od analizy do wdrożenia.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#0c0b0a",
+  "theme_color": "#0c0b0a",
+  "lang": "pl",
+  "icons": [
+    { "src": "/assets/brand/favicon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/assets/brand/favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

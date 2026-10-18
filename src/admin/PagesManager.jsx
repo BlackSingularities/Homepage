@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  AlignLeft, ArrowUpRight, BadgeCheck, EyeOff, FileText, Image as ImageIcon, Images,
+  AlignLeft, ArrowUpRight, BadgeCheck, Copy, EyeOff, FileText, Image as ImageIcon, Images,
   LayoutGrid, Link2, LoaderCircle, MessageSquareQuote, Plus, Search, Sigma, Trash2,
 } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
 import {
-  Area, Card, Dropzone, Empty, ImagePicker, Notice, Repeater, SaveBar, Select, Text, Toggle, useMedia,
+  Area, Card, Dropzone, Empty, ImagePicker, LangTabs, Notice, Repeater, SaveBar, Select, Text, Toggle, useMedia,
 } from './parts'
 
 const BLOCK_TYPES = [
@@ -44,7 +44,12 @@ function emptyPage() {
     published: false,
     featured: true,
     blocks: [newBlock('text')],
+    en: emptyTranslation(),
   }
+}
+
+function emptyTranslation() {
+  return { title: '', kicker: '', excerpt: '', lead: '', seoDescription: '', blocks: [] }
 }
 
 function GalleryEditor({ block, patch }) {
@@ -199,7 +204,7 @@ function BlockEditor({ block, patch }) {
   }
 }
 
-export default function PagesManager({ notify }) {
+export default function PagesManager({ notify, item = '', onItem = () => {} }) {
   const [pages, setPages] = useState([])
   const [selectedId, setSelectedId] = useState('')
   const [draft, setDraft] = useState(null)
@@ -208,14 +213,18 @@ export default function PagesManager({ notify }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
+  const [lang, setLang] = useState('pl')
 
   const load = async (selectSlugId = '') => {
     setLoading(true)
     try {
       const list = await api('/api/admin/pages')
       setPages(list)
-      const next = list.find(page => page.id === (selectSlugId || selectedId)) || null
+      const next = list.find(page => page.id === (selectSlugId || selectedId))
+        || (item ? list.find(page => page.slug === item) : null)
+        || null
       if (next) {
+        onItem(next.slug)
         setSelectedId(next.id)
         setDraft(structuredClone(next))
         setOriginal(structuredClone(next))
@@ -234,9 +243,26 @@ export default function PagesManager({ notify }) {
     setDraft(structuredClone(page))
     setOriginal(structuredClone(page))
     setError('')
+    onItem(page.slug)
   }
 
+  // „Wstecz” w przeglądarce zmienia adres – lista idzie za nim.
+  useEffect(() => {
+    if (loading || !item) return
+    const target = pages.find(page => page.slug === item)
+    if (target && target.id !== selectedId) select(target)
+  }, [item, loading]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const patch = value => setDraft(current => ({ ...current, ...value }))
+  const en = { ...emptyTranslation(), ...(draft?.en || {}) }
+  // Pola edytują wersję wybraną w zakładce języka; puste pole angielskie
+  // spada na stronie na polski oryginał, który widać tu jako podpowiedź.
+  const value = key => (lang === 'en' ? en[key] : draft?.[key])
+  const set = (key, next) => (lang === 'en'
+    ? setDraft(current => ({ ...current, en: { ...emptyTranslation(), ...(current.en || {}), [key]: next } }))
+    : patch({ [key]: next }))
+  const hint = key => (lang === 'en' ? draft?.[key] : undefined)
+  const blocks = lang === 'en' ? en.blocks : draft?.blocks || []
 
   const dirty = useMemo(
     () => Boolean(draft && original) && JSON.stringify(draft) !== JSON.stringify(original),
@@ -278,7 +304,7 @@ export default function PagesManager({ notify }) {
     if (!window.confirm(`Usunąć stronę „${page.title}”? Tej operacji nie można cofnąć.`)) return
     await api(`/api/admin/pages/${page.id}`, { method: 'DELETE' })
     setPages(current => current.filter(item => item.id !== page.id))
-    if (page.id === selectedId) { setDraft(null); setSelectedId('') }
+    if (page.id === selectedId) { setDraft(null); setSelectedId(''); onItem('') }
     notify('Strona została usunięta.')
   }
 
@@ -345,13 +371,20 @@ export default function PagesManager({ notify }) {
               title="Podstawy"
               description="Tytuł, adres i zajawka pokazywana na stronie głównej."
               actions={(
-                <a className="ap-btn ap-btn-ghost" href={`/p/${draft.slug}`} target="_blank" rel="noreferrer">
-                  Podgląd <ArrowUpRight size={14} />
+                <a className="ap-btn ap-btn-ghost" href={lang === 'en' ? `/en/p/${draft.slug}` : `/p/${draft.slug}`} target="_blank" rel="noreferrer">
+                  Podgląd {lang.toUpperCase()} <ArrowUpRight size={14} />
                 </a>
               )}
             >
+              <LangTabs
+                value={lang}
+                onChange={setLang}
+                hint={lang === 'en'
+                  ? `Wersja angielska pod /en/p/${draft.slug}. Puste pola i brak bloków = polski oryginał.`
+                  : 'Wersja polska – podstawowa. Adres, zdjęcia i ustawienia są wspólne.'}
+              />
               <div className="ap-grid-2">
-                <Text label="Tytuł strony" value={draft.title} onChange={title => patch({ title })} />
+                <Text label="Tytuł strony" value={value('title')} onChange={next => set('title', next)} placeholder={hint('title')} />
                 <Text label="Adres (slug)" value={draft.slug} onChange={slug => patch({ slug })} hint={`Strona będzie dostępna pod /p/${draft.slug || '…'}`} />
               </div>
               <div className="ap-grid-2">
@@ -362,9 +395,10 @@ export default function PagesManager({ notify }) {
                   options={[['gold', 'Złoty'], ['ivory', 'Kość słoniowa'], ['ember', 'Bursztyn'], ['mint', 'Mięta']]}
                 />
               </div>
-              <Area label="Zajawka (kafelek na stronie głównej)" value={draft.excerpt} onChange={excerpt => patch({ excerpt })} rows={2} />
-              <Area label="Wprowadzenie (nagłówek strony)" value={draft.lead} onChange={lead => patch({ lead })} rows={3} />
-              <Area label="Opis dla wyszukiwarek" value={draft.seoDescription} onChange={seoDescription => patch({ seoDescription })} rows={2} hint="Do 320 znaków." />
+              <Area label="Zajawka (kafelek na stronie głównej)" value={value('excerpt')} onChange={next => set('excerpt', next)} rows={2} placeholder={hint('excerpt')} />
+              <Area label="Wprowadzenie (nagłówek strony)" value={value('lead')} onChange={next => set('lead', next)} rows={3} placeholder={hint('lead')} />
+              <Area label="Opis dla wyszukiwarek" value={value('seoDescription')} onChange={next => set('seoDescription', next)} rows={2} placeholder={hint('seoDescription')}
+                hint={`${String(value('seoDescription') || '').length}/320 znaków. Najlepiej 120–158 – tyle Google pokazuje w wynikach.`} />
               <ImagePicker label="Zdjęcie główne" value={draft.cover} onChange={cover => patch({ cover })} hint="Widoczne w nagłówku strony i na kafelku." />
               <div className="ap-switch-row">
                 <Toggle label="Opublikowana" hint="Widoczna dla odwiedzających" checked={draft.published} onChange={published => patch({ published })} />
@@ -372,10 +406,27 @@ export default function PagesManager({ notify }) {
               </div>
             </Card>
 
-            <Card title="Treść strony" description="Układaj stronę z bloków – tekstu, zdjęć, galerii, liczb i wezwań do działania.">
+            <Card
+              title={lang === 'en' ? 'Treść strony – English' : 'Treść strony'}
+              description={lang === 'en'
+                ? 'Bloki wersji angielskiej. Dopóki lista jest pusta, strona angielska pokazuje polskie bloki.'
+                : 'Układaj stronę z bloków – tekstu, zdjęć, galerii, liczb i wezwań do działania.'}
+            >
+              {lang === 'en' && (
+                <button
+                  type="button"
+                  className="ap-btn ap-btn-ghost"
+                  onClick={() => {
+                    if (en.blocks.length && !window.confirm('Zastąpić angielskie bloki kopią polskich?')) return
+                    set('blocks', structuredClone(draft.blocks).map(block => ({ ...block, id: uid() })))
+                  }}
+                >
+                  <Copy size={14} /> Skopiuj bloki z wersji polskiej do przetłumaczenia
+                </button>
+              )}
               <Repeater
-                items={draft.blocks}
-                onChange={blocks => patch({ blocks })}
+                items={blocks}
+                onChange={next => set('blocks', next)}
                 create={() => newBlock('text')}
                 addLabel="Dodaj blok tekstowy"
                 itemLabel={block => `${BLOCK_LABEL[block.type] || 'Blok'}${block.heading ? ` – ${block.heading}` : ''}`}
@@ -385,7 +436,7 @@ export default function PagesManager({ notify }) {
               <div className="ap-block-add">
                 <span>Dodaj blok:</span>
                 {BLOCK_TYPES.map(([type, label, Icon]) => (
-                  <button key={type} type="button" onClick={() => patch({ blocks: [...draft.blocks, newBlock(type)] })}>
+                  <button key={type} type="button" onClick={() => set('blocks', [...blocks, newBlock(type)])}>
                     <Icon size={14} /> {label}
                   </button>
                 ))}

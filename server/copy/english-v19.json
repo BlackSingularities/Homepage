@@ -1,0 +1,247 @@
+{
+  "projects": {
+    "arcadia": {
+      "en": {
+        "label": "Games and tools / web application",
+        "tagline": "Forty games and thirty-five tools that run right in the browser – no installs, no ads, no accounts.",
+        "summary": "One catalogue instead of a mess of browser tabs: classics reimagined, brand-new ideas and a workshop of tools that are genuinely useful for work and study.",
+        "body": "Every entry is a separate, carefully finished piece – not a variation of the same template. Tetris has hold and combos, LUNARIS recreates a full Apollo flight with seven stages and lunar module physics, Chrono Rally takes a driver through a championship season with tyres, fuel and a ghost of the best lap, and Metro Manager is a calm strategy game about designing lines in a growing city.\n\nThe tools follow the same path: a periodic table with complete element data, function plots with roots and derivatives, Color Lab converting colours between HEX, RGB, HSL and OKLCH together with WCAG contrast, and a piano that teaches you melodies. Everything is computed locally – files never leave your computer and there is no account to create.\n\nIt is all held together by a shared catalogue with filters, search and a Ctrl+K command palette, shared server-side leaderboards and one visual system that this very website is part of: the same glyph background and the same typography.",
+        "role": "Idea, design, graphics, code, deployment and ongoing development",
+        "features": [
+          "40 games and 35 tools in one catalogue",
+          "everything runs locally, no file uploads",
+          "shared leaderboards and a Ctrl+K command palette",
+          "full touch support and full-screen mode"
+        ],
+        "shotAlts": [
+          "Arcadia catalogue: 75 entries with type and category filters",
+          "Filtering the catalogue by category and sorting entries",
+          "Tetris: board mid-game with the piece queue and score",
+          "LUNARIS: Saturn V launch with the mission flight computer",
+          "Chrono Rally: season calendar, car selection and stage goals",
+          "Metro Manager: city map and planning the first line",
+          "Function plots: several functions at once with their roots",
+          "Chemistry toolbox: periodic table with element data",
+          "Color Lab: converting a colour between HEX, RGB, HSL and OKLCH",
+          "Piano: keyboard with melody lessons and a metronome"
+        ]
+      }
+    },
+    "openpdf": {
+      "pl": {
+        "summary": "Darmowy czytnik i edytor PDF na Androida z prawdziwym trybem książki, adnotacjami zgodnymi ze standardem PDF i pełną pracą na stronach – wszystko lokalnie na telefonie, bez konta i bez reklam."
+      },
+      "en": {
+        "label": "PDF editor / Android & iOS",
+        "tagline": "A reader that treats a PDF like a book and an editor whose changes Acrobat can open later. No account, no subscription and no uploading your file to someone else's server.",
+        "summary": "A free PDF reader and editor for Android with a true book mode, annotations that follow the PDF standard and full page management – everything stays on your phone, with no account and no ads.",
+        "body": "Book mode places two pages side by side – automatically in landscape and on an unfolded foldable screen, because the app detects the hinge. The cover can be shown on its own, just like in print, and a spread can be zoomed and panned like a single illustration; when you zoom in, the visible area is re-rendered, so text stays sharp. On top of that: continuous scrolling or page turning, right-to-left reading for manga and RTL languages, and plain, night and sepia paper.\n\nEditing covers pen, highlighter, text, notes, shapes and handwritten signatures saved for reuse. Everything is stored as standard PDF annotations with appearance streams, so a file opened later in Acrobat or a web browser looks exactly the same and can still be edited – these are not pixels burned into the page.\n\nAt the document level: rotating, deleting, duplicating and reordering pages, inserting other PDFs and images, merging files, forms including flattening, AES-256 password protection, exporting pages to PNG and JPG, and search that ignores diacritics. Undo and redo also cover page operations.\n\nThe whole thing is built on Kotlin Multiplatform and Compose Multiplatform: Android uses PdfBox and the system PdfRenderer, while the same UI code supports iOS through PDFKit. Every merge to the main branch builds and publishes a new release, and the app offers the update on its own.",
+        "role": "Design, architecture, implementation and releases",
+        "features": [
+          "book mode with foldable hinge detection",
+          "standard PDF annotations, readable in Acrobat",
+          "forms, signatures and flattening",
+          "page operations with undo and redo",
+          "requires Android 10 or newer"
+        ],
+        "shotAlts": [
+          "Book mode: two pages side by side with a spine shadow",
+          "Settings panel: spread layout, paper colour and margin cropping",
+          "Continuous vertical scrolling with the page number"
+        ]
+      }
+    },
+    "opentakeoff": {
+      "pl": {
+        "summary": "Darmowa aplikacja na Androida dla wirtualnych pilotów MSFS i X-Plane: aktualna pogoda lotniskowa, dane lotnisk, mapa 3D z planem lotu i mobilny kokpit, który przez sieć lokalną steruje samolotem w Microsoft Flight Simulator 2024.",
+        "body": "Aplikacja na Androida dla wirtualnych pilotów korzystających z MSFS i X-Plane. Łączy pogodę, informacje o lotniskach i mobilny kokpit w jednym miejscu, wraz z kilkoma mniejszymi funkcjami. Oferuje interaktywne depesze METAR, prognozy TAF, komunikaty SIGMET i PIREP, informacje o pasach, częstotliwościach i systemach ILS, a także odczytywany na głos ATIS. Mapa z widokiem 3D prezentuje lotniska, pogodę, trasę oraz ślad lotu z profilem wysokości. Plan można przygotować ręcznie, wyznaczyć na mapie lub pobrać z SimBrief, a po połączeniu z MSFS także uzupełnić o procedury SID, STAR i podejścia, punkty na mapie i więcej.\n\nDzięki OpenTakeoff Link – niewielkiemu programowi na Windows – telefon łączy się z MSFS 2024 w sieci lokalnej i staje się dodatkowym panelem przyrządów oraz kontrolerem. Mobilny kokpit udostępnia wyświetlacze PFD i ND, parametry silników, dźwignie mocy, autopilota, radio oraz sterowanie systemami samolotu. Układ dopasowuje się do telefonu lub tabletu, a panele autopilota odwzorowują stylistykę rozwiązań Airbus, Boeing, Garmin i KAP140. Samolotem można sterować przez przechylanie telefonu, ekranowy drążek lub zewnętrzny kontroler. Pływający przycisk pozwala zachować dostęp do sterowania również podczas przeglądania mapy czy briefingu.\n\nAplikacja automatycznie prowadzi dziennik lotów z przebiegiem trasy, wykresami parametrów i oceną lądowania, umożliwiając późniejsze odtworzenie lotu na mapie 3D. Obsługuje również kopie zapasowe historii, eksport do GPX oraz narzędzia pomocnicze, takie jak kalkulator wiatru, paliwa i zniżania, przelicznik jednostek czy dekoder METAR i TAF. OpenTakeoff korzysta z darmowych, otwartych źródeł danych, nie zawiera reklam i do podstawowych funkcji nie wymaga kont ani kluczy API; opcjonalny import z SimBrief wymaga wskazania konta w tej usłudze. Interfejs jest dostępny po polsku i angielsku, z motywami AMOLED, grafitowym i jasnym.",
+        "features": [
+          "pogoda lotniskowa: METAR, TAF, SIGMET, PIREP i ATIS czytany na głos",
+          "dane lotnisk: pasy, częstotliwości, ILS i radiolatarnie",
+          "mapa 3D z planem lotu, importem z SimBrief i śladem lotu",
+          "mobilny kokpit dla MSFS 2024: PFD, ND, autopilot, radio i silniki",
+          "dziennik lotów z oceną lądowania i odtwarzaniem na mapie",
+          "lokalna baza danych z kopią zapasową i eksportem GPX"
+        ],
+        "shotAlts": [
+          "Kokpit na telefonie: PFD, autopilot i parametry przelotu na zniżaniu",
+          "Mapa ruchomej trasy nad Warszawą z planem lotu i lotniskami",
+          "EPWA Chopin: pogoda, wiatr na pasach i częstotliwości radiowe",
+          "Kokpit Bede BD-5J: PFD, ND i panel autopilota w stylu Garmina",
+          "Kokpit w pionie: PFD, mapa nawigacyjna i zakres kursu",
+          "Mapa 3D: ślad lotu z profilem wysokości startującego z EPLL",
+          "Kokpit w poziomie: PFD, obroty silnika i dźwignie mocy",
+          "Depesze METAR z ostatnich godzin i radiolatarnie wokół Łodzi",
+          "EPLL Łódź: aktualny METAR, warunki IFR, pasy i częstotliwości"
+        ]
+      },
+      "en": {
+        "label": "Virtual pilot / Android",
+        "tagline": "An Android app for virtual pilots (MSFS, X-Plane, VATSIM, IVAO). Weather, airport data, flight plans and a cockpit on your phone.",
+        "summary": "A free Android app for MSFS and X-Plane virtual pilots: live airport weather, airport data, a 3D map with your flight plan and a mobile cockpit that controls your aircraft in Microsoft Flight Simulator 2024 over your local network.",
+        "body": "An Android app for virtual pilots flying in MSFS and X-Plane. It brings weather, airport information and a mobile cockpit together in one place, along with a number of smaller tools. It offers interactive METAR reports, TAF forecasts, SIGMET and PIREP messages, runway, frequency and ILS information, plus ATIS read aloud. A map with a 3D view shows airports, weather, your route and the flight track with its altitude profile. A flight plan can be created by hand, drawn on the map or imported from SimBrief, and once connected to MSFS it can be extended with SID, STAR and approach procedures, map waypoints and more.\n\nWith OpenTakeoff Link – a small Windows companion program – the phone connects to MSFS 2024 over the local network and becomes an extra instrument panel and controller. The mobile cockpit provides PFD and ND displays, engine parameters, thrust levers, autopilot, radios and aircraft system controls. The layout adapts to phones and tablets, and the autopilot panels mirror the look of Airbus, Boeing, Garmin and KAP140 units. You can fly the aircraft by tilting the phone, with an on-screen stick or with an external controller. A floating button keeps the controls within reach even while you browse the map or the briefing.\n\nThe app automatically keeps a flight log with the route, parameter charts and a landing rating, so you can replay any flight on the 3D map later. It also supports history backups, GPX export and handy tools such as wind, fuel and descent calculators, a unit converter and a METAR and TAF decoder. OpenTakeoff uses free, open data sources, contains no ads and needs no accounts or API keys for its core features; the optional SimBrief import requires your SimBrief username. The interface is available in Polish and English, with AMOLED, graphite and light themes.",
+        "role": "Design, development and release",
+        "features": [
+          "airport weather: METAR, TAF, SIGMET, PIREP and ATIS read aloud",
+          "airport data: runways, frequencies, ILS and navaids",
+          "3D map with flight plan, SimBrief import and flight track",
+          "mobile cockpit for MSFS 2024: PFD, ND, autopilot, radios and engines",
+          "flight log with landing rating and replay on the map",
+          "local database with backups and GPX export"
+        ],
+        "shotAlts": [
+          "Phone cockpit: PFD, autopilot and cruise data during descent",
+          "Moving map over Warsaw with the flight plan and airports",
+          "EPWA Chopin Airport: weather, runway winds and radio frequencies",
+          "Bede BD-5J cockpit: PFD, ND and a Garmin-style autopilot panel",
+          "Portrait cockpit: PFD, navigation display and heading arc",
+          "3D map: flight track with altitude profile departing EPLL",
+          "Landscape cockpit: PFD, engine gauge and thrust levers",
+          "Recent METAR reports and navaids around Łódź",
+          "EPLL Łódź: current METAR, IFR conditions, runways and frequencies"
+        ]
+      }
+    },
+    "openshot": {
+      "pl": {
+        "tagline": "Aparat, kamera i dyktafon w jednej aplikacji na Androida – z RAW/DNG, obliczeniowym trybem nocnym, fuzją HDR, ręcznym trybem Pro i studiem dźwięku.",
+        "summary": "Darmowa aplikacja aparatu dla Androida, która łączy pełną kontrolę nad zdjęciem z fotografią obliczeniową: zdjęcia RAW, własny tryb nocny i HDR, długie naświetlanie, film 4K w HDR 10-bit, poklatkowy do 8K, zwolnione tempo i dyktafon z jakością studyjną.",
+        "body": "Tryby zdjęć idą dalej niż systemowy aparat. Tryb nocny korzysta ze sprzętowego trybu producenta, a gdy go brak – z własnego potoku: seria od 4 do 12 klatek jest wyrównywana, uśredniana z odrzucaniem „duchów” i adaptacyjnie mapowana tonalnie. HDR to sprzętowy tryb albo fuzja trzech ekspozycji (−1,7 / 0 / +1,7 EV) z lokalnym mapowaniem tonów. Długi czas łączy klatki z 1–15 sekund w jedno zdjęcie – jako rozmycie ruchu albo smugi światła – z wyrównaniem do zdjęć z ręki. Do tego portret z rozmyciem tła, zdjęcie ruchome z trzema sekundami przed i po migawce oraz pełny tryb ręczny: ISO, czas do 30 sekund, ostrość z odległością, balans bieli i kompensacja ekspozycji. Zdjęcia można zapisywać jako RAW (DNG) albo RAW+JPEG, także z sensora, który telefon udostępnia jako osobny aparat fizyczny.\n\nWideo to 4K, 1080p i 720p, HDR 10-bit (HLG) i stabilizacja – dobierane automatycznie do możliwości urządzenia. Film poklatkowy w 1080p, 4K i 8K koduje się na bieżąco z przyspieszeniem od ×15 do ×1800 i wyrównywaniem jasności, a zwolnione tempo wybiera każdą wykrytą parę rozdzielczości i klatkażu, na przykład 120 i 240 kl./s. Płynne zbliżanie robi wolny, równy najazd w trakcie nagrania.\n\nDyktafon nagrywa w AAC (mowa, muzyka, studio do 320 kb/s) albo bezstratnie w WAV 48 kHz, w tle i przy zgaszonym ekranie, z mikrofonu wbudowanego lub zewnętrznego – przewodowego, USB albo Bluetooth LE. Ma wzmocnienie do +24 dB z ogranicznikiem, redukcję szumów, mierniki szczytów, znaczniki w trakcie nagrania i bibliotekę z zarysem fali, wyszukiwaniem i zmianą prędkości odtwarzania.\n\nInterfejs zbudowany jest wokół łukowego pokrętła trybów, które działa jak pierścień obiektywu z haptycznymi zapadkami. Zoom płynnie przechodzi między obiektywami 0,5× – 10×, a pomoce kadru obejmują poziomicę, histogram na żywo, siatki, obrys ostrości i zebrę. Całość to Kotlin, Jetpack Compose i CameraX; potok obliczeniowy przetwarza klatki pasami, więc zużywa pamięć rzędu jednej klatki zamiast całej serii. Każda zmiana w repozytorium buduje i publikuje nową wersję.",
+        "role": "Projekt, interfejs, przetwarzanie obrazu i dźwięku, wydania",
+        "stack": ["Kotlin", "Jetpack Compose", "Material 3", "CameraX", "Camera2", "AudioRecord"],
+        "features": [
+          "RAW (DNG) i RAW+JPEG z automatycznym wyborem sensora",
+          "własny tryb nocny i fuzja HDR z trzech ekspozycji",
+          "długie naświetlanie: rozmycie ruchu i smugi światła",
+          "ręczny tryb Pro: ISO, czas do 30 s, ostrość i balans bieli",
+          "wideo 4K HDR 10-bit, poklatkowy do 8K i zwolnione tempo",
+          "dyktafon AAC i WAV z nagrywaniem w tle i znacznikami",
+          "wymaga Androida 10 lub nowszego"
+        ],
+        "shotAlts": [
+          "Ustawienia OpenShot: wykryte aparaty, obiektywy i formaty zapisu"
+        ]
+      },
+      "en": {
+        "label": "Pro camera app / Android",
+        "tagline": "Camera, video camera and voice recorder in one Android app – with RAW/DNG, computational night mode, HDR fusion, a manual Pro mode and an audio studio.",
+        "summary": "A free Android camera app that combines full manual control with computational photography: RAW photos, its own night and HDR modes, long exposures, 4K 10-bit HDR video, time-lapse up to 8K, slow motion and a studio-quality voice recorder.",
+        "body": "The photo modes go further than the stock camera. Night mode uses the manufacturer's hardware mode when available and otherwise its own pipeline: a burst of 4 to 12 frames is aligned, averaged with ghost rejection and adaptively tone-mapped. HDR uses the hardware mode or a fusion of three exposures (−1.7 / 0 / +1.7 EV) with local tone mapping. Long exposure blends 1–15 seconds of frames into a single photo – as motion blur or light trails – with alignment for handheld shots. There is also portrait mode with background blur, motion photos capturing three seconds before and after the shutter, and a full manual mode: ISO, shutter speeds up to 30 seconds, focus with distance, white balance and exposure compensation. Photos can be saved as RAW (DNG) or RAW+JPEG, even from a sensor the phone exposes as a separate physical camera.\n\nVideo means 4K, 1080p and 720p, 10-bit HDR (HLG) and stabilisation – matched automatically to what the device supports. Time-lapse in 1080p, 4K and 8K is encoded on the fly at ×15 to ×1800 speed with brightness smoothing, and slow motion lets you pick any detected resolution and frame-rate pair, such as 120 and 240 fps. Smooth zoom produces a slow, even push-in while recording.\n\nThe voice recorder captures AAC (speech, music, studio up to 320 kbps) or lossless 48 kHz WAV, in the background and with the screen off, from the built-in microphone or an external one – wired, USB or Bluetooth LE. It offers up to +24 dB gain with a limiter, noise reduction, peak meters, markers during recording and a library with waveforms, search and variable playback speed.\n\nThe interface is built around an arc-shaped mode dial that works like a lens ring with haptic detents. Zoom glides smoothly between 0.5× and 10× lenses, and framing aids include a level, a live histogram, grids, focus peaking and zebras. It is written in Kotlin with Jetpack Compose and CameraX; the computational pipeline processes frames in strips, so it uses memory for roughly one frame instead of the whole burst. Every change to the repository builds and publishes a new release.",
+        "role": "Design, interface, image and audio processing, releases",
+        "features": [
+          "RAW (DNG) and RAW+JPEG with automatic sensor selection",
+          "custom night mode and three-exposure HDR fusion",
+          "long exposure: motion blur and light trails",
+          "manual Pro mode: ISO, shutter up to 30 s, focus and white balance",
+          "4K 10-bit HDR video, time-lapse up to 8K and slow motion",
+          "AAC and WAV voice recorder with background recording and markers",
+          "requires Android 10 or newer"
+        ],
+        "shotAlts": [
+          "OpenShot settings: detected cameras, lenses and capture formats"
+        ]
+      }
+    }
+  },
+  "pages": {
+    "infrastruktura-domowa": {
+      "title": "Home network, server and smart home",
+      "kicker": "Beyond apps",
+      "excerpt": "A home server, backups, network-wide ad blocking and a smart home – set up once, and set up properly.",
+      "lead": "Besides writing applications, I also build the physical and network foundations those applications – and the whole house – can run on. Server, network, automation and privacy, organised once and done right.",
+      "seoDescription": "Home servers, self-hosting, Home Assistant smart homes, AdGuard Home and VPN – infrastructure I design and set up alongside web development.",
+      "blocks": [
+        {
+          "type": "text",
+          "heading": "A foundation, not an add-on",
+          "body": "A router on factory settings, a smart home scattered across several manufacturer apps, a server with no backup – that's the most common state of home infrastructure. It works until something fails.\nI set it up once, deliberately: network, server, automation and privacy as one coherent system rather than a collection of random devices.",
+          "layout": "default"
+        },
+        {
+          "type": "features",
+          "heading": "What I actually handle",
+          "items": [
+            { "title": "Home servers and self-hosting", "text": "Docker, Proxmox, NAS, backups and proper virtualisation – services you host yourself, without paying for the cloud or losing control of your data." },
+            { "title": "Smart home and automation", "text": "Home Assistant as the heart of the house: integrating devices from different brands, scenes, schedules and automations that genuinely make the day easier instead of adding yet another app." },
+            { "title": "DNS, ads and privacy", "text": "AdGuard Home blocking ads and tracking across the whole network – it works for every device in the house without installing anything on your phone or laptop." },
+            { "title": "Secure remote access", "text": "VPN and sensible network segmentation, so you can reach your home services from outside without exposing ports to the world or leaving accidental security holes." }
+          ]
+        },
+        {
+          "type": "cta",
+          "heading": "Got a tangle of cables and abandoned ideas at home?",
+          "body": "Tell me what's already there and what's missing – I'll propose a concrete setup.",
+          "label": "Get in touch",
+          "href": "/#kontakt"
+        }
+      ]
+    },
+    "strony-aplikacje-cms": {
+      "title": "Websites and business software",
+      "kicker": "Main focus",
+      "excerpt": "Websites, online shops and browser-based business software – built from scratch, with a simple admin panel where you can edit the content yourself.",
+      "lead": "I design and build websites and software for businesses: from a business card site, through an online shop, to a system for handling orders and customers. I do everything myself – from the first conversation, through the design, to launch and ongoing care – so you work with one person who knows the whole project.",
+      "seoDescription": "Custom websites, online shops and business software built from scratch, with an admin panel for editing content yourself. Examples, scope of work and how we work together.",
+      "blocks": [
+        {
+          "type": "text",
+          "heading": "Built for you, not from a template",
+          "layout": "default",
+          "body": "Ready-made templates look the same for everyone and rarely fit the way a business actually works. That's why I build every website and every piece of software from scratch: first I understand what it needs to do, and only then do I design how it looks and works.\n\nThe result is a solution that looks like you, does exactly what you need and isn't weighed down by features nobody uses."
+        },
+        {
+          "type": "features",
+          "heading": "What I can build for you",
+          "items": [
+            { "title": "Company website", "text": "A business card site that clearly says what you do, presents your offer and encourages people to get in touch." },
+            { "title": "Online shop", "text": "Products, basket, online payments and shipping – with order management in one place." },
+            { "title": "Customer portal", "text": "A place where your customers log in, check their orders, download documents or book appointments." },
+            { "title": "Business management software", "text": "Quotes, orders, schedules, stock or invoicing in one browser-based tool – nothing to install." },
+            { "title": "Admin panel for your website", "text": "A simple panel where you change texts, photos, prices and blog posts yourself – no need to call a developer." },
+            { "title": "Content portal", "text": "A blog, magazine or how-to site – with search, categories and tools for the editorial team." }
+          ]
+        },
+        {
+          "type": "gallery",
+          "heading": "Examples from my projects",
+          "images": [
+            { "src": "/assets/portfolio/travel-1.png", "alt": "Travel agency admin panel: list of offers and trip editing" },
+            { "src": "/assets/portfolio/strefa-1.png", "alt": "News portal editorial panel: editing an article, photos and publishing" },
+            { "src": "/assets/portfolio/kompendium-1.png", "alt": "Travel guide service: climate, weather and city information" },
+            { "src": "/assets/portfolio/arcadia-01-katalog.webp", "alt": "Arcadia: catalogue of games and tools running in the browser" }
+          ]
+        },
+        {
+          "type": "features",
+          "heading": "What every project includes",
+          "items": [
+            { "title": "Your own design", "text": "A design tailored to your business and your customers, not yet another popular theme." },
+            { "title": "Works on phones", "text": "Websites and software work comfortably on desktop, tablet and phone." },
+            { "title": "Visibility on Google", "text": "Proper site structure, descriptions and speed that make you easier to find." },
+            { "title": "Speed and security", "text": "Encrypted connections, backups and updates, so nothing gets lost." },
+            { "title": "Training", "text": "After launch I show you how to use the admin panel and leave a short guide." },
+            { "title": "Care after launch", "text": "I can keep looking after the site, answer questions and add new features." }
+          ]
+        },
+        {
+          "type": "text",
+          "heading": "How we work together",
+          "layout": "default",
+          "body": "We start with a conversation: you tell me what you need, I ask about the details and propose a solution with a timeline and a price.\n\nThen I prepare the design of how it will look and work. Once you approve it, I build the finished version and show you progress along the way, so you can give feedback before everything is done.\n\nFinally I launch the website or software, move your content over, show you how to use it and stay available whenever questions or new ideas come up."
+        },
+        {
+          "type": "quote",
+          "body": "First I understand how you work. Only then do I design.",
+          "author": "The principle I follow"
+        },
+        {
+          "type": "cta",
+          "heading": "See what I've already built",
+          "body": "The portfolio has live websites and apps – you can open or download every one of them.",
+          "label": "Go to the portfolio",
+          "href": "/portfolio"
+        }
+      ]
+    }
+  }
+}

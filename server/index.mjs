@@ -10,6 +10,8 @@ import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSl
 import { PLATFORMS, downloadsFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { createAnalytics } from './analytics.mjs'
+import { langOf, localizePage, localizeProject } from './i18n.mjs'
+import { renderDocument, renderSitemap } from './seo.mjs'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -18,6 +20,8 @@ const SETTINGS_FILE = path.join(DATA_DIR, 'mail-settings.json')
 const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json')
 const OUTBOX_FILE = path.join(DATA_DIR, 'outbox.json')
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
+const CONTENT_EN_FILE = path.join(DATA_DIR, 'content.en.json')
+const SITE_TEMPLATE_URL = process.env.SITE_TEMPLATE_URL || 'http://homepage/index.html'
 const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
 const RELEASES_FILE = path.join(DATA_DIR, 'releases.json')
@@ -42,6 +46,15 @@ const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60
 const defaultContent = JSON.parse(
   await fs.readFile(new URL('./content.default.json', import.meta.url), 'utf8'),
 )
+const defaultContentEn = JSON.parse(
+  await fs.readFile(new URL('./content.default.en.json', import.meta.url), 'utf8'),
+)
+
+/** Teksty strony per język: osobny plik zapisu i osobne wartości domyślne. */
+const CONTENT_SOURCES = {
+  pl: { file: CONTENT_FILE, defaults: defaultContent },
+  en: { file: CONTENT_EN_FILE, defaults: defaultContentEn },
+}
 
 const IMAGE_TYPES = {
   'image/png': 'png',
@@ -237,7 +250,7 @@ function enforceSameOrigin(req, res, next) {
 /* ── content (homepage sections) ─────────────────────────────────────── */
 
 /** Stored content may be partial – defaults fill every gap so the site never breaks. */
-function mergeContent(stored) {
+function mergeContent(stored, defaults = defaultContent) {
   const merge = (base, override) => {
     if (Array.isArray(base)) return Array.isArray(override) ? override : base
     if (base && typeof base === 'object') {
@@ -248,11 +261,11 @@ function mergeContent(stored) {
     }
     return override === undefined || override === null ? base : override
   }
-  return merge(defaultContent, stored)
+  return merge(defaults, stored)
 }
 
 /** Strings only, arrays of plain objects – never trusts shapes coming from the client. */
-function sanitizeContent(input) {
+function sanitizeContent(input, defaults = defaultContent) {
   const walk = (base, value) => {
     if (Array.isArray(base)) {
       if (!Array.isArray(value)) return base
@@ -273,13 +286,14 @@ function sanitizeContent(input) {
     if (typeof value === 'string' || typeof value === 'number') return cleanText(value, 4000)
     return typeof base === 'string' ? base : ''
   }
-  const merged = walk(defaultContent, input)
-  merged.about.image = cleanMedia(input?.about?.image) || defaultContent.about.image || ''
+  const merged = walk(defaults, input)
+  merged.about.image = cleanMedia(input?.about?.image) || defaults.about.image || ''
   return merged
 }
 
-async function getContent() {
-  return mergeContent(await readJson(CONTENT_FILE, {}))
+async function getContent(lang = 'pl') {
+  const source = CONTENT_SOURCES[langOf(lang)]
+  return mergeContent(await readJson(source.file, {}), source.defaults)
 }
 
 /* ── realizacje (portfolio) ──────────────────────────────────────────── */
@@ -381,6 +395,18 @@ function sanitizeBlock(input) {
   }
 }
 
+function sanitizePageTranslation(input) {
+  const source = input && typeof input === 'object' ? input : {}
+  return {
+    title: cleanText(source.title, 180),
+    kicker: cleanText(source.kicker, 80),
+    excerpt: cleanText(source.excerpt, 600),
+    lead: cleanText(source.lead, 1200),
+    seoDescription: cleanText(source.seoDescription, 320),
+    blocks: (Array.isArray(source.blocks) ? source.blocks : []).slice(0, 60).map(sanitizeBlock),
+  }
+}
+
 function sanitizePage(input, existing = {}) {
   const title = cleanText(input?.title, 180) || existing.title || 'Nowa strona'
   return {
@@ -397,9 +423,15 @@ function sanitizePage(input, existing = {}) {
     featured: input?.featured === true,
     order: Number.isFinite(Number(input?.order)) ? Number(input.order) : 0,
     blocks: (Array.isArray(input?.blocks) ? input.blocks : []).slice(0, 60).map(sanitizeBlock),
+    en: sanitizePageTranslation(input?.en),
     createdAt: existing.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
+}
+
+function publicPage(page, lang) {
+  const { en: _translation, ...localized } = localizePage(page, lang)
+  return localized
 }
 
 function publicPageSummary(page) {
@@ -462,8 +494,8 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;')
 }
 
-function emailFrame(content) {
-  return `<!doctype html><html lang="pl"><head><meta charset="utf-8"></head>
+function emailFrame(content, lang = 'pl') {
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"></head>
   <body style="margin:0;background:#0a0a0c;color:#f5f1e8;font-family:Arial,sans-serif">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0a0a0c;padding:32px 12px">
       <tr><td align="center">
@@ -474,7 +506,7 @@ function emailFrame(content) {
           </td></tr>
           <tr><td style="padding:42px 28px">${content}</td></tr>
           <tr><td style="padding:18px 28px;border-top:1px solid #2c2a26;font-size:11px;color:#807a70">
-            redzikowski.com · Strony internetowe, systemy webowe, AI i dane
+            redzikowski.com · ${lang === 'en' ? 'Websites, web systems, AI and data' : 'Strony internetowe, systemy webowe, AI i dane'}
           </td></tr>
         </table>
       </td></tr>
@@ -604,9 +636,10 @@ app.post('/api/auth/logout', enforceSameOrigin, (_req, res) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
 
-app.get('/api/content', async (_req, res) => {
+app.get('/api/content', async (req, res) => {
+  const lang = langOf(req.query.lang)
   const [content, pages, projects, counts] = await Promise.all([
-    getContent(),
+    getContent(lang),
     readJson(PAGES_FILE, []),
     publishedProjects(),
     analytics.counts(),
@@ -614,8 +647,9 @@ app.get('/api/content', async (_req, res) => {
   res.set('Cache-Control', 'no-cache')
   res.json({
     content,
-    pages: pages.filter(page => page.published !== false).sort(byOrder).map(publicPageSummary),
-    projects: projects.map(({ project, release }) => projectSummary(project, release, counts)),
+    pages: pages.filter(page => page.published !== false).sort(byOrder)
+      .map(page => publicPageSummary(localizePage(page, lang))),
+    projects: projects.map(({ project, release }) => projectSummary(localizeProject(project, lang), release, counts)),
   })
 })
 
@@ -623,7 +657,7 @@ app.get('/api/pages/:slug', async (req, res) => {
   const pages = await readJson(PAGES_FILE, [])
   const page = pages.find(item => item.slug === req.params.slug && item.published !== false)
   if (!page) return res.status(404).json({ error: 'Nie znaleziono strony.' })
-  res.json(page)
+  res.json(publicPage(page, langOf(req.query.lang)))
 })
 
 app.get('/api/projects/:slug', async (req, res) => {
@@ -639,7 +673,8 @@ app.get('/api/projects/:slug', async (req, res) => {
       : null
   }
   res.set('Cache-Control', 'no-cache')
-  res.json({ project: publicProject(project, release, counts), previous: neighbour(-1), next: neighbour(1) })
+  const lang = langOf(req.query.lang)
+  res.json({ project: publicProject(localizeProject(project, lang), release, counts), previous: neighbour(-1), next: neighbour(1) })
 })
 
 /** Proxy pobierania dla prywatnych wydań – token nie opuszcza serwera. */
@@ -684,12 +719,44 @@ app.post('/api/track', express.text({ type: '*/*', limit: '4kb' }), async (req, 
   res.status(204).end()
 })
 
+/** Komunikaty formularza w języku, z którego wysłano zapytanie. */
+const CONTACT_TEXT = {
+  pl: {
+    tooMany: 'Za dużo prób. Spróbuj ponownie za kilka minut.',
+    name: 'Podaj imię.',
+    email: 'Podaj poprawny adres e-mail.',
+    phone: 'Podaj numer telefonu.',
+    message: 'Napisz kilka zdań o projekcie.',
+    consent: 'Zaakceptuj zgodę na kontakt.',
+    subject: 'Dziękuję za wiadomość – Adam Rędzikowski',
+    text: name => `Cześć ${name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
+    kicker: 'Wiadomość dotarła',
+    thanks: name => `Dziękuję, ${name}.`,
+    body: phone => `Otrzymałem Twoje zapytanie i zapoznam się z nim osobiście. Odpowiem ${phone ? 'telefonicznie' : 'mailowo'} możliwie szybko.`,
+  },
+  en: {
+    tooMany: 'Too many attempts. Please try again in a few minutes.',
+    name: 'Please enter your name.',
+    email: 'Please enter a valid email address.',
+    phone: 'Please enter your phone number.',
+    message: 'Please write a few sentences about the project.',
+    consent: 'Please agree to be contacted.',
+    subject: 'Thank you for your message – Adam Rędzikowski',
+    text: name => `Hi ${name},\n\nThank you for your message. I have received your enquiry and will get back to you as soon as possible.\n\nAdam Rędzikowski\nredzikowski.com`,
+    kicker: 'Message received',
+    thanks: name => `Thank you, ${name}.`,
+    body: phone => `I have received your enquiry and will read it personally. I will get back to you by ${phone ? 'phone' : 'email'} as soon as possible.`,
+  },
+}
+
 app.post('/api/contact', async (req, res) => {
+  const lang = langOf(req.body?.lang)
+  const copy = CONTACT_TEXT[lang]
   const ip = req.ip || 'unknown'
   const now = Date.now()
   const recent = (rateLimits.get(ip) || []).filter(timestamp => now - timestamp < 15 * 60 * 1000)
   if (recent.length >= 5) {
-    return res.status(429).json({ error: 'Za dużo prób. Spróbuj ponownie za kilka minut.' })
+    return res.status(429).json({ error: copy.tooMany })
   }
   recent.push(now)
   rateLimits.set(ip, recent)
@@ -713,15 +780,16 @@ app.post('/api/contact', async (req, res) => {
     scope: (Array.isArray(req.body.scope) ? req.body.scope : []).slice(0, 12).map(item => cleanText(item, 60)).filter(Boolean),
     source: cleanText(req.body.source, 60),
     consent: req.body.consent === true,
+    lang,
     status: 'new',
   }
 
   const errors = []
-  if (submission.name.length < 2) errors.push('Podaj imię.')
-  if (!isEmail(submission.email)) errors.push('Podaj poprawny adres e-mail.')
-  if (submission.contactMethod === 'phone' && submission.phone.length < 6) errors.push('Podaj numer telefonu.')
-  if (submission.message.length < 12) errors.push('Napisz kilka zdań o projekcie.')
-  if (!submission.consent) errors.push('Zaakceptuj zgodę na kontakt.')
+  if (submission.name.length < 2) errors.push(copy.name)
+  if (!isEmail(submission.email)) errors.push(copy.email)
+  if (submission.contactMethod === 'phone' && submission.phone.length < 6) errors.push(copy.phone)
+  if (submission.message.length < 12) errors.push(copy.message)
+  if (!submission.consent) errors.push(copy.consent)
   if (errors.length) return res.status(400).json({ error: errors[0], fields: errors })
 
   await updateJson(SUBMISSIONS_FILE, [], current => [submission, ...current].slice(0, 2000))
@@ -744,7 +812,7 @@ app.post('/api/contact', async (req, res) => {
         from: { name: settings.fromName, address: settings.smtpUsername },
         to: settings.ownerEmail,
         replyTo: submission.email,
-        subject: `Nowe zapytanie: ${submission.subject || submission.name}`,
+        subject: `Nowe zapytanie${lang === 'en' ? ' (EN)' : ''}: ${submission.subject || submission.name}`,
         text: `${submission.name}\n${submission.company}\n${replyLabel}\n${details.join('\n')}\n\n${submission.message}`,
         html: emailFrame(`
           <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowe zapytanie ze strony</div>
@@ -759,14 +827,14 @@ app.post('/api/contact', async (req, res) => {
         from: { name: settings.fromName, address: settings.smtpUsername },
         to: submission.email,
         replyTo: settings.ownerEmail,
-        subject: 'Dziękuję za wiadomość – Adam Rędzikowski',
-        text: `Cześć ${submission.name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
+        subject: copy.subject,
+        text: copy.text(submission.name),
         html: emailFrame(`
-          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Wiadomość dotarła</div>
-          <h1 style="font-size:34px;line-height:1.1;margin:15px 0 22px;color:#f7f2e8">Dziękuję, ${escapeHtml(submission.name)}.</h1>
-          <p style="font-size:16px;line-height:1.7;margin:0;color:#cfc8bb">Otrzymałem Twoje zapytanie i zapoznam się z nim osobiście. Odpowiem ${submission.contactMethod === 'phone' ? 'telefonicznie' : 'mailowo'} możliwie szybko.</p>
+          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">${copy.kicker}</div>
+          <h1 style="font-size:34px;line-height:1.1;margin:15px 0 22px;color:#f7f2e8">${escapeHtml(copy.thanks(submission.name))}</h1>
+          <p style="font-size:16px;line-height:1.7;margin:0;color:#cfc8bb">${copy.body(submission.contactMethod === 'phone')}</p>
           <p style="margin:32px 0 0;line-height:1.6;color:#e7e1d6">Adam Rędzikowski<br><span style="color:#8d8579">Digital Studio</span></p>
-        `),
+        `, lang),
       }, 'confirmation', submission.id)
       mailStatus = ownerMail.status === 'sent' && confirmationMail.status === 'sent' ? 'sent' : 'partial'
     }
@@ -776,6 +844,88 @@ app.post('/api/contact', async (req, res) => {
   }
 
   res.status(201).json({ ok: true, id: submission.id, mailStatus })
+})
+
+/* ── SEO: sitemap i strony renderowane z meta ────────────────────────── */
+
+/**
+ * Szablon to zbudowany index.html z kontenera nginx – zawsze ten sam, który
+ * dostaje przeglądarka, więc nazwy plików z hashami nie mogą się rozjechać.
+ * Trzymamy go minutę, żeby nowy deploy był widoczny bez restartu API.
+ */
+let siteTemplate = { html: '', at: 0 }
+async function readTemplate() {
+  if (siteTemplate.html && Date.now() - siteTemplate.at < 60 * 1000) return siteTemplate.html
+  const response = await fetch(SITE_TEMPLATE_URL, { signal: AbortSignal.timeout(3000) })
+  if (!response.ok) throw new Error(`template ${response.status}`)
+  const html = await response.text()
+  if (!html.includes('<div id="root"></div>')) throw new Error('template without root')
+  siteTemplate = { html, at: Date.now() }
+  return html
+}
+
+async function publishedPages() {
+  return (await readJson(PAGES_FILE, [])).filter(page => page.published !== false).sort(byOrder)
+}
+
+/** Dane dla jednego widoku – te same, które przeglądarka dostaje z API. */
+async function seoData(route) {
+  const { lang } = route
+  const [pages, entries, counts] = await Promise.all([publishedPages(), publishedProjects(), analytics.counts()])
+  const data = {
+    pages: pages.map(page => localizePage(page, lang)),
+    projects: entries.map(({ project, release }) => projectSummary(localizeProject(project, lang), release, counts)),
+  }
+  if (route.view === 'home' || route.view === 'catalog') data.content = await getContent(lang)
+  if (route.view === 'project') {
+    const entry = entries.find(item => item.project.slug === route.slug)
+    if (entry) data.project = publicProject(localizeProject(entry.project, lang), entry.release, counts)
+  }
+  if (route.view === 'page') {
+    const page = pages.find(item => item.slug === route.slug)
+    if (page) data.page = publicPage(page, lang)
+  }
+  return data
+}
+
+app.get('/sitemap.xml', async (_req, res, next) => {
+  try {
+    const [pages, entries] = await Promise.all([publishedPages(), publishedProjects()])
+    const stamps = [...pages, ...entries.map(entry => entry.project)].map(item => item.updatedAt).filter(Boolean).sort()
+    res.set('Content-Type', 'application/xml; charset=utf-8')
+    res.set('Cache-Control', 'public, max-age=3600')
+    res.send(renderSitemap({
+      pages,
+      projects: entries.map(entry => entry.project),
+      updatedAt: stamps.at(-1) || new Date().toISOString(),
+    }))
+  } catch (error) {
+    next(error)
+  }
+})
+
+/**
+ * Publiczne adresy strony (nginx kieruje je tutaj). Gdy szablonu brak –
+ * lokalnie albo przy błędzie obrazu – 503 każe nginxowi podać zwykły index.html.
+ */
+app.get(/^\/(?:en(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, async (req, res) => {
+  let template
+  try {
+    template = await readTemplate()
+  } catch {
+    return res.status(503).send('template unavailable')
+  }
+  try {
+    const { html, status } = await renderDocument(template, req.path, seoData)
+    res.status(status)
+    res.set('Content-Type', 'text/html; charset=utf-8')
+    res.set('Cache-Control', 'no-cache')
+    res.set('Content-Language', req.path === '/en' || req.path.startsWith('/en/') ? 'en' : 'pl')
+    res.send(html)
+  } catch (error) {
+    console.error('SEO render failed:', error)
+    res.status(200).set('Content-Type', 'text/html; charset=utf-8').send(template)
+  }
 })
 
 /* ── protected admin API ─────────────────────────────────────────────── */
@@ -827,19 +977,21 @@ app.delete('/api/admin/submissions/:id', enforceSameOrigin, async (req, res) => 
 
 /* ── admin: content ──────────────────────────────────────────────────── */
 
-app.get('/api/admin/content', async (_req, res) => {
-  res.json(await getContent())
+app.get('/api/admin/content', async (req, res) => {
+  res.json(await getContent(req.query.lang))
 })
 
 app.put('/api/admin/content', enforceSameOrigin, async (req, res) => {
-  const sanitized = sanitizeContent(req.body)
-  await updateJson(CONTENT_FILE, {}, () => sanitized)
+  const source = CONTENT_SOURCES[langOf(req.query.lang)]
+  const sanitized = sanitizeContent(req.body, source.defaults)
+  await updateJson(source.file, {}, () => sanitized)
   res.json(sanitized)
 })
 
-app.post('/api/admin/content/reset', enforceSameOrigin, async (_req, res) => {
-  await updateJson(CONTENT_FILE, {}, () => ({}))
-  res.json(await getContent())
+app.post('/api/admin/content/reset', enforceSameOrigin, async (req, res) => {
+  const lang = langOf(req.query.lang)
+  await updateJson(CONTENT_SOURCES[lang].file, {}, () => ({}))
+  res.json(await getContent(lang))
 })
 
 /* ── admin: pages ────────────────────────────────────────────────────── */

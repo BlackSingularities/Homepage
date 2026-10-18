@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { ChevronDown, Menu, X } from 'lucide-react'
 import { CATALOG_PATH } from '../lib/projects'
+import { LANGS, LANG_NAME, localePath, useT } from '../lib/i18n'
 import { useActiveSection } from '../lib/ui'
 
 const SECTIONS = [
-  ['zakres', 'Oferta'],
-  ['proces', 'Proces'],
-  ['portfolio', 'Portfolio'],
-  ['o-mnie', 'O mnie'],
+  ['zakres', 'nav.offer'],
+  ['proces', 'nav.process'],
+  ['portfolio', 'nav.portfolio'],
+  ['o-mnie', 'nav.about'],
 ]
 
 // Portfolio to osobna podstrona, nie sekcja – ma własny adres i podświetla
@@ -17,11 +18,44 @@ const PORTFOLIO = 'portfolio'
 const SECTION_IDS = SECTIONS.map(([id]) => id).filter(id => id !== PORTFOLIO)
 
 /**
+ * Przełącznik języka: prowadzi do odpowiednika bieżącej podstrony, więc nikt
+ * nie ląduje z powrotem na stronie głównej. Kotwica sekcji jedzie razem z nim.
+ */
+export function LangSwitch({ path, onNavigate, className = '' }) {
+  const { lang, t } = useT()
+  return (
+    <nav className={`lang-switch ${className}`} aria-label={t('nav.language')}>
+      {LANGS.map(code => {
+        const href = localePath(path, code)
+        return (
+          <a
+            key={code}
+            href={href}
+            hrefLang={code}
+            lang={code}
+            title={LANG_NAME[code]}
+            aria-current={code === lang ? 'true' : undefined}
+            className={code === lang ? 'is-active' : ''}
+            onClick={event => {
+              event.preventDefault()
+              if (code !== lang) onNavigate(`${href}${window.location.hash || ''}`)
+            }}
+          >
+            {code.toUpperCase()}
+          </a>
+        )
+      })}
+    </nav>
+  )
+}
+
+/**
  * Pasek jest cienki i nieprzezroczysty dopiero po zjechaniu z pierwszego
  * ekranu. Kontakt to zwykły link w obwódce – złoto zostaje dla jednego
  * przycisku na ekranie, a nie dla nawigacji.
  */
-export default function Header({ brand, pages = [], home = true, onNavigate }) {
+export default function Header({ brand, pages = [], home = true, path = '/', onNavigate }) {
+  const { t, lp } = useT()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [pagesOpen, setPagesOpen] = useState(false)
@@ -39,8 +73,8 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
     return () => document.body.classList.remove('no-scroll')
   }, [open])
 
-  const href = id => (id === PORTFOLIO ? CATALOG_PATH : home ? `#${id}` : `/#${id}`)
-  const isActive = id => (id === PORTFOLIO ? !home : home && active === id)
+  const href = id => (id === PORTFOLIO ? lp(CATALOG_PATH) : home ? `#${id}` : lp(`/#${id}`))
+  const isActive = id => (id === PORTFOLIO ? path.startsWith(CATALOG_PATH) : home && active === id)
 
   // Adresy wewnętrzne przechwytujemy, zakotwiczenia zostawiamy przeglądarce.
   const go = event => {
@@ -56,16 +90,16 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
   return (
     <>
       <header className={`masthead ${scrolled || !home ? 'is-solid' : ''}`}>
-        <a className="wordmark" href="/" onClick={go}>
+        <a className="wordmark" href={lp('/')} onClick={go}>
           <img src="/assets/brand/logo-ar-web.png" alt="" />
           <span>{brand.name}</span>
         </a>
 
-        <nav className="masthead-nav" aria-label="Główna">
-          {SECTIONS.map(([id, label]) => {
+        <nav className="masthead-nav" aria-label={t('nav.main')}>
+          {SECTIONS.map(([id, key]) => {
             const link = (
               <a key={id} className={isActive(id) ? 'is-active' : ''} href={href(id)} onClick={go}>
-                {label}
+                {t(key)}
                 {id === 'zakres' && pages.length > 0 && <ChevronDown size={13} aria-hidden="true" />}
               </a>
             )
@@ -85,7 +119,7 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
                 {pagesOpen && (
                   <div className="nav-dropdown">
                     {pages.map(page => (
-                      <a key={page.id} href={`/p/${page.slug}`} onClick={go}>
+                      <a key={page.id} href={lp(`/p/${page.slug}`)} onClick={go}>
                         <b>{page.title}</b>
                         {page.excerpt && <span>{page.excerpt}</span>}
                       </a>
@@ -95,22 +129,24 @@ export default function Header({ brand, pages = [], home = true, onNavigate }) {
               </div>
             )
           })}
-          <a className="masthead-cta" href={href('kontakt')} onClick={go}>Kontakt</a>
+          <a className="masthead-cta" href={href('kontakt')} onClick={go}>{t('nav.contact')}</a>
         </nav>
 
-        <button className="nav-toggle" onClick={() => setOpen(value => !value)} aria-label="Menu" aria-expanded={open}>
+        <LangSwitch path={path} onNavigate={target => { setOpen(false); onNavigate(target) }} />
+
+        <button className="nav-toggle" onClick={() => setOpen(value => !value)} aria-label={t('nav.menu')} aria-expanded={open}>
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
       </header>
 
       {open && (
         <div className="mobile-sheet">
-          <nav aria-label="Główna">
-            {SECTIONS.map(([id, label]) => <a key={id} href={href(id)} onClick={go}>{label}</a>)}
+          <nav aria-label={t('nav.main')}>
+            {SECTIONS.map(([id, key]) => <a key={id} href={href(id)} onClick={go}>{t(key)}</a>)}
             {pages.map(page => (
-              <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>
+              <a key={page.id} href={lp(`/p/${page.slug}`)} onClick={go}>{page.title}</a>
             ))}
-            <a href={href('kontakt')} onClick={go}>Kontakt</a>
+            <a href={href('kontakt')} onClick={go}>{t('nav.contact')}</a>
           </nav>
         </div>
       )}

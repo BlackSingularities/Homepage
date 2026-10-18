@@ -1,0 +1,175 @@
+{
+  "brand": {
+    "initials": "AR",
+    "name": "Adam Rędzikowski",
+    "role": "Custom websites and applications",
+    "tagline": "Analysis, design, code and deployment – all from one person.",
+    "location": "Łódź, Poland · working remotely worldwide",
+    "email": "",
+    "phone": ""
+  },
+  "hero": {
+    "titleTop": "One person,",
+    "titleAccent": "from analysis to launch.",
+    "lead": "I design and build custom websites and applications. I start with the problem and the way you work, then take care of the interface, the code, the launch and everything that comes after. Below are some of my projects – each one can be opened in the browser or downloaded.",
+    "primaryCta": "Tell me what you need",
+    "secondaryCta": "See the portfolio"
+  },
+  "projects": {
+    "title": "Selected work",
+    "accent": "from recent years.",
+    "lead": "Every project has its own architecture, interface and back end. None of them was built on an off-the-shelf theme.",
+    "catalogCta": "Full portfolio",
+    "empty": "The portfolio is still empty."
+  },
+  "catalog": {
+    "title": "Everything I have built",
+    "accent": "and still maintain.",
+    "lead": "Web services you can open in the browser and applications you can download. App files come straight from the latest releases – not from a hand-maintained list.",
+    "filterAll": "Everything",
+    "filterWeb": "Websites and services",
+    "filterApp": "Applications"
+  },
+  "scope": {
+    "title": "How I can",
+    "accent": "help",
+    "lead": "I don't sell ready-made packages. First we work out what you actually need, then I pick the right solution – sometimes that's a single website, sometimes software that makes everyday work in your company easier.",
+    "items": [
+      {
+        "id": "sc-web",
+        "title": "Websites",
+        "lead": "A website that looks like you and does what you expect it to.",
+        "detail": "Company websites, portfolios, online shops and blogs. I take care of everything: layout, graphics, copy, making the site easy to find on Google, and putting it live. I don't use ready-made templates, so nothing limits the design."
+      },
+      {
+        "id": "sc-apps",
+        "title": "Business software and content management",
+        "lead": "A tool shaped around the way you work – not the other way round.",
+        "detail": "Browser-based systems for your business: orders and customers, documents, reports, staff accounts. For websites I also build a simple admin panel where you can change texts and photos yourself – no developer needed."
+      },
+      {
+        "id": "sc-desktop",
+        "title": "Desktop and mobile apps",
+        "lead": "Software installed right on the device.",
+        "detail": "I build applications for Windows, Android and macOS – with an installer and automatic updates. Several of them can be downloaded for free from my portfolio."
+      },
+      {
+        "id": "sc-data",
+        "title": "Dashboards and reports",
+        "lead": "Numbers that show at a glance what's going on in your business.",
+        "detail": "I pull data together from different places – spreadsheets, your online shop, accounting software – and turn it into clear charts and reports that update themselves. No more copying tables by hand."
+      },
+      {
+        "id": "sc-ai",
+        "title": "Automation and AI",
+        "lead": "Less repetitive manual work.",
+        "detail": "I set up software to handle the boring tasks on its own: sorting documents, answering common questions, drafting texts or moving data between systems. I only suggest AI where it genuinely saves time."
+      },
+      {
+        "id": "sc-infra",
+        "title": "Networks, servers and smart homes",
+        "lead": "Home and office tech that simply works.",
+        "detail": "I set up home servers and network storage, automatic backups, network-wide ad blocking, lighting and heating control, and secure access to your files from outside the house."
+      }
+    ]
+  },
+  "process": {
+    "title": "From the first conversation to",
+    "accent": "ongoing care",
+    "lead": "I run the whole process personally, so business, design and technical decisions never drift apart between departments.",
+    "items": [
+      {
+        "no": "01",
+        "title": "Conversation",
+        "text": "You tell me what you need and how you work today. Together we decide what is really worth building."
+      },
+      {
+        "no": "02",
+        "title": "Plan",
+        "text": "I prepare the design: what the solution should include, how it will work and look. Before I start building, you know exactly what you'll get."
+      },
+      {
+        "no": "03",
+        "title": "Build",
+        "text": "I create a working version and show it to you as it grows, so you can test it on real examples."
+      },
+      {
+        "no": "04",
+        "title": "Launch",
+        "text": "I put the finished solution online or install it on your side, secure it and show you how to use it."
+      },
+      {
+        "no": "05",
+        "title": "Care",
+        "text": "I make sure everything keeps running, help when questions come up and add new features as your needs grow."
+      }
+    ]
+  },
+  "about": {
+    "title": "I don't start with a template. I start with",
+    "accent": "the way you work",
+    "lead": "I'm a data analyst, designer and developer. I combine skills that larger projects usually spread across several people.",
+    "text": "I lead each project myself – from the first conversation, through planning, design and programming, all the way to launch. I build websites, business software, admin panels for editing websites yourself, and desktop and mobile apps – always from scratch and tailored to specific needs.\n\nMany of these things started from my own needs: I wanted to organise my travels, understand road traffic data or identify the stars in a photo of the night sky. That's why I know what software you use every day should feel like.\n\nPhotography is my other way of telling stories about places and people. After launch I can keep looking after your project, help you run it and keep developing it.",
+    "strengths": [
+      "Websites",
+      "Visual design and usability",
+      "Browser-based business software",
+      "Apps for Windows, Android and macOS",
+      "Admin panels for editing your own site",
+      "Data dashboards and reports",
+      "Home networks, servers and smart homes"
+    ]
+  },
+  "pagesSection": {
+    "title": "More about",
+    "accent": "what I can do",
+    "lead": "The two areas I work in most often. Each page shows examples, the scope of work and what working together looks like."
+  },
+  "faq": {
+    "title": "Before",
+    "accent": "we start.",
+    "items": [
+      {
+        "q": "Do I need to know exactly what I want?",
+        "a": "No. It's enough to describe the problem or the idea. I'll help you sort out your needs and turn them into a concrete plan."
+      },
+      {
+        "q": "How long does it take?",
+        "a": "A simple website or blog usually takes a few weeks. Larger software is built in stages. After our first conversation I'll give you a realistic timeline."
+      },
+      {
+        "q": "How much does it cost?",
+        "a": "The price depends on what needs to be built. Before we start you get a description of the work, the timeline and the cost. If it makes sense to begin with a smaller version and expand it later, I'll tell you straight away."
+      },
+      {
+        "q": "Will I be able to edit the content myself?",
+        "a": "Yes. If you need it, you'll get a simple admin panel where you can change texts, photos or prices without any programming knowledge."
+      },
+      {
+        "q": "Will it connect to the tools I already use?",
+        "a": "Usually yes – for example payments, email, invoicing software or your customer database. Before I promise anything, I check that the integration will work reliably."
+      },
+      {
+        "q": "Can you improve a website or app I already have?",
+        "a": "Yes. First I check what state it's in and tell you honestly whether it's better to keep developing it or to rebuild it."
+      },
+      {
+        "q": "Will I own the website?",
+        "a": "Yes. Before we start we agree exactly what I hand over – code, passwords and access – so you're never dependent on me."
+      },
+      {
+        "q": "What happens after launch?",
+        "a": "I can keep looking after the website or software, answer your questions and add new things. We agree the scope of support individually."
+      },
+      {
+        "q": "Do you work with clients outside Poland?",
+        "a": "Yes. I work remotely and communicate in English. Calls, demos and project updates all happen online, so the distance doesn't matter."
+      }
+    ]
+  },
+  "contact": {
+    "title": "Tell me what you need.",
+    "accent": "I'll reply with specifics.",
+    "lead": "You can come with a finished idea or just a problem. We'll talk about the goal, the users and the way you work, and I'll suggest a direction – without squeezing your project into a ready-made package."
+  }
+}

@@ -8,7 +8,7 @@ import {
   PLATFORM_LABEL, PLATFORM_ORDER, formatBytes, formatReleaseDate,
 } from '../lib/projects'
 import {
-  Area, Dropzone, Empty, Field, ImagePicker, Notice, Repeater, SaveBar, Select, Text, Toggle, useMedia,
+  Area, Dropzone, Empty, Field, ImagePicker, LangTabs, Notice, Repeater, SaveBar, Select, Text, Toggle, useMedia,
 } from './parts'
 
 /**
@@ -52,7 +52,12 @@ function emptyProject() {
     downloads: [],
     published: false,
     featured: false,
+    en: emptyTranslation(),
   }
+}
+
+function emptyTranslation() {
+  return { label: '', tagline: '', summary: '', body: '', role: '', features: [], shotAlts: [] }
 }
 
 /** Edytor listy prostych łańcuchów – jedna linia to jedna pozycja. */
@@ -224,6 +229,13 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
   const [checking, setChecking] = useState(false)
   const [releaseError, setReleaseError] = useState('')
   const update = patch => onChange({ ...project, ...patch })
+  const [lang, setLang] = useState('pl')
+  const en = { ...emptyTranslation(), ...(project.en || {}) }
+  // Pola tekstowe edytują wersję wybraną w zakładce języka; w angielskiej
+  // podpowiedzią jest polski oryginał, a puste pole spada na niego na stronie.
+  const value = key => (lang === 'en' ? en[key] : project[key])
+  const set = (key, next) => (lang === 'en' ? update({ en: { ...en, [key]: next } }) : update({ [key]: next }))
+  const original = key => (lang === 'en' ? project[key] : undefined)
 
   useEffect(() => { setRelease(project.release || null) }, [project.id, project.release])
 
@@ -259,23 +271,32 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
         />
       </div>
 
+      <LangTabs
+        value={lang}
+        onChange={setLang}
+        hint={lang === 'en'
+          ? 'Wersja angielska (/en/portfolio/…). Puste pole = na stronie pokaże się polski tekst.'
+          : 'Wersja polska – podstawowa.'}
+      />
+
       <div className="ap-grid-2">
-        <Text label="Etykieta" value={project.label} onChange={label => update({ label })} placeholder="OSINT / analiza danych" />
+        <Text label="Etykieta" value={value('label')} onChange={next => set('label', next)} placeholder={original('label') || 'OSINT / analiza danych'} />
         <Text label="Rok" value={project.year} onChange={year => update({ year })} />
       </div>
 
-      <Text label="Zdanie na liście" value={project.tagline} onChange={tagline => update({ tagline })} wide
-        hint="Jedno zdanie, które widać na liście." />
-      <Area label="Wprowadzenie" value={project.summary} onChange={summary => update({ summary })} rows={2}
-        hint="Pierwszy, wyróżniony akapit na stronie pracy." />
-      <Area label="Opis" value={project.body} onChange={body => update({ body })} rows={7}
-        hint="Akapity rozdzielaj pustą linią." />
-      <Text label="Mój udział" value={project.role} onChange={role => update({ role })} wide
-        placeholder="Analiza, projekt, wykonanie, wdrożenie i utrzymanie" />
+      <Text label="Zdanie na liście" value={value('tagline')} onChange={next => set('tagline', next)} wide
+        placeholder={original('tagline')} hint="Jedno zdanie, które widać na liście." />
+      <Area label="Wprowadzenie" value={value('summary')} onChange={next => set('summary', next)} rows={2}
+        placeholder={original('summary')} hint="Pierwszy, wyróżniony akapit na stronie pracy." />
+      <Area label="Opis" value={value('body')} onChange={next => set('body', next)} rows={7}
+        placeholder={original('body')} hint="Akapity rozdzielaj pustą linią." />
+      <Text label="Mój udział" value={value('role')} onChange={next => set('role', next)} wide
+        placeholder={original('role') || 'Analiza, projekt, wykonanie, wdrożenie i utrzymanie'} />
 
       <div className="ap-grid-2">
-        <Lines label="Funkcje" value={project.features} onChange={features => update({ features })} rows={5} />
-        <Lines label="Technologie" value={project.stack} onChange={stack => update({ stack })} rows={5} />
+        <Lines key={`features-${lang}`} label="Funkcje" value={value('features')} onChange={next => set('features', next)} rows={5} />
+        <Lines label="Technologie" value={project.stack} onChange={stack => update({ stack })} rows={5}
+          hint="Wspólne dla obu języków. Każda linia to osobna pozycja." />
       </div>
 
       <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
@@ -377,9 +398,14 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
           <Trash2 size={14} /> Usuń pracę
         </button>
         {project.slug && project.published !== false && (
-          <a className="ap-btn ap-btn-ghost" href={`/portfolio/${project.slug}`} target="_blank" rel="noreferrer">
-            Podejrzyj na stronie <ArrowUpRight size={14} />
-          </a>
+          <>
+            <a className="ap-btn ap-btn-ghost" href={`/portfolio/${project.slug}`} target="_blank" rel="noreferrer">
+              Podejrzyj PL <ArrowUpRight size={14} />
+            </a>
+            <a className="ap-btn ap-btn-ghost" href={`/en/portfolio/${project.slug}`} target="_blank" rel="noreferrer">
+              Podejrzyj EN <ArrowUpRight size={14} />
+            </a>
+          </>
         )}
       </div>
 
@@ -388,7 +414,7 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
   )
 }
 
-export default function ProjectsManager({ notify }) {
+export default function ProjectsManager({ notify, item = '', onItem = () => {} }) {
   const [projects, setProjects] = useState(null)
   const [platforms, setPlatforms] = useState([])
   const [selected, setSelected] = useState('')
@@ -402,9 +428,11 @@ export default function ProjectsManager({ notify }) {
       setProjects(payload.projects)
       setPlatforms(payload.platforms)
       const next = keep || selected
-      const current = payload.projects.find(item => item.id === next)
+      const current = payload.projects.find(entry => entry.id === next)
+        || (!next && item ? payload.projects.find(entry => entry.slug === item) : null)
       setSelected(current ? current.id : '')
       setDraft(current ? structuredClone(current) : null)
+      if (current) onItem(current.slug)
     } catch (requestError) {
       setError(requestError.message)
     }
@@ -422,7 +450,15 @@ export default function ProjectsManager({ notify }) {
   const choose = project => {
     setSelected(project.id)
     setDraft(structuredClone(project))
+    onItem(project.slug)
   }
+
+  // „Wstecz” w przeglądarce zmienia adres – lista idzie za nim.
+  useEffect(() => {
+    if (!projects || !item) return
+    const target = projects.find(entry => entry.slug === item)
+    if (target && target.id !== selected) choose(target)
+  }, [item, projects]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const create = async () => {
     try {
@@ -453,6 +489,7 @@ export default function ProjectsManager({ notify }) {
     await api(`/api/admin/projects/${draft.id}`, { method: 'DELETE' })
     setSelected('')
     setDraft(null)
+    onItem('')
     await load()
     notify('Praca usunięta.')
   }

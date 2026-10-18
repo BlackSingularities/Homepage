@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, slugify } from './sanitize.mjs'
+import { sanitizeProjectTranslation } from './i18n.mjs'
 
 /**
  * Model realizacji. Dwa rodzaje treści:
@@ -99,6 +100,7 @@ export function sanitizeProject(input, existing = {}) {
     releaseSource: kind === 'app' ? releaseSource : 'none',
     downloads: (Array.isArray(input?.downloads) ? input.downloads : [])
       .slice(0, 12).map(sanitizeDownload).filter(item => item.url),
+    en: sanitizeProjectTranslation(input?.en),
     published: input?.published !== false,
     featured: input?.featured === true,
     order: Number.isFinite(Number(input?.order)) ? Number(input.order) : 0,
@@ -160,8 +162,9 @@ export const totalDownloads = downloads => downloads.reduce((sum, item) => sum +
 
 export function publicProject(project, release, counts = {}) {
   const downloads = downloadsFor(project, release, counts)
+  const { en: _translation, ...rest } = project
   return {
-    ...project,
+    ...rest,
     siteUrl: project.siteHidden ? '' : project.siteUrl,
     repo: project.repoHidden ? '' : project.repo,
     downloads,

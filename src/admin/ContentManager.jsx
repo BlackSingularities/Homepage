@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, LoaderCircle, RotateCcw } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
-import { Area, Field, Notice, Repeater, SaveBar, Text } from './parts'
+import { Area, Field, LangTabs, Notice, Repeater, SaveBar, Text } from './parts'
 
 /**
  * Teksty strony głównej i portfolio. Prace mają własną zakładkę, bo są
@@ -64,7 +64,9 @@ function HeadFields({ data, patch, withLead = true }) {
   )
 }
 
-export default function ContentManager({ notify }) {
+export default function ContentManager({ notify, item = '', onItem = () => {} }) {
+  // Wersja językowa siedzi w adresie: /admin/tresci albo /admin/tresci/en.
+  const lang = item === 'en' ? 'en' : 'pl'
   const [draft, setDraft] = useState(null)
   const [original, setOriginal] = useState(null)
   const [open, setOpen] = useState('hero')
@@ -73,7 +75,8 @@ export default function ContentManager({ notify }) {
 
   const load = async () => {
     try {
-      const content = await api('/api/admin/content')
+      setDraft(null)
+      const content = await api(`/api/admin/content?lang=${lang}`)
       setDraft(structuredClone(content))
       setOriginal(structuredClone(content))
     } catch (requestError) {
@@ -81,7 +84,13 @@ export default function ContentManager({ notify }) {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [lang]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const switchLang = next => {
+    if (next === lang) return
+    if (dirty && !window.confirm('Masz niezapisane zmiany. Przełączyć język i je odrzucić?')) return
+    onItem(next === 'en' ? 'en' : '')
+  }
 
   const dirty = useMemo(
     () => Boolean(draft && original) && JSON.stringify(draft) !== JSON.stringify(original),
@@ -94,10 +103,10 @@ export default function ContentManager({ notify }) {
     setSaving(true)
     setError('')
     try {
-      const saved = await api('/api/admin/content', json('PUT', draft))
+      const saved = await api(`/api/admin/content?lang=${lang}`, json('PUT', draft))
       setDraft(structuredClone(saved))
       setOriginal(structuredClone(saved))
-      notify('Treści strony zostały zaktualizowane.')
+      notify(lang === 'en' ? 'Angielskie treści strony zostały zaktualizowane.' : 'Treści strony zostały zaktualizowane.')
     } catch (requestError) {
       setError(requestError.message)
     } finally {
@@ -106,15 +115,23 @@ export default function ContentManager({ notify }) {
   }
 
   const resetAll = async () => {
-    if (!window.confirm('Przywrócić wszystkie teksty do wersji domyślnej?')) return
-    const content = await api('/api/admin/content/reset', json('POST', {}))
+    if (!window.confirm(`Przywrócić wszystkie teksty (${lang.toUpperCase()}) do wersji domyślnej?`)) return
+    const content = await api(`/api/admin/content/reset?lang=${lang}`, json('POST', {}))
     setDraft(structuredClone(content))
     setOriginal(structuredClone(content))
     notify('Przywrócono treści domyślne.')
   }
 
+  const tabs = (
+    <LangTabs
+      value={lang}
+      onChange={switchLang}
+      hint={lang === 'en' ? 'Teksty wersji angielskiej – strona pod /en.' : 'Teksty wersji polskiej – strona główna i /portfolio.'}
+    />
+  )
+
   if (!draft) {
-    return <div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję treści…</div>
+    return <div className="ap-content-editor">{tabs}<div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję treści…</div></div>
   }
 
   const toggle = id => setOpen(id)
@@ -122,6 +139,8 @@ export default function ContentManager({ notify }) {
   return (
     <div className="ap-content-editor">
       {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
+
+      {tabs}
 
       <div className="ap-content-intro">
         <p>Teksty strony głównej i portfolio. Same prace dodaje się w zakładce Portfolio.</p>

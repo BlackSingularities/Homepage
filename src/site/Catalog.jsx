@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { plural } from '../lib/projects'
+import { useMemo, useState } from 'react'
+import { useT } from '../lib/i18n'
 import Register from './Register'
 import SectionHead from './SectionHead'
 
@@ -9,11 +9,8 @@ import SectionHead from './SectionHead'
  * się pobiera. Liczba przy filtrze mówi, ile pozycji za nim stoi.
  */
 export default function Catalog({ data, projects, onNavigate }) {
+  const { t } = useT()
   const [kind, setKind] = useState('all')
-
-  useEffect(() => {
-    document.title = `${data.title} ${data.accent} – Adam Rędzikowski`.replace(/\s+/g, ' ').trim()
-  }, [data.title, data.accent])
 
   const groups = useMemo(() => ({
     all: projects,
@@ -36,9 +33,9 @@ export default function Catalog({ data, projects, onNavigate }) {
           title={data.title}
           accent={data.accent}
           lead={data.lead}
-          count={`${projects.length} ${plural(projects.length, 'pozycja', 'pozycje', 'pozycji')} w portfolio`}
+          count={t('catalog.count', projects.length)}
           action={filters.length > 2 ? (
-            <div className="catalog-filters" role="group" aria-label="Rodzaj pracy">
+            <div className="catalog-filters" role="group" aria-label={t('catalog.filters')}>
               {filters.map(([id, label]) => (
                 <button
                   key={id}
@@ -53,7 +50,7 @@ export default function Catalog({ data, projects, onNavigate }) {
             </div>
           ) : null}
         />
-        <Register projects={shown} onNavigate={onNavigate} empty="Nic tu jeszcze nie ma." />
+        <Register projects={shown} onNavigate={onNavigate} empty={t('catalog.empty')} />
       </section>
     </main>
   )

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
 import {
-  CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL,
-  formatBytes, formatDownloads, formatReleaseDate, hostOf,
+  CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL,
+  formatBytes, formatReleaseDate, hostOf,
 } from '../lib/projects'
+import { LOCALE, useT } from '../lib/i18n'
+import { applySeo, describe } from '../lib/seo'
 import { trackDownload } from '../lib/analytics'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
@@ -24,11 +26,13 @@ function Paragraphs({ text }) {
  * zawsze względny i nie ujawnia tokenu.
  */
 function Downloads({ project }) {
+  const { t, lang } = useT()
+  const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
   if (!project.downloads.length) {
     if (project.kind !== 'app') return null
     return (
       <div className="pv-downloads is-empty">
-        <p>Wydanie publiczne jeszcze nie jest gotowe. Napisz, jeśli chcesz zobaczyć wersję roboczą.</p>
+        <p>{t('project.noRelease')}</p>
       </div>
     )
   }
@@ -36,16 +40,16 @@ function Downloads({ project }) {
   return (
     <div className="pv-downloads">
       <div className="pv-downloads-head">
-        <h2>Do pobrania</h2>
+        <h2>{t('project.downloads')}</h2>
         {project.downloadCount > 0 && (
-          <p className="pv-download-total mono">{formatDownloads(project.downloadCount)}</p>
+          <p className="pv-download-total mono">{t('downloads', project.downloadCount)}</p>
         )}
         {project.release && (
           <p className="pv-release">
             <span className="mono">{project.release.tag}</span>
-            {project.release.publishedAt && <> · wydane {formatReleaseDate(project.release.publishedAt)}</>}
+            {project.release.publishedAt && <> · {t('project.released', formatReleaseDate(project.release.publishedAt, LOCALE[lang]))}</>}
             {project.release.url && (
-              <> · <a href={project.release.url} target="_blank" rel="noreferrer">historia wydań</a></>
+              <> · <a href={project.release.url} target="_blank" rel="noreferrer">{t('project.history')}</a></>
             )}
           </p>
         )}
@@ -63,13 +67,13 @@ function Downloads({ project }) {
               >
                 <Icon size={18} aria-hidden="true" />
                 <span className="pv-file-main">
-                  <strong>{PLATFORM_LABEL[file.platform] || file.platform}</strong>
+                  <strong>{platformName(file.platform)}</strong>
                   {file.label && <span className="mono">{file.label}</span>}
                 </span>
                 <span className="pv-file-meta mono">
                   {file.version && <i>{file.version}</i>}
                   {formatBytes(file.size) && <i>{formatBytes(file.size)}</i>}
-                  {file.count > 0 && <i title="Liczba pobrań">↓ {new Intl.NumberFormat('pl-PL').format(file.count)}</i>}
+                  {file.count > 0 && <i title={t('project.downloadCount')}>↓ {new Intl.NumberFormat(LOCALE[lang]).format(file.count)}</i>}
                 </span>
                 <Download size={17} aria-hidden="true" />
               </a>
@@ -82,19 +86,20 @@ function Downloads({ project }) {
 }
 
 function Gallery({ shots, name, onZoom }) {
+  const { t } = useT()
   if (!shots.length) return null
   return (
     <Reveal
       className={`pv-gallery ${shots.length === 1 ? 'is-single' : ''}`}
       tabIndex={shots.length > 1 ? 0 : undefined}
       role="region"
-      aria-label={`Zrzuty ekranu: ${name}`}
+      aria-label={t('project.shots', name)}
     >
       {shots.map((shot, index) => (
         <button type="button" key={shot.src} onClick={() => onZoom(index)}>
           <img
             src={shot.src}
-            alt={shot.alt || `${name} – ekran ${index + 1}`}
+            alt={shot.alt || t('project.shot', name, index + 1)}
             loading={index === 0 ? 'eager' : 'lazy'}
           />
         </button>
@@ -104,6 +109,8 @@ function Gallery({ shots, name, onZoom }) {
 }
 
 export default function ProjectView({ slug, onNavigate }) {
+  const { t, lp, lang } = useT()
+  const catalog = lp(CATALOG_PATH)
   const [data, setData] = useState(null)
   const [status, setStatus] = useState('loading')
   const [zoom, setZoom] = useState(-1)
@@ -111,16 +118,27 @@ export default function ProjectView({ slug, onNavigate }) {
   useEffect(() => {
     let active = true
     setStatus('loading')
-    fetch(`/api/projects/${encodeURIComponent(slug)}`)
+    fetch(`/api/projects/${encodeURIComponent(slug)}?lang=${lang}`)
       .then(response => (response.ok ? response.json() : Promise.reject(new Error('404'))))
       .then(payload => { if (active) { setData(payload); setStatus('ready') } })
       .catch(() => active && setStatus('missing'))
     return () => { active = false }
-  }, [slug])
+  }, [slug, lang])
 
   useEffect(() => {
-    if (data?.project) document.title = `${data.project.name} – Adam Rędzikowski`
-  }, [data])
+    const project = data?.project
+    if (status === 'missing') {
+      applySeo({ lang, path: `${CATALOG_PATH}/${slug}`, title: t('seo.notFound'), noindex: true })
+    }
+    if (!project || status !== 'ready') return
+    applySeo({
+      lang,
+      path: `${CATALOG_PATH}/${project.slug}`,
+      title: `${project.name} – ${project.label || t(`kind.${project.kind}`)} | Adam Rędzikowski`,
+      description: describe(project.tagline || project.summary || project.body),
+      image: project.cover,
+    })
+  }, [data, status, lang, slug, t])
 
   const shotCount = data?.project?.shots?.length || 0
   // Przewijanie w podglądzie zawija się: za ostatnim zdjęciem jest pierwsze.
@@ -142,20 +160,20 @@ export default function ProjectView({ slug, onNavigate }) {
   }, [zoom >= 0, shotCount]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (status === 'loading') {
-    return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>Wczytuję realizację…</span></main>
+    return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>{t('project.loading')}</span></main>
   }
 
   if (status === 'missing') {
     return (
       <main className="page-state">
         <h1>404</h1>
-        <p>Tej pracy nie ma w portfolio albo nie jest opublikowana.</p>
+        <p>{t('project.missing')}</p>
         <a
           className="btn btn-primary"
-          href={CATALOG_PATH}
-          onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
+          href={catalog}
+          onClick={event => { event.preventDefault(); onNavigate(catalog) }}
         >
-          Wróć do portfolio
+          {t('project.backToPortfolio')}
         </a>
       </main>
     )
@@ -169,16 +187,16 @@ export default function ProjectView({ slug, onNavigate }) {
       <div className="section">
         <a
           className="pv-back"
-          href={CATALOG_PATH}
-          onClick={event => { event.preventDefault(); onNavigate(CATALOG_PATH) }}
+          href={catalog}
+          onClick={event => { event.preventDefault(); onNavigate(catalog) }}
         >
-          <ArrowLeft size={15} /> Portfolio
+          <ArrowLeft size={15} /> {t('nav.portfolio')}
         </a>
 
         <header className="pv-head">
           <div className="pv-head-main">
             <span className="pv-tags">
-              <span className="reg-kind" data-kind={project.kind}>{KIND_LABEL[project.kind] || project.kind}</span>
+              <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>
               {project.label && <span className="reg-label">{project.label}</span>}
               {project.year && <span className="reg-year mono">{project.year}</span>}
             </span>
@@ -191,12 +209,12 @@ export default function ProjectView({ slug, onNavigate }) {
           <div className="pv-head-side">
             {project.siteUrl && (
               <a className="btn btn-primary" href={project.siteUrl} target={external ? '_blank' : undefined} rel="noreferrer">
-                Otwórz {project.kind === 'app' ? 'stronę' : 'serwis'} <ExternalLink size={16} />
+                {t('project.open', project.kind)} <ExternalLink size={16} />
               </a>
             )}
             {project.siteUrl && <span className="pv-host mono">{hostOf(project.siteUrl)}</span>}
             {!project.siteUrl && project.kind === 'web' && (
-              <span className="pv-host mono is-quiet">Adres nie jest publiczny – prezentacja na życzenie.</span>
+              <span className="pv-host mono is-quiet">{t('project.private')}</span>
             )}
             {project.repo && (
               <a className="pv-repo mono" href={`https://github.com/${project.repo}`} target="_blank" rel="noreferrer">
@@ -217,7 +235,7 @@ export default function ProjectView({ slug, onNavigate }) {
           <aside className="pv-side">
             {project.features.length > 0 && (
               <div className="pv-panel">
-                <h2>Funkcje</h2>
+                <h2>{t('project.features')}</h2>
                 <ul className="pv-features">
                   {project.features.map(feature => (
                     <li key={feature}><Check size={13} aria-hidden="true" />{feature}</li>
@@ -227,7 +245,7 @@ export default function ProjectView({ slug, onNavigate }) {
             )}
             {project.stack.length > 0 && (
               <div className="pv-panel">
-                <h2>Technologie</h2>
+                <h2>{t('project.stack')}</h2>
                 <ul className="pv-stack">
                   {project.stack.map(item => <li className="mono" key={item}>{item}</li>)}
                 </ul>
@@ -235,7 +253,7 @@ export default function ProjectView({ slug, onNavigate }) {
             )}
             {project.role && (
               <div className="pv-panel">
-                <h2>Mój udział</h2>
+                <h2>{t('project.role')}</h2>
                 <p>{project.role}</p>
               </div>
             )}
@@ -245,23 +263,23 @@ export default function ProjectView({ slug, onNavigate }) {
         <Downloads project={project} />
 
         {(previous || next) && (
-          <nav className="pv-nav" aria-label="Inne prace">
+          <nav className="pv-nav" aria-label={t('project.others')}>
             {previous && (
               <a
-                href={`${CATALOG_PATH}/${previous.slug}`}
-                onClick={event => { event.preventDefault(); onNavigate(`${CATALOG_PATH}/${previous.slug}`) }}
+                href={lp(`${CATALOG_PATH}/${previous.slug}`)}
+                onClick={event => { event.preventDefault(); onNavigate(lp(`${CATALOG_PATH}/${previous.slug}`)) }}
               >
                 <ArrowLeft size={15} />
-                <span>Poprzednia<strong>{previous.name}</strong></span>
+                <span>{t('project.previous')}<strong>{previous.name}</strong></span>
               </a>
             )}
             {next && (
               <a
                 className="is-next"
-                href={`${CATALOG_PATH}/${next.slug}`}
-                onClick={event => { event.preventDefault(); onNavigate(`${CATALOG_PATH}/${next.slug}`) }}
+                href={lp(`${CATALOG_PATH}/${next.slug}`)}
+                onClick={event => { event.preventDefault(); onNavigate(lp(`${CATALOG_PATH}/${next.slug}`)) }}
               >
-                <span>Następna<strong>{next.name}</strong></span>
+                <span>{t('project.next')}<strong>{next.name}</strong></span>
                 <ArrowRight size={15} />
               </a>
             )}

@@ -178,7 +178,7 @@
 
 .ap-sidebar nav { display: grid; gap: 3px; padding-top: 18px; }
 
-.ap-sidebar nav button {
+.ap-sidebar nav :is(button, a) {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -193,15 +193,15 @@
   transition: .22s;
 }
 
-.ap-sidebar nav button:hover { color: var(--ink); background: rgba(255, 255, 255, .04); }
+.ap-sidebar nav :is(button, a):hover { color: var(--ink); background: rgba(255, 255, 255, .04); }
 
-.ap-sidebar nav button.is-active {
+.ap-sidebar nav :is(button, a).is-active {
   color: var(--ink);
   background: linear-gradient(115deg, rgba(231, 198, 138, .14), rgba(255, 255, 255, .02));
   border-color: var(--ap-line-strong);
 }
 
-.ap-sidebar nav button.is-active svg { color: var(--gold); }
+.ap-sidebar nav :is(button, a).is-active svg { color: var(--gold); }
 
 .ap-back {
   margin-top: auto;
@@ -1230,8 +1230,8 @@
   .ap-shell { grid-template-columns: 74px 1fr; }
   .ap-sidebar { padding: 18px 10px; }
   .ap-brand { padding: 0 4px 18px; justify-content: center; }
-  .ap-brand span, .ap-back span, .ap-sidebar nav button span { display: none; }
-  .ap-sidebar nav button { justify-content: center; padding: 12px 0; }
+  .ap-brand span, .ap-back span, .ap-sidebar nav :is(button, a) span { display: none; }
+  .ap-sidebar nav :is(button, a) { justify-content: center; padding: 12px 0; }
   .ap-back { justify-content: center; }
   .ap-two, .ap-stats { grid-template-columns: 1fr 1fr; }
   .ap-submission-grid { grid-template-columns: 1fr; gap: 16px; }
@@ -1261,7 +1261,7 @@
   .ap-brand { border: 0; padding: 0 6px 0 0; }
   .ap-brand b { width: 34px; height: 34px; border-radius: 10px; font-size: 15px; }
   .ap-sidebar nav { display: flex; padding: 0; }
-  .ap-sidebar nav button { padding: 10px 12px; }
+  .ap-sidebar nav :is(button, a) { padding: 10px 12px; }
   .ap-back { display: none; }
   .ap-main { padding: 0 14px 110px; }
   .ap-header { padding: 18px 0 16px; }
@@ -1518,3 +1518,26 @@
 @media (max-width: 900px) {
   .an-stats { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── wersje językowe ────────────────────────────────────────────── */
+
+.ap-lang-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.ap-lang-tabs [role="tablist"] { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--ap-line); border-radius: 100px; }
+.ap-lang-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  transition: .22s;
+}
+.ap-lang-tabs button b { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; color: var(--ink-4); }
+.ap-lang-tabs button:hover { color: var(--ink); }
+.ap-lang-tabs button.is-active { color: var(--ink); border-color: var(--ap-line-strong); background: rgba(231, 198, 138, .08); }
+.ap-lang-tabs button.is-active b { color: var(--gold); }
+.ap-lang-tabs p { margin: 0; font-size: 12px; color: var(--ink-3); }

@@ -9,7 +9,9 @@ import ProjectView from './site/ProjectView'
 import PageView from './site/PageView'
 import CookieBanner from './site/CookieBanner'
 import { trackPageview } from './lib/analytics'
+import { LangContext, splitLang, translate } from './lib/i18n'
 import { CATALOG_PATH } from './lib/projects'
+import { applySeo } from './lib/seo'
 import { useSiteData } from './lib/useSiteData'
 
 const Admin = lazy(() => import('./admin/Admin'))
@@ -24,7 +26,7 @@ function usePath() {
   return [path, setPath]
 }
 
-/** Rozkłada adres na widok: strona główna, katalog, realizacja albo podstrona. */
+/** Rozkłada adres (już bez prefiksu języka) na widok. */
 function routeOf(path) {
   const clean = path.replace(/\/+$/, '') || '/'
   if (clean === CATALOG_PATH) return { view: 'catalog' }
@@ -36,9 +38,17 @@ function routeOf(path) {
   return { view: 'home' }
 }
 
+/** Serwer wstawia treść dla robotów do #root – po starcie aplikacji jest zbędna. */
+function dropPrerender() {
+  document.querySelectorAll('[data-prerender]').forEach(node => node.remove())
+}
+
 export default function App() {
   const [path, setPath] = usePath()
-  const { content, pages, projects } = useSiteData()
+  const { lang, path: localPath } = splitLang(path)
+  const { content, pages, projects } = useSiteData(lang)
+
+  useEffect(dropPrerender, [])
 
   useEffect(() => {
     if (!path.startsWith('/admin')) trackPageview(path)
@@ -59,6 +69,20 @@ export default function App() {
     }
   }, [setPath])
 
+  const route = routeOf(localPath)
+
+  // Strona główna i portfolio mają stałe meta; realizacje i podstrony
+  // ustawiają je same, gdy dociągną dane.
+  useEffect(() => {
+    if (path.startsWith('/admin')) return
+    if (route.view === 'home') {
+      applySeo({ lang, path: '/', title: translate(lang, 'seo.homeTitle'), description: translate(lang, 'seo.homeDescription') })
+    }
+    if (route.view === 'catalog') {
+      applySeo({ lang, path: CATALOG_PATH, title: translate(lang, 'seo.catalogTitle'), description: translate(lang, 'seo.catalogDescription') })
+    }
+  }, [lang, route.view, path])
+
   if (path.startsWith('/admin')) {
     return (
       <Suspense fallback={<div className="page-state"><LoaderCircle className="spin" size={26} /><span>Panel</span></div>}>
@@ -67,18 +91,18 @@ export default function App() {
     )
   }
 
-  const route = routeOf(path)
-
   return (
-    <div className="site">
-      <GlyphField />
-      <Header brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
-      {route.view === 'home' && <Home content={content} pages={pages} projects={projects} onNavigate={navigate} />}
-      {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
-      {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
-      {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
-      <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
-      <CookieBanner />
-    </div>
+    <LangContext.Provider value={lang}>
+      <div className="site">
+        <GlyphField />
+        <Header brand={content.brand} pages={pages} home={route.view === 'home'} path={localPath} onNavigate={navigate} />
+        {route.view === 'home' && <Home content={content} pages={pages} projects={projects} onNavigate={navigate} />}
+        {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
+        {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
+        {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
+        <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
+        <CookieBanner />
+      </div>
+    </LangContext.Provider>
   )
 }

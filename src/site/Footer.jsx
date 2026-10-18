@@ -1,8 +1,10 @@
 import { openConsent } from '../lib/analytics'
 import { CATALOG_PATH } from '../lib/projects'
+import { useT } from '../lib/i18n'
 
 export default function Footer({ brand, pages = [], onNavigate, home = true }) {
-  const href = id => (home ? `#${id}` : `/#${id}`)
+  const { t, lp } = useT()
+  const href = id => (home ? `#${id}` : lp(`/#${id}`))
   const year = new Date().getFullYear()
 
   const go = event => {
@@ -21,22 +23,22 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
           <p>{brand.tagline}</p>
         </div>
 
-        <nav className="footer-nav" aria-label="Stopka">
-          <a href={href('zakres')} onClick={go}>Oferta</a>
-          <a href={href('proces')} onClick={go}>Proces</a>
-          <a href={CATALOG_PATH} onClick={go}>Portfolio</a>
-          <a href={href('o-mnie')} onClick={go}>O mnie</a>
+        <nav className="footer-nav" aria-label={t('nav.footer')}>
+          <a href={href('zakres')} onClick={go}>{t('nav.offer')}</a>
+          <a href={href('proces')} onClick={go}>{t('nav.process')}</a>
+          <a href={lp(CATALOG_PATH)} onClick={go}>{t('nav.portfolio')}</a>
+          <a href={href('o-mnie')} onClick={go}>{t('nav.about')}</a>
           {pages.slice(0, 6).map(page => (
-            <a key={page.id} href={`/p/${page.slug}`} onClick={go}>{page.title}</a>
+            <a key={page.id} href={lp(`/p/${page.slug}`)} onClick={go}>{page.title}</a>
           ))}
-          <a href={href('kontakt')} onClick={go}>Kontakt</a>
+          <a href={href('kontakt')} onClick={go}>{t('nav.contact')}</a>
           {brand.email && <a href={`mailto:${brand.email}`}>{brand.email}</a>}
           {brand.phone && <a href={`tel:${brand.phone.replace(/\s/g, '')}`}>{brand.phone}</a>}
         </nav>
 
         <p className="footer-legal">
           © {year} {brand.name}. {brand.location}.
-          {' '}<button type="button" className="footer-consent" onClick={openConsent}>Ustawienia prywatności</button>
+          {' '}<button type="button" className="footer-consent" onClick={openConsent}>{t('footer.privacy')}</button>
         </p>
       </div>
     </footer>

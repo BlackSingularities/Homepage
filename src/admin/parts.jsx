@@ -281,3 +281,28 @@ export function SaveBar({ dirty, saving, onSave, onReset, resetLabel = 'Przywró
     </AnimatePresence>
   )
 }
+
+const LANG_TABS = [['pl', 'Polski', 'PL'], ['en', 'English', 'EN']]
+
+/** Przełącznik wersji językowej edytowanej treści. */
+export function LangTabs({ value, onChange, hint }) {
+  return (
+    <div className="ap-lang-tabs">
+      <div role="tablist" aria-label="Wersja językowa">
+        {LANG_TABS.map(([code, label, short]) => (
+          <button
+            key={code}
+            type="button"
+            role="tab"
+            aria-selected={value === code}
+            className={value === code ? 'is-active' : ''}
+            onClick={() => onChange(code)}
+          >
+            <b>{short}</b> {label}
+          </button>
+        ))}
+      </div>
+      {hint && <p>{hint}</p>}
+    </div>
+  )
+}

@@ -11,13 +11,21 @@
       href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <meta
-      name="description"
-      content="Adam Rędzikowski – strony, aplikacje webowe i programy na komputer oraz telefon, projektowane i budowane od zera. Analiza, interfejs, kod, wdrożenie i dalszy rozwój u jednej osoby."
-    />
     <meta name="theme-color" content="#0c0b0a" />
     <meta name="color-scheme" content="dark" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <!-- Zastępowane przez API dla każdego adresu (server/seo.mjs). -->
+    <!-- seo -->
+    <title>Adam Rędzikowski – strony, aplikacje i programy na zamówienie</title>
+    <meta name="description" content="Strony internetowe, aplikacje webowe i programy na komputer oraz telefon projektowane i budowane od zera. Analiza, interfejs, kod, wdrożenie i dalszy rozwój u jednej osoby." />
+    <link rel="canonical" href="https://redzikowski.com/" />
+    <link rel="alternate" hreflang="pl" href="https://redzikowski.com/" />
+    <link rel="alternate" hreflang="en" href="https://redzikowski.com/en" />
+    <link rel="alternate" hreflang="x-default" href="https://redzikowski.com/" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Adam Rędzikowski" />
+    <meta property="og:locale" content="pl_PL" />
     <meta property="og:url" content="https://redzikowski.com/" />
     <meta property="og:title" content="Adam Rędzikowski – strony, aplikacje i programy na zamówienie" />
     <meta property="og:description" content="Strony internetowe, programy dla firm i aplikacje na komputer i telefon – zaprojektowane i zbudowane od zera przez jedną osobę." />
@@ -26,7 +34,12 @@
     <meta name="twitter:title" content="Adam Rędzikowski – strony, aplikacje i programy na zamówienie" />
     <meta name="twitter:description" content="Strony internetowe, programy dla firm i aplikacje na komputer i telefon – zaprojektowane i zbudowane od zera przez jedną osobę." />
     <meta name="twitter:image" content="https://redzikowski.com/og.png" />
-    <title>Adam Rędzikowski – strony, aplikacje i programy na zamówienie</title>
+    <!-- /seo -->
+    <style>
+      /* Treść wyrenderowana na serwerze jest dla robotów i czytników bez JS;
+         aplikacja zastępuje ją po starcie, więc wizualnie jej nie pokazujemy. */
+      .prerender { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+    </style>
   </head>
   <body>
     <div id="root"></div>

@@ -20,7 +20,8 @@
       "env": {
         "SETTINGS_ENCRYPTION_KEY": "dev-secret",
         "DATA_DIR": "./data",
-        "PORT": "3001"
+        "PORT": "3001",
+        "SITE_TEMPLATE_URL": "http://localhost:5173/index.html"
       },
       "port": 3001
     }

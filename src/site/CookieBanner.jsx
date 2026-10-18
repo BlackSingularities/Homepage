@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CONSENT_EVENT, getConsent, setConsent } from '../lib/analytics'
 import { ease } from '../lib/ui'
+import { useT } from '../lib/i18n'
 
 /**
  * Zgoda na statystyki. Bez niej strona liczy tylko anonimowe odsłony i
@@ -9,6 +10,7 @@ import { ease } from '../lib/ui'
  * Nic nie trafia do firm trzecich – opis mówi to wprost.
  */
 export default function CookieBanner() {
+  const { t } = useT()
   const [open, setOpen] = useState(() => !getConsent())
 
   useEffect(() => {
@@ -28,23 +30,19 @@ export default function CookieBanner() {
         <motion.aside
           className="cookie-banner"
           role="dialog"
-          aria-label="Ustawienia prywatności"
+          aria-label={t('cookie.label')}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.35, ease }}
         >
           <div className="cookie-text">
-            <strong>Statystyki odwiedzin</strong>
-            <p>
-              Strona zapisuje w przeglądarce losowy identyfikator, żeby policzyć unikalne wizyty,
-              źródła wejść i czas na stronie. Dane zostają na moim serwerze, bez reklam i firm trzecich.
-              Bez zgody liczę tylko anonimowe odsłony i pobrania.
-            </p>
+            <strong>{t('cookie.title')}</strong>
+            <p>{t('cookie.text')}</p>
           </div>
           <div className="cookie-actions">
-            <button type="button" className="cookie-btn is-ghost" onClick={() => choose('denied')}>Tylko niezbędne</button>
-            <button type="button" className="cookie-btn" onClick={() => choose('granted')}>Akceptuję</button>
+            <button type="button" className="cookie-btn is-ghost" onClick={() => choose('denied')}>{t('cookie.deny')}</button>
+            <button type="button" className="cookie-btn" onClick={() => choose('granted')}>{t('cookie.accept')}</button>
           </div>
         </motion.aside>
       )}

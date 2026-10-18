@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { useT } from '../lib/i18n'
 
 /**
  * Podgląd zdjęcia na pełnym ekranie. Strzałki po bokach, klawisze ← →
@@ -8,6 +9,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react'
  * ile ich jest. Kliknięcie w tło albo Esc zamyka.
  */
 export default function Lightbox({ shots, index, name, onClose, onStep }) {
+  const { t } = useT()
   const [touchX, setTouchX] = useState(null)
   const shot = shots[index]
   const many = shots.length > 1
@@ -20,7 +22,7 @@ export default function Lightbox({ shots, index, name, onClose, onStep }) {
       className="lightbox"
       role="dialog"
       aria-modal="true"
-      aria-label={`${name}: zrzut ${index + 1} z ${shots.length}`}
+      aria-label={t('lightbox.label', name, index + 1, shots.length)}
       onClick={onClose}
       onTouchStart={event => setTouchX(event.touches[0].clientX)}
       onTouchEnd={event => {
@@ -30,21 +32,21 @@ export default function Lightbox({ shots, index, name, onClose, onStep }) {
         setTouchX(null)
       }}
     >
-      <button type="button" className="lightbox-close" aria-label="Zamknij" onClick={stop(onClose)} autoFocus><X size={20} /></button>
+      <button type="button" className="lightbox-close" aria-label={t('lightbox.close')} onClick={stop(onClose)} autoFocus><X size={20} /></button>
       {many && (
-        <button type="button" className="lightbox-nav is-prev" aria-label="Poprzednie zdjęcie" onClick={stop(() => onStep(-1))}>
+        <button type="button" className="lightbox-nav is-prev" aria-label={t('lightbox.prev')} onClick={stop(() => onStep(-1))}>
           <ChevronLeft size={26} />
         </button>
       )}
       <figure onClick={event => event.stopPropagation()}>
-        <img key={shot.src} src={shot.src} alt={shot.alt || `${name} – ekran ${index + 1}`} />
+        <img key={shot.src} src={shot.src} alt={shot.alt || t('project.shot', name, index + 1)} />
         <figcaption>
           {shot.alt && <span>{shot.alt}</span>}
           {many && <span className="lightbox-count">{index + 1} / {shots.length}</span>}
         </figcaption>
       </figure>
       {many && (
-        <button type="button" className="lightbox-nav is-next" aria-label="Następne zdjęcie" onClick={stop(() => onStep(1))}>
+        <button type="button" className="lightbox-nav is-next" aria-label={t('lightbox.next')} onClick={stop(() => onStep(1))}>
           <ChevronRight size={26} />
         </button>
       )}

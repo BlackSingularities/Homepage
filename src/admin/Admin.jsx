@@ -12,18 +12,35 @@ import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
 import '../styles/admin.css'
 
+/** Zakładka, jej adres pod /admin, nazwa i ikona. */
 const TABS = [
-  ['dashboard', 'Pulpit', LayoutDashboard],
-  ['analytics', 'Analityka', BarChart3],
-  ['submissions', 'Zgłoszenia', MessageSquareText],
-  ['projects', 'Portfolio', Boxes],
-  ['pages', 'Podstrony', Files],
-  ['content', 'Treści strony', FileStack],
-  ['gallery', 'Galeria', Camera],
-  ['inbox', 'Odebrane', Inbox],
-  ['outbox', 'Wysłane', MailCheck],
-  ['settings', 'Poczta', Settings],
+  ['dashboard', '', 'Pulpit', LayoutDashboard],
+  ['analytics', 'analityka', 'Analityka', BarChart3],
+  ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText],
+  ['projects', 'portfolio', 'Portfolio', Boxes],
+  ['pages', 'podstrony', 'Podstrony', Files],
+  ['content', 'tresci', 'Treści strony', FileStack],
+  ['gallery', 'galeria', 'Galeria', Camera],
+  ['inbox', 'odebrane', 'Odebrane', Inbox],
+  ['outbox', 'wyslane', 'Wysłane', MailCheck],
+  ['settings', 'poczta', 'Poczta', Settings],
 ]
+
+/**
+ * Każdy widok panelu ma własny adres: /admin/<zakładka>/<pozycja>. Pozycja to
+ * slug edytowanej pracy albo podstrony (lub „en” dla angielskich treści), więc
+ * link do konkretnego edytora można zapisać, odświeżyć i otworzyć w nowej karcie.
+ */
+function parseAdminPath(pathname = window.location.pathname) {
+  const [, segment = '', ...rest] = pathname.replace(/^\/admin\/?/, '/').split('/')
+  const found = TABS.find(([, slug]) => slug === decodeURIComponent(segment))
+  return { tab: found ? found[0] : 'dashboard', item: decodeURIComponent(rest.join('/') || '') }
+}
+
+function adminPath(tab, item = '') {
+  const slug = TABS.find(([id]) => id === tab)?.[1] || ''
+  return ['/admin', slug, item && encodeURIComponent(item)].filter(Boolean).join('/')
+}
 
 const STATUS_LABEL = {
   new: 'Nowe', 'in-progress': 'W toku', closed: 'Zamknięte',
@@ -118,6 +135,7 @@ function Submissions({ items, loading, onStatus, onDelete }) {
 /* ── dashboard ──────────────────────────────────────────────────── */
 
 function Dashboard({ submissions, pages, onTab }) {
+  // onTab(tab, item) – pulpit linkuje prosto do edytora konkretnej podstrony.
   const stats = [
     ['Zgłoszenia', submissions.length, 'submissions'],
     ['Nowe zgłoszenia', submissions.filter(item => item.status === 'new').length, 'submissions'],
@@ -150,7 +168,7 @@ function Dashboard({ submissions, pages, onTab }) {
 
         <Card title="Twoje podstrony" description="Strony oferty tworzone w panelu.">
           {pages.slice(0, 6).map(page => (
-            <button key={page.id} className="ap-row" onClick={() => onTab('pages')}>
+            <button key={page.id} className="ap-row" onClick={() => onTab('pages', page.slug)}>
               <span className={`ap-dot ${page.published ? 'is-live' : ''}`} />
               <span className="ap-row-main"><b>{page.title}</b><i>/p/{page.slug}</i></span>
               <time>{page.published ? 'opublikowana' : 'szkic'}</time>
@@ -339,7 +357,8 @@ function GalleryManager() {
 /* ── shell ──────────────────────────────────────────────────────── */
 
 function AdminPanel({ admin, onLogout }) {
-  const [tab, setTab] = useState('dashboard')
+  const [location, setLocation] = useState(() => parseAdminPath())
+  const { tab, item } = location
   const [submissions, setSubmissions] = useState([])
   const [pages, setPages] = useState([])
   const [inbox, setInbox] = useState([])
@@ -380,6 +399,20 @@ function AdminPanel({ admin, onLogout }) {
 
   useEffect(() => { loadOverview() }, [loadOverview])
 
+  useEffect(() => {
+    const onPop = () => setLocation(parseAdminPath())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  // Pozycja w edytorze (praca, podstrona, język treści) – podmienia adres bez
+  // nowego wpisu w historii, żeby „wstecz” wracało do poprzedniej zakładki.
+  const selectItem = useCallback(next => {
+    const target = adminPath(tab, next)
+    if (target !== window.location.pathname) window.history.replaceState({}, '', target)
+    setLocation(current => (current.item === (next || '') ? current : { ...current, item: next || '' }))
+  }, [tab])
+
   const refresh = () => {
     if (tab === 'dashboard') return loadOverview()
     if (tab === 'analytics') return setRefreshKey(value => value + 1)
@@ -393,8 +426,7 @@ function AdminPanel({ admin, onLogout }) {
     return undefined
   }
 
-  const chooseTab = next => {
-    setTab(next)
+  const loadTab = next => {
     setError('')
     if (next === 'inbox' && !inbox.length) run(async () => setInbox(await api('/api/admin/inbox')))
     if (next === 'outbox' && !outbox.length) run(async () => setOutbox(await api('/api/admin/outbox')))
@@ -404,6 +436,16 @@ function AdminPanel({ admin, onLogout }) {
     })
     if (next === 'dashboard') loadOverview()
   }
+
+  const chooseTab = (next, nextItem = '') => {
+    const target = adminPath(next, nextItem)
+    if (target !== window.location.pathname) window.history.pushState({}, '', target)
+    setLocation({ tab: next, item: nextItem })
+    loadTab(next)
+  }
+
+  // Wejście z adresu (odświeżenie, link, „wstecz”) też dociąga dane zakładki.
+  useEffect(() => { if (tab !== 'dashboard') loadTab(tab) }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const changeStatus = (id, status) => run(async () => {
     const updated = await api(`/api/admin/submissions/${id}`, json('PATCH', { status }))
@@ -426,7 +468,11 @@ function AdminPanel({ admin, onLogout }) {
     }, 'Ustawienia poczty zostały bezpiecznie zapisane.')
   }
 
-  const active = TABS.find(item => item[0] === tab)
+  const active = TABS.find(entry => entry[0] === tab)
+
+  useEffect(() => {
+    document.title = `${active?.[2] || 'Panel'}${item ? ` · ${item}` : ''} – Panel administracyjny`
+  }, [active, item])
 
   return (
     <div className="ap-shell">
@@ -437,10 +483,20 @@ function AdminPanel({ admin, onLogout }) {
         </a>
 
         <nav>
-          {TABS.map(([id, label, Icon]) => (
-            <button key={id} className={tab === id ? 'is-active' : ''} onClick={() => chooseTab(id)}>
+          {TABS.map(([id, , label, Icon]) => (
+            <a
+              key={id}
+              href={adminPath(id)}
+              className={tab === id ? 'is-active' : ''}
+              aria-current={tab === id ? 'page' : undefined}
+              onClick={event => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) return
+                event.preventDefault()
+                chooseTab(id)
+              }}
+            >
               <Icon size={17} /><span>{label}</span>
-            </button>
+            </a>
           ))}
         </nav>
 
@@ -451,7 +507,7 @@ function AdminPanel({ admin, onLogout }) {
         {tab !== 'gallery' && <header className="ap-header">
           <div>
             <span>redzikowski.com / {admin.username}</span>
-            <h1>{active?.[1]}</h1>
+            <h1>{active?.[2]}</h1>
           </div>
           <div className="ap-header-actions">
             <a className="ap-btn ap-btn-ghost" href="/" target="_blank" rel="noreferrer">
@@ -479,11 +535,11 @@ function AdminPanel({ admin, onLogout }) {
           )}
 
           {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
-          {tab === 'projects' && <ProjectsManager notify={notify} />}
+          {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}
 
-          {tab === 'pages' && <PagesManager notify={notify} />}
+          {tab === 'pages' && <PagesManager notify={notify} item={item} onItem={selectItem} />}
 
-          {tab === 'content' && <ContentManager notify={notify} />}
+          {tab === 'content' && <ContentManager notify={notify} item={item} onItem={selectItem} />}
 
           {tab === 'gallery' && <GalleryManager />}
 

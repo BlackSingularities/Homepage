@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /galeria/admin
+
+Sitemap: https://redzikowski.com/sitemap.xml

@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react'
-import { CATALOG_PATH, KIND_LABEL, PLATFORM_ICON, PLATFORM_LABEL, formatDownloads, hostOf } from '../lib/projects'
+import { CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
+import { useT } from '../lib/i18n'
 import { Reveal } from '../lib/ui'
 
 /**
@@ -12,28 +13,31 @@ import { Reveal } from '../lib/ui'
  */
 
 function Platforms({ project }) {
+  const { t } = useT()
+  const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
   if (project.kind === 'app' && project.platforms.length) {
     return (
       <span className="reg-platforms">
         {project.platforms.map(platform => {
           const Icon = PLATFORM_ICON[platform] || PLATFORM_ICON.other
           return (
-            <span key={platform} title={PLATFORM_LABEL[platform] || platform}>
+            <span key={platform} title={platformName(platform)}>
               <Icon size={14} aria-hidden="true" />
-              <i>{PLATFORM_LABEL[platform] || platform}</i>
+              <i>{platformName(platform)}</i>
             </span>
           )
         })}
-        {project.downloadCount > 0 && <span className="reg-downloads mono">{formatDownloads(project.downloadCount)}</span>}
+        {project.downloadCount > 0 && <span className="reg-downloads mono">{t('downloads', project.downloadCount)}</span>}
       </span>
     )
   }
   if (project.site) return <span className="reg-host mono">{hostOf(project.site)}</span>
-  return <span className="reg-host mono is-quiet">dostęp na życzenie</span>
+  return <span className="reg-host mono is-quiet">{t('register.onRequest')}</span>
 }
 
 function Row({ project, onNavigate, lead }) {
-  const href = `${CATALOG_PATH}/${project.slug}`
+  const { t, lp } = useT()
+  const href = lp(`${CATALOG_PATH}/${project.slug}`)
   return (
     <a
       className={`reg-row ${lead ? 'is-lead' : ''}`}
@@ -50,7 +54,7 @@ function Row({ project, onNavigate, lead }) {
         <strong>{project.name}</strong>
         {project.tagline && <span className="reg-tagline">{project.tagline}</span>}
         <span className="reg-tags">
-          <span className="reg-kind" data-kind={project.kind}>{KIND_LABEL[project.kind] || project.kind}</span>
+          <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>
           {project.label && <span className="reg-label">{project.label}</span>}
         </span>
       </span>
@@ -66,7 +70,8 @@ function Row({ project, onNavigate, lead }) {
 }
 
 export default function Register({ projects, onNavigate, lead = false, empty }) {
-  if (!projects.length) return <p className="reg-empty">{empty || 'Portfolio jest jeszcze puste.'}</p>
+  const { t } = useT()
+  if (!projects.length) return <p className="reg-empty">{empty || t('register.empty')}</p>
 
   return (
     <div className="register">

@@ -38,11 +38,11 @@ export function formatBytes(bytes) {
   return `${megabytes.toFixed(megabytes < 100 ? 1 : 0)} MB`
 }
 
-export function formatReleaseDate(value) {
+export function formatReleaseDate(value, locale = 'pl-PL') {
   if (!value) return ''
   const date = new Date(value)
   if (Number.isNaN(date.valueOf())) return ''
-  return new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
 }
 
 /** Adres bez protokołu – na liście liczy się domena, nie `https://`. */

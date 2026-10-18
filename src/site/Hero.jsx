@@ -1,6 +1,7 @@
 import Heading from './Heading'
 import { useState } from 'react'
-import { CATALOG_PATH, KIND_LABEL, plural } from '../lib/projects'
+import { CATALOG_PATH } from '../lib/projects'
+import { useT } from '../lib/i18n'
 
 /**
  * Pierwszy ekran to od razu indeks prac. Zdanie o tym, co robię, stoi nad
@@ -11,7 +12,9 @@ import { CATALOG_PATH, KIND_LABEL, plural } from '../lib/projects'
  * jedno wejście przy załadowaniu, nic przy przewijaniu.
  */
 export default function Hero({ hero, labels, featured = [], total = 0, onNavigate }) {
+  const { t, lp } = useT()
   const [current, setCurrent] = useState(0)
+  const catalog = lp(CATALOG_PATH)
   const rest = total - featured.length
 
   // Wejście robi CSS (.rise), więc treść jest widoczna nawet bez JS-owej animacji.
@@ -29,7 +32,7 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
           <p>{hero.lead}</p>
           <div className="hero-actions">
             <a className="btn btn-primary" href="#kontakt">{hero.primaryCta}</a>
-            <a className="hero-link" href={CATALOG_PATH} onClick={event => open(event, CATALOG_PATH)}>
+            <a className="hero-link" href={catalog} onClick={event => open(event, catalog)}>
               {hero.secondaryCta}
             </a>
           </div>
@@ -45,7 +48,7 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
           <div className="works-body">
             <ol className="works-list">
               {featured.map((project, index) => {
-                const href = `${CATALOG_PATH}/${project.slug}`
+                const href = lp(`${CATALOG_PATH}/${project.slug}`)
                 return (
                   <li key={project.id}>
                     <a
@@ -57,7 +60,7 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
                     >
                       <strong>{project.name}</strong>
                       <span className="works-meta">
-                        <span>{project.label || KIND_LABEL[project.kind]}</span>
+                        <span>{project.label || t(`kind.${project.kind}`)}</span>
                         {project.year && <span>{project.year}</span>}
                       </span>
                     </a>
@@ -81,8 +84,8 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
           </div>
 
           {rest > 0 && (
-            <a className="works-more" href={CATALOG_PATH} onClick={event => open(event, CATALOG_PATH)}>
-              {labels.catalogCta}: jeszcze {rest} {plural(rest, 'pozycja', 'pozycje', 'pozycji')}
+            <a className="works-more" href={catalog} onClick={event => open(event, catalog)}>
+              {t('hero.more', labels.catalogCta, rest)}
             </a>
           )}
         </div>

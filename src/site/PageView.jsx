@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowRight, LoaderCircle, Quote } from 'lucide-react'
 import { Reveal } from '../lib/ui'
 import Heading from './Heading'
 import Lightbox from './Lightbox'
+import { localePath, useLang, useT } from '../lib/i18n'
+import { applySeo, describe } from '../lib/seo'
 
 function Paragraphs({ text }) {
   return String(text || '')
@@ -17,7 +19,8 @@ function Paragraphs({ text }) {
     ))
 }
 
-function Block({ block, onZoom }) {
+function Block({ block, onZoom, onNavigate }) {
+  const lang = useLang()
   switch (block.type) {
     case 'image':
       return block.src ? (
@@ -86,7 +89,16 @@ function Block({ block, onZoom }) {
             <h2>{block.heading}</h2>
             {block.body && <p>{block.body}</p>}
           </div>
-          <a className="btn btn-primary" href={block.href}>{block.label} <ArrowRight size={17} /></a>
+          <a
+            className="btn btn-primary"
+            href={localePath(block.href, lang)}
+            onClick={event => {
+              const target = localePath(block.href, lang)
+              if (!target.startsWith('/') || target.startsWith('//')) return
+              event.preventDefault()
+              onNavigate(target)
+            }}
+          >{block.label} <ArrowRight size={17} /></a>
         </Reveal>
       )
 
@@ -101,6 +113,7 @@ function Block({ block, onZoom }) {
 }
 
 export default function PageView({ slug, onNavigate }) {
+  const { t, lp, lang } = useT()
   const [page, setPage] = useState(null)
   const [status, setStatus] = useState('loading')
   // podgląd: lista zdjęć z bloku i numer otwartego
@@ -114,19 +127,26 @@ export default function PageView({ slug, onNavigate }) {
   useEffect(() => {
     let active = true
     setStatus('loading')
-    fetch(`/api/pages/${encodeURIComponent(slug)}`)
+    fetch(`/api/pages/${encodeURIComponent(slug)}?lang=${lang}`)
       .then(response => (response.ok ? response.json() : Promise.reject(new Error('404'))))
       .then(data => { if (active) { setPage(data); setStatus('ready') } })
       .catch(() => active && setStatus('missing'))
     return () => { active = false }
-  }, [slug])
+  }, [slug, lang])
 
   useEffect(() => {
-    if (!page) return
-    document.title = `${page.title} – Adam Rędzikowski`
-    const meta = document.querySelector('meta[name="description"]')
-    if (meta && page.seoDescription) meta.setAttribute('content', page.seoDescription)
-  }, [page])
+    if (status === 'missing') {
+      applySeo({ lang, path: `/p/${slug}`, title: t('seo.notFound'), noindex: true })
+    }
+    if (!page || status !== 'ready') return
+    applySeo({
+      lang,
+      path: `/p/${page.slug}`,
+      title: `${page.title} | Adam Rędzikowski`,
+      description: describe(page.seoDescription || page.lead || page.excerpt),
+      image: page.cover,
+    })
+  }, [page, status, lang, slug, t])
 
   useEffect(() => {
     if (!zoom) return undefined
@@ -144,16 +164,16 @@ export default function PageView({ slug, onNavigate }) {
   }, [Boolean(zoom)]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (status === 'loading') {
-    return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>Wczytuję stronę…</span></main>
+    return <main className="page-state"><LoaderCircle className="spin" size={26} /><span>{t('page.loading')}</span></main>
   }
 
   if (status === 'missing') {
     return (
       <main className="page-state">
         <h1>404</h1>
-        <p>Ta strona nie istnieje albo została ukryta.</p>
-        <a className="btn btn-primary" href="/" onClick={event => { event.preventDefault(); onNavigate('/') }}>
-          Wróć na stronę główną
+        <p>{t('page.missing')}</p>
+        <a className="btn btn-primary" href={lp('/')} onClick={event => { event.preventDefault(); onNavigate(lp('/')) }}>
+          {t('page.backHome')}
         </a>
       </main>
     )
@@ -162,8 +182,8 @@ export default function PageView({ slug, onNavigate }) {
   return (
     <main className={`page-view accent-${page.accent || 'gold'}`}>
       <header className="page-hero">
-        <a className="page-back" href="/" onClick={event => { event.preventDefault(); onNavigate('/') }}>
-          <ArrowLeft size={15} /> Strona główna
+        <a className="page-back" href={lp('/')} onClick={event => { event.preventDefault(); onNavigate(lp('/')) }}>
+          <ArrowLeft size={15} /> {t('page.home')}
         </a>
         <h1 className="rise">{page.title}</h1>
         {page.lead && (
@@ -177,16 +197,16 @@ export default function PageView({ slug, onNavigate }) {
       </header>
 
       <div className="page-blocks">
-        {page.blocks.map(block => <Block key={block.id} block={block} onZoom={openZoom} />)}
+        {page.blocks.map(block => <Block key={block.id} block={block} onZoom={openZoom} onNavigate={onNavigate} />)}
       </div>
 
       <Reveal className="page-foot">
         <div>
-          <span>Masz podobny projekt?</span>
-          <h2><Heading title="Opisz go w kilku zdaniach –" accent="resztą zajmę się ja" /></h2>
+          <span>{t('page.footKicker')}</span>
+          <h2><Heading title={t('page.footTitle')} accent={t('page.footAccent')} /></h2>
         </div>
-        <a className="btn btn-primary" href="/#kontakt" onClick={event => { event.preventDefault(); onNavigate('/#kontakt') }}>
-          Przejdź do formularza <ArrowRight size={17} />
+        <a className="btn btn-primary" href={lp('/#kontakt')} onClick={event => { event.preventDefault(); onNavigate(lp('/#kontakt')) }}>
+          {t('page.footCta')} <ArrowRight size={17} />
         </a>
       </Reveal>
 
