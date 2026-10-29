@@ -1343,6 +1343,20 @@ app.post('/api/admin/github/release', enforceSameOrigin, async (req, res) => {
   res.json(await releases.refresh(repo))
 })
 
+/** Pobiera od razu na nowo wydania wszystkich aplikacji z GitHuba, z pominięciem cache. */
+app.post('/api/admin/github/refresh-all', enforceSameOrigin, async (_req, res) => {
+  const repos = [...new Set((await readProjects())
+    .filter(project => project.releaseSource === 'github' && project.repo)
+    .map(project => project.repo))]
+  const results = []
+  // Po kilka naraz, żeby nie zasypać API GitHuba.
+  for (let i = 0; i < repos.length; i += 6) {
+    const batch = await Promise.all(repos.slice(i, i + 6).map(repo => releases.refresh(repo)))
+    results.push(...batch.map((entry, index) => ({ repo: repos[i + index], tag: entry?.tag || '', error: entry?.error || '' })))
+  }
+  res.json({ refreshed: results.length, failed: results.filter(item => item.error).length, results })
+})
+
 app.get('/api/admin/github', async (_req, res) => {
   res.json(await releases.check())
 })

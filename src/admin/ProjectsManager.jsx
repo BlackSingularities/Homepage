@@ -168,11 +168,28 @@ function ReleasePreview({ release, busy, onRefresh }) {
 }
 
 /** Połączenie z GitHubem: bez tokenu czytamy tylko repozytoria publiczne. */
-function GithubPanel({ notify }) {
+function GithubPanel({ notify, onRefreshed }) {
   const [state, setState] = useState(null)
   const [token, setToken] = useState('')
   const [busy, setBusy] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+
+  const refreshAll = async () => {
+    setRefreshing(true)
+    setError('')
+    try {
+      const result = await api('/api/admin/github/refresh-all', json('POST', {}))
+      await onRefreshed?.()
+      const failed = result.results.filter(item => item.error)
+      if (failed.length) setError(`Nie udało się odświeżyć: ${failed.map(item => item.repo).join(', ')}.`)
+      notify(`Pobrano na nowo wydania ${result.refreshed} repozytoriów z GitHuba.`)
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const load = () => api('/api/admin/github').then(setState).catch(requestError => setError(requestError.message))
 
@@ -226,6 +243,15 @@ function GithubPanel({ notify }) {
               <Trash2 size={14} /> Usuń token
             </button>
           )}
+          <button
+            className="ap-btn ap-btn-ghost"
+            onClick={refreshAll}
+            disabled={refreshing}
+            title="Strona trzyma wydania przez 30 minut – to pobiera wszystkie od razu, także dla aktualizacji w aplikacjach."
+          >
+            {refreshing ? <LoaderCircle className="spin" size={14} /> : <RefreshCw size={14} />}
+            {refreshing ? ' Pobieram z GitHuba…' : ' Odśwież wszystkie wydania z GitHuba'}
+          </button>
         </div>
       </div>
     </div>
@@ -549,7 +575,7 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
     <div className="ap-projects">
       {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
-      <GithubPanel notify={notify} />
+      <GithubPanel notify={notify} onRefreshed={() => (dirty ? undefined : load())} />
 
       <div className="ap-projects-layout">
         <div className="ap-projects-list">
