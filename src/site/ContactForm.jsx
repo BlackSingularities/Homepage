@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole, Mail, Phone, Send } from 'lucide-react'
 import { ease } from '../lib/ui'
+import GlowEdge from '../lib/GlowEdge'
 import { useT } from '../lib/i18n'
 
 const EMPTY = {
@@ -122,9 +123,9 @@ export default function ContactForm({ scopeOptions = [] }) {
                 <span>{t('form.scope')}</span>
                 <div className="chips scope-choices">
                   {scopeOptions.map(option => (
-                    <button type="button" key={option} className={`chip ${form.scope.includes(option) ? 'is-active' : ''}`} onClick={() => toggleScope(option)} aria-pressed={form.scope.includes(option)}>
+                    <GlowEdge as="button" type="button" key={option} className={`chip ${form.scope.includes(option) ? 'is-active' : ''}`} onClick={() => toggleScope(option)} aria-pressed={form.scope.includes(option)}>
                       <i>{form.scope.includes(option) ? <Check size={12} /> : '+'}</i><span>{option}</span>
-                    </button>
+                    </GlowEdge>
                   ))}
                 </div>
               </div>
@@ -135,7 +136,7 @@ export default function ContactForm({ scopeOptions = [] }) {
                 <span>{t('form.budget')}</span>
                 <div className="chips compact-choices">
                   {BUDGETS.map(option => (
-                    <button type="button" key={option} className={`chip ${form.budget === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, budget: current.budget === option ? '' : option }))}>{option}</button>
+                    <GlowEdge as="button" type="button" key={option} className={`chip ${form.budget === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, budget: current.budget === option ? '' : option }))}>{option}</GlowEdge>
                   ))}
                 </div>
               </div>
@@ -143,7 +144,7 @@ export default function ContactForm({ scopeOptions = [] }) {
                 <span>{t('form.timeline')}</span>
                 <div className="chips compact-choices">
                   {TIMELINES.map(option => (
-                    <button type="button" key={option} className={`chip ${form.timeline === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, timeline: current.timeline === option ? '' : option }))}>{option}</button>
+                    <GlowEdge as="button" type="button" key={option} className={`chip ${form.timeline === option ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, timeline: current.timeline === option ? '' : option }))}>{option}</GlowEdge>
                   ))}
                 </div>
               </div>

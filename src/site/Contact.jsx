@@ -1,3 +1,4 @@
+import GlowEdge from '../lib/GlowEdge'
 import Heading from './Heading'
 import ContactForm from './ContactForm'
 
@@ -17,9 +18,9 @@ export default function Contact({ data, brand, scopeOptions }) {
         </div>
       </div>
 
-      <div className="contact-panel" id="formularz">
+      <GlowEdge className="contact-panel" id="formularz">
         <ContactForm scopeOptions={scopeOptions} />
-      </div>
+      </GlowEdge>
     </section>
   )
 }
