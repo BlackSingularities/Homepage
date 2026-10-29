@@ -189,7 +189,7 @@ export function downloadsFor(project, release, counts = {}) {
   if (project.releaseSource !== 'github' || !release) return []
   return (release.assets || [])
     // Sumy kontrolne i podpisy zostają w wydaniu dla aktualizatorów, na stronie to szum.
-    .filter(asset => !/\.(sha256|sha512|sig|asc)$/i.test(asset.name || ''))
+    .filter(asset => !/(\.(sha256|sha512|sig|asc)|sha\d*sums\.txt)$/i.test(asset.name || ''))
     .map(asset => ({
       id: asset.id,
       platform: asset.platform,
