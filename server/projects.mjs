@@ -204,7 +204,7 @@ export function downloadsFor(project, release, counts = {}) {
 
 export const totalDownloads = downloads => downloads.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
 
-export function publicProject(project, release, counts = {}) {
+export function publicProject(project, release, counts = {}, { changelog = false } = {}) {
   // Sklep zastępuje pliki: kto wystawił aplikację w sklepie, ten nie chce,
   // żeby obok wisiał instalator z GitHuba.
   const stores = storesFor(project)
@@ -224,7 +224,8 @@ export function publicProject(project, release, counts = {}) {
         name: release.name,
         publishedAt: release.publishedAt,
         // Historia zmian jest na stronie, bo wydania na GitHubie nie są publiczne.
-        history: (release.history?.length ? release.history : [release])
+        // Włącza ją przełącznik w panelu (Treści strony → Całe portfolio).
+        history: !changelog ? [] : (release.history?.length ? release.history : [release])
           .map(item => ({ tag: item.tag, publishedAt: item.publishedAt, prerelease: item.prerelease === true, notes: item.notes || '' })),
       }
       : null,

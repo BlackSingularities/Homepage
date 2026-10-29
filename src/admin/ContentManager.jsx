@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, LoaderCircle, RotateCcw } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
-import { Area, Field, LangTabs, Notice, Repeater, SaveBar, Text } from './parts'
+import { Area, Field, LangTabs, Notice, Repeater, SaveBar, Text, Toggle } from './parts'
 
 /**
  * Teksty strony głównej i portfolio. Prace mają własną zakładkę, bo są
@@ -190,6 +190,14 @@ export default function ContentManager({ notify, item = '', onItem = () => {} })
           <Text label="Filtr: strony" value={draft.catalog.filterWeb} onChange={filterWeb => patch('catalog', { filterWeb })} />
           <Text label="Filtr: aplikacje" value={draft.catalog.filterApp} onChange={filterApp => patch('catalog', { filterApp })} />
         </div>
+        {lang !== 'en' && (
+          <Toggle
+            label="Pokazuj historię zmian aplikacji"
+            hint="Notatki z ostatnich wydań pod plikami do pobrania – wspólne dla obu języków."
+            checked={draft.catalog.showChangelog === true}
+            onChange={showChangelog => patch('catalog', { showChangelog })}
+          />
+        )}
       </Section>
 
       <Section id="scope" title="Zakres" description="Lista obszarów, którymi się zajmujesz." open={open === 'scope'} onToggle={toggle}>

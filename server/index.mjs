@@ -296,6 +296,11 @@ async function getContent(lang = 'pl') {
   return mergeContent(await readJson(source.file, {}), source.defaults)
 }
 
+/** Przełącznik historii zmian jest wspólny dla obu języków – trzyma go wersja polska. */
+async function changelogEnabled() {
+  return (await getContent('pl')).catalog.showChangelog === true
+}
+
 /* ── realizacje (portfolio) ──────────────────────────────────────────── */
 
 async function getGithubToken() {
@@ -665,7 +670,7 @@ app.get('/api/projects/:slug', async (req, res) => {
   const index = entries.findIndex(entry => entry.project.slug === req.params.slug)
   if (index === -1) return res.status(404).json({ error: 'Nie znaleziono realizacji.' })
   const { project, release } = entries[index]
-  const counts = await analytics.counts()
+  const [counts, changelog] = await Promise.all([analytics.counts(), changelogEnabled()])
   const neighbour = step => {
     const target = entries[(index + step + entries.length) % entries.length]
     return target && target.project.slug !== project.slug
@@ -674,7 +679,7 @@ app.get('/api/projects/:slug', async (req, res) => {
   }
   res.set('Cache-Control', 'no-cache')
   const lang = langOf(req.query.lang)
-  res.json({ project: publicProject(localizeProject(project, lang), release, counts), previous: neighbour(-1), next: neighbour(1) })
+  res.json({ project: publicProject(localizeProject(project, lang), release, counts, { changelog }), previous: neighbour(-1), next: neighbour(1) })
 })
 
 /** Plik z dowolnego wydania trzymanego w historii, po identyfikatorze. */
@@ -970,7 +975,7 @@ async function seoData(route) {
   if (route.view === 'home' || route.view === 'catalog') data.content = await getContent(lang)
   if (route.view === 'project') {
     const entry = entries.find(item => item.project.slug === route.slug)
-    if (entry) data.project = publicProject(localizeProject(entry.project, lang), entry.release, counts)
+    if (entry) data.project = publicProject(localizeProject(entry.project, lang), entry.release, counts, { changelog: await changelogEnabled() })
   }
   if (route.view === 'page') {
     const page = pages.find(item => item.slug === route.slug)

@@ -23,6 +23,7 @@
     "empty": "The portfolio is still empty."
   },
   "catalog": {
+    "showChangelog": false,
     "title": "Everything I have built",
     "accent": "and still maintain.",
     "lead": "Web services you can open in the browser and applications you can download. App files come straight from the latest releases – not from a hand-maintained list.",

@@ -23,6 +23,7 @@
     "empty": "Portfolio jest jeszcze puste."
   },
   "catalog": {
+    "showChangelog": false,
     "title": "Wszystko, co zbudowałem",
     "accent": "i nadal utrzymuję.",
     "lead": "Serwisy, które da się otworzyć w przeglądarce, i aplikacje, które da się pobrać. Pliki aplikacji pochodzą wprost z najnowszych wydań – nie z ręcznie aktualizowanej listy.",
