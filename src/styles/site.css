@@ -34,6 +34,14 @@
 }
 
 .pv-head-main { display: grid; gap: 16px; }
+.pv-title { display: flex; align-items: center; gap: clamp(14px, 1.8vw, 22px); min-width: 0; }
+.pv-icon {
+  flex: none;
+  width: clamp(52px, 6vw, 80px);
+  height: clamp(52px, 6vw, 80px);
+  border-radius: 22%;
+  object-fit: contain;
+}
 .pv-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
 .pv-tagline {
@@ -1449,6 +1457,15 @@
 }
 
 .reg-row:hover .reg-main strong { color: var(--accent); }
+
+.reg-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.reg-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  object-fit: contain;
+}
 
 .reg-tagline { max-width: 62ch; font-size: 14.5px; line-height: 1.55; color: var(--ink-2); }
 

@@ -51,7 +51,10 @@ function Row({ project, onNavigate, lead }) {
       </span>
 
       <span className="reg-main">
-        <strong>{project.name}</strong>
+        <span className="reg-title">
+          {project.icon && <img className="reg-icon" src={project.icon} alt="" loading="lazy" />}
+          <strong>{project.name}</strong>
+        </span>
         {project.tagline && <span className="reg-tagline">{project.tagline}</span>}
         <span className="reg-tags">
           <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>

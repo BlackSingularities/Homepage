@@ -200,9 +200,12 @@ export default function ProjectView({ slug, onNavigate }) {
               {project.label && <span className="reg-label">{project.label}</span>}
               {project.year && <span className="reg-year mono">{project.year}</span>}
             </span>
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>
-              {project.name}
-            </motion.h1>
+            <div className="pv-title">
+              {project.icon && <img className="pv-icon" src={project.icon} alt="" />}
+              <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>
+                {project.name}
+              </motion.h1>
+            </div>
             {project.tagline && <p className="pv-tagline">{project.tagline}</p>}
           </div>
 

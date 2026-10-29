@@ -42,6 +42,7 @@ function emptyProject() {
     role: '',
     stack: [],
     features: [],
+    icon: '',
     cover: '',
     shots: [],
     siteUrl: '',
@@ -299,6 +300,8 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
           hint="Wspólne dla obu języków. Każda linia to osobna pozycja." />
       </div>
 
+      <ImagePicker label="Ikona aplikacji" value={project.icon} onChange={icon => update({ icon })}
+        hint="Kwadratowa ikona z przezroczystym tłem – pokazuje się obok nazwy, osobno od zrzutów." />
       <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
         hint="Najlepiej poziomy zrzut ekranu – kadrowany do 16:10." />
       <Shots value={project.shots} onChange={shots => update({ shots })} />
@@ -526,7 +529,7 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
             <div key={project.id} className={`ap-project-row ${project.id === selected ? 'is-active' : ''}`}>
               <button type="button" className="ap-project-pick" onClick={() => choose(project)}>
                 <span className="ap-project-thumb">
-                  {project.cover ? <img src={project.cover} alt="" /> : <AppWindow size={15} />}
+                  {project.icon || project.cover ? <img src={project.icon || project.cover} alt="" /> : <AppWindow size={15} />}
                 </span>
                 <span className="ap-project-text">
                   <strong>{project.name || 'Bez nazwy'}</strong>

@@ -90,6 +90,7 @@ export function sanitizeProject(input, existing = {}) {
       .slice(0, 20).map(item => cleanText(item, 60)).filter(Boolean),
     features: (Array.isArray(input?.features) ? input.features : [])
       .slice(0, 20).map(item => cleanText(item, 200)).filter(Boolean),
+    icon: cleanMedia(input?.icon),
     cover: cleanMedia(input?.cover),
     shots: (Array.isArray(input?.shots) ? input.shots : [])
       .slice(0, 24).map(sanitizeShot).filter(shot => shot.src),
@@ -119,6 +120,7 @@ export function projectSummary(project, release, counts = {}) {
     label: project.label,
     year: project.year,
     tagline: project.tagline,
+    icon: project.icon || '',
     cover: project.cover,
     featured: project.featured,
     site: project.siteHidden ? '' : project.siteUrl,
