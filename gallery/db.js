@@ -22,6 +22,9 @@ const PHOTO_COLUMNS = [
   ['iso',           'TEXT'],
   ['blur_data_url', 'TEXT'],
   ['original_quality', 'INTEGER DEFAULT 0'],
+  // Wariant poglądowy: jedyny plik, jaki trafia do przeglądarki gościa.
+  // Oryginał zostaje na serwerze i wychodzi wyłącznie do zalogowanego autora.
+  ['display', 'TEXT'],
 ]
 
 const ALBUM_COLUMNS = [

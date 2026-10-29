@@ -5,31 +5,30 @@ import Grid from '../components/Grid'
 import SkeletonGrid from '../components/SkeletonGrid'
 import BackToTop from '../components/BackToTop'
 import PasswordGate from '../components/PasswordGate'
+import GalleryToolbar, { photoWord } from '../components/GalleryToolbar'
+import { Nav, Footer } from '../components/Chrome'
+import { usePhotoView } from '../lib/photoView'
 import { setPageMeta } from '../lib/seo'
 import { IconImage } from '../components/icons'
 
-const TOKEN_KEY = (slug) => `album_token_${slug}`
+/**
+ * Album – ten sam sposób oglądania, co w portfolio, tyle że zbiór bywa
+ * zamknięty na hasło. Również bez pobierania: można podesłać link do
+ * konkretnego zdjęcia, ale plik źródłowy nigdy nie opuszcza serwera.
+ */
 
-function Nav() {
-  return (
-    <nav className="nav">
-      <Link to="/" className="nav-logo">Adam Rędzikowski</Link>
-      <div className="nav-links">
-        <Link to="/" className="nav-link">← Portfolio</Link>
-      </div>
-    </nav>
-  )
-}
+const TOKEN_KEY = (slug) => `album_token_${slug}`
 
 export default function Album() {
   const { slug } = useParams()
   const [searchParams] = useSearchParams()
-  const [data, setData]     = useState(null)
+  const [data, setData] = useState(null)
   const [mediaToken, setMediaToken] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsPass, setNeedsPass] = useState(false)
   const [albumName, setAlbumName] = useState('')
   const [notFound, setNotFound] = useState(false)
+  const { shown, controls } = usePhotoView(data?.photos || [], `album_${slug}`)
 
   const load = async (token) => {
     setLoading(true)
@@ -68,7 +67,7 @@ export default function Album() {
 
   if (loading) return (
     <div className="page">
-      <Nav />
+      <Nav current="album" />
       <div className="gallery-wrap" style={{ paddingTop: 40 }}>
         <SkeletonGrid count={9} />
       </div>
@@ -83,11 +82,11 @@ export default function Album() {
 
   if (notFound || !data) return (
     <div className="page">
-      <Nav />
+      <Nav current="album" />
       <div className="empty-state" style={{ paddingTop: 120 }}>
         <IconImage width={40} height={40} style={{ opacity: .3, margin: '0 auto' }} />
-        <p>Ten album nie istnieje lub został usunięty.</p>
-        <Link to="/" style={{ color:'var(--gold)', fontSize:13 }}>← Wróć do portfolio</Link>
+        <p>Ten album nie istnieje albo został usunięty.</p>
+        <Link to="/" style={{ color: 'var(--gold)', fontSize: 13 }}>Wróć do galerii</Link>
       </div>
     </div>
   )
@@ -96,43 +95,51 @@ export default function Album() {
 
   return (
     <div className="page">
-      <Nav />
+      <Nav current="album" />
 
-      {/* Breadcrumbs */}
       <div className="breadcrumbs">
-        <Link to="/">Portfolio</Link>
+        <Link to="/">Galeria</Link>
         <span>/</span>
         <span className="breadcrumbs-current">{album.name}</span>
       </div>
 
-      {/* Header */}
-      <div className="section-wrap" style={{ paddingTop: 24, paddingBottom: 32 }}>
+      <div className="section-wrap" style={{ paddingTop: 20, paddingBottom: 0 }}>
         <p className="section-label">Album</p>
-        <h1 className="section-heading" style={{ marginBottom: album.description ? 12 : 32 }}>
-          {album.name}
-        </h1>
+        <h1 className="section-heading" style={{ marginBottom: album.description ? 14 : 18 }}>{album.name}</h1>
         {album.description && (
-          <p style={{ color:'var(--text-2)', maxWidth:600, marginBottom:32 }}>
-            {album.description}
-          </p>
+          <p className="hero-lead" style={{ marginBottom: 14 }}>{album.description}</p>
         )}
-        <p style={{ color:'var(--text-3)', fontSize:13 }}>
-          {photos.length} {photos.length === 1 ? 'zdjęcie' : photos.length < 5 ? 'zdjęcia' : 'zdjęć'}
+        <p style={{ color: 'var(--text-3)', fontSize: 13 }}>
+          {photos.length} {photoWord(photos.length)}
+          {album.has_password ? ' · album na hasło' : ''}
         </p>
       </div>
 
-      {/* Grid */}
+      {photos.length > 0 && <GalleryToolbar {...controls} />}
+
       <div className="gallery-wrap">
-        <Grid
-          photos={photos}
-          syncUrl
-          mediaToken={mediaToken}
-          allowShareDownload
-          albumSlug={slug}
-          tileSizeStorageKey={`album_tile_size_${slug}`}
-        />
+        {shown.length === 0 ? (
+          <div className="empty-state"><p>Żadne zdjęcie nie pasuje do wybranych filtrów.</p></div>
+        ) : (
+          <Grid
+            photos={shown}
+            syncUrl
+            mediaToken={mediaToken}
+            canShare
+            albumSlug={slug}
+            tileSize={controls.tileSize}
+            layout={controls.layout}
+            showTileSizeControl={false}
+          />
+        )}
       </div>
 
+      <p className="gal-note">
+        Album jest do oglądania – zdjęcia wyświetlają się w pomniejszonej kopii z podpisem.
+        Pliki w pełnej jakości wysyłam na życzenie.
+      </p>
+
+      <Footer />
       <BackToTop />
     </div>
   )

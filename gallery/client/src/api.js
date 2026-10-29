@@ -6,6 +6,12 @@ export const API   = `${BASE}/api`
 // harmless, so callers with a token in scope can just always pass it through.
 export const fileUrl  = (f, token) => f ? `${BASE}/uploads/${f}${token ? `?t=${encodeURIComponent(token)}` : ''}` : ''
 export const thumbUrl = (f, token) => f ? `${BASE}/thumbs/${f}${token ? `?t=${encodeURIComponent(token)}` : ''}`  : ''
+// Wariant poglądowy – jedyny obraz w pełnym rozmiarze, jaki dostaje gość.
+// Pliki źródłowe (`fileUrl`) serwer wydaje wyłącznie zalogowanemu autorowi.
+export const viewUrl  = (f, token) => f ? `${BASE}/view/${f}${token ? `?t=${encodeURIComponent(token)}` : ''}`   : ''
+
+/** Adres zdjęcia do oglądania: wariant poglądowy, a w panelu – plik źródłowy. */
+export const photoSrc = (photo, token) => (photo?.view ? viewUrl(photo.view, token) : fileUrl(photo?.filename, token))
 
 async function req(method, path, body, token) {
   const headers = { 'Content-Type': 'application/json' }

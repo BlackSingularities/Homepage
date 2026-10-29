@@ -19,9 +19,14 @@ const HOMEPAGE_API_URL = process.env.HOMEPAGE_API_URL || 'http://localhost:3001'
 
 const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, 'persist/uploads')
 const THUMBS_DIR  = process.env.THUMBS_DIR  || path.join(__dirname, 'persist/thumbs')
+const DISPLAY_DIR = process.env.DISPLAY_DIR || path.join(__dirname, 'persist/display')
+
+// Podpis wypalany w wariancie poglądowym. Pusty = bez podpisu.
+const WATERMARK = (process.env.GALLERY_WATERMARK ?? 'redzikowski.com').trim()
 
 fs.mkdirSync(UPLOADS_DIR, { recursive: true })
 fs.mkdirSync(THUMBS_DIR,  { recursive: true })
+fs.mkdirSync(DISPLAY_DIR, { recursive: true })
 
 if (NODE_ENV === 'production' && JWT_SECRET === 'galeria-secret-change-me-in-production') {
   console.warn('\n' + '⚠ '.repeat(20))
@@ -65,39 +70,88 @@ const authLimiter = rateLimit({
 const PHOTO_DATE_ORDER_DESC = "datetime(COALESCE(NULLIF(p.taken_at, ''), p.created_at)) DESC, p.created_at DESC, p.id DESC"
 
 // ── Media access gate ────────────────────────────────────────────────────────
-// Listing endpoints already require a password/token, but the raw file URLs
-// used to be served unconditionally by express.static – anyone who learned a
-// filename could fetch it forever. This middleware re-checks access on every
-// single file request. Portfolio originals and thumbnails stay public for
-// display; password-protected album originals require album/admin access.
-async function protectMedia(req, res, next) {
+// Gość widzi wyłącznie miniatury i wariant poglądowy – pliki źródłowe wychodzą
+// tylko do zalogowanego autora. Każde żądanie pliku sprawdzamy osobno, bo sama
+// znajomość nazwy nie może dawać dostępu do zdjęć z albumu na hasło.
+
+/** Wiersz zdjęcia po nazwie pliku w jednej z trzech kolumn. */
+function photoByFile(column, filename) {
   const db = getDb()
-  const filename = path.basename(req.path)
-  const isThumb = filename.startsWith('t_')
-  const column = isThumb ? 'thumb' : 'filename'
-  const photo = db.prepare(`SELECT p.is_portfolio, a.id as album_id, a.password as album_password, a.token_version as token_version
+  return db.prepare(`SELECT p.id, p.filename, p.display, p.is_portfolio,
+      a.id as album_id, a.password as album_password, a.token_version as token_version
     FROM photos p LEFT JOIN albums a ON a.id = p.album_id WHERE p.${column} = ?`).get(filename)
+}
 
-  if (!photo) return res.status(404).end()
-  if (isThumb) return next()
-  if (photo.is_portfolio) return next()
-  if (photo.album_id && !photo.album_password) return next()
-  if (!photo.album_id && !photo.is_portfolio) return next()
-
-  if (await authenticatedAdmin(req)) return next()
-
+/** Czy żądanie ma prawo oglądać to zdjęcie (hasło albumu albo konto autora). */
+async function mayView(photo, req) {
+  if (photo.is_portfolio) return true
+  if (!photo.album_id || !photo.album_password) return true
+  if (await authenticatedAdmin(req)) return true
   const token = req.query.t || req.headers.authorization?.replace('Bearer ', '')
   try {
-    const p = jwt.verify(token, JWT_SECRET)
-    if (photo.album_id && p.albumId === photo.album_id && (p.tokenVersion || 0) === (photo.token_version || 0)) return next()
-  } catch {}
+    const payload = jwt.verify(token, JWT_SECRET)
+    return payload.albumId === photo.album_id && (payload.tokenVersion || 0) === (photo.token_version || 0)
+  } catch {
+    return false
+  }
+}
 
-  return res.status(403).json({ error: 'Brak dostępu' })
+/** Zdjęcia nie mają trafiać do wyszukiwarek ani do pamięci wspólnych pośredników. */
+function privateMedia(res) {
+  res.set('X-Robots-Tag', 'noindex, noimageindex, noarchive')
+  res.set('Cache-Control', 'private, max-age=604800')
+}
+
+/** Miniatury: publiczne dla portfolio i albumów bez hasła. */
+async function protectThumb(req, res, next) {
+  const photo = photoByFile('thumb', path.basename(req.path))
+  if (!photo) return res.status(404).end()
+  if (!await mayView(photo, req)) return res.status(403).json({ error: 'Brak dostępu' })
+  privateMedia(res)
+  next()
+}
+
+/** Pliki źródłowe: wyłącznie dla zalogowanego autora. */
+async function protectOriginal(req, res, next) {
+  const photo = photoByFile('filename', path.basename(req.path))
+  if (!photo) return res.status(404).end()
+  if (!await authenticatedAdmin(req)) return res.status(403).json({ error: 'Brak dostępu' })
+  privateMedia(res)
+  next()
+}
+
+/**
+ * Wariant poglądowy. Nazwa wynika z nazwy oryginału, więc zdjęcia dodane
+ * przed wprowadzeniem wariantów dorabiają go przy pierwszym wyświetleniu.
+ */
+async function serveDisplay(req, res) {
+  const name = path.basename(req.path)
+  if (!/^d_[\w.-]+\.jpg$/.test(name)) return res.status(404).end()
+
+  const db = getDb()
+  let photo = photoByFile('display', name)
+  if (!photo) {
+    const base = name.replace(/^d_/, '').replace(/\.jpg$/, '')
+    photo = db.prepare(`SELECT p.id, p.filename, p.display, p.is_portfolio,
+        a.id as album_id, a.password as album_password, a.token_version as token_version
+      FROM photos p LEFT JOIN albums a ON a.id = p.album_id
+      WHERE p.filename LIKE ? ESCAPE '!' LIMIT 1`).get(`${base.replace(/[%_!]/g, '!$&')}.%`)
+  }
+  if (!photo) return res.status(404).end()
+  if (!await mayView(photo, req)) return res.status(403).json({ error: 'Brak dostępu' })
+
+  const file = await ensureDisplay(photo)
+  if (!file) return res.status(404).end()
+  if (photo.display !== file) db.prepare('UPDATE photos SET display=? WHERE id=?').run(file, photo.id)
+
+  privateMedia(res)
+  res.sendFile(path.join(DISPLAY_DIR, file), { maxAge: '7d' })
 }
 
 // Static files (served directly – nginx proxy strips /galeria prefix)
-app.use('/uploads', protectMedia, express.static(UPLOADS_DIR, { maxAge: '1y', immutable: true }))
-app.use('/thumbs',  protectMedia, express.static(THUMBS_DIR,  { maxAge: '1y', immutable: true }))
+app.use('/uploads', protectOriginal, express.static(UPLOADS_DIR, { maxAge: '1y', immutable: true }))
+app.use('/thumbs',  protectThumb,    express.static(THUMBS_DIR,  { maxAge: '1y', immutable: true }))
+app.get('/view/:file', serveDisplay)
 
 // Multer
 const storage = multer.diskStorage({
@@ -121,6 +175,10 @@ const MAIN_IMAGE_MAX_SIZE = 3000
 const MAIN_IMAGE_QUALITY = 90
 const THUMB_MAX_SIZE = 800
 const THUMB_QUALITY = 82
+// Wariant poglądowy: tyle, ile potrzeba na ekran w pełnej rozdzielczości,
+// i ani piksela więcej – oryginał nigdy nie opuszcza serwera.
+const DISPLAY_MAX_SIZE = 2200
+const DISPLAY_QUALITY = 82
 const LQIP_SIZE = 24
 const LQIP_QUALITY = 40
 const MAX_UPLOAD_FILES = 1000
@@ -175,6 +233,59 @@ function displayDims(meta) {
   return rotated ? { width: meta.height, height: meta.width } : { width: meta.width, height: meta.height }
 }
 
+/** Nazwa wariantu poglądowego – wyliczalna z nazwy oryginału. */
+function displayNameFor(filename) {
+  return `d_${path.basename(filename, path.extname(filename))}.jpg`
+}
+
+/**
+ * Wariant poglądowy: zmniejszona kopia z wypalonym podpisem w rogu. To jedyny
+ * plik, jaki dostaje przeglądarka gościa, więc zrzut ekranu też niesie podpis,
+ * a oryginał w pełnej jakości zostaje po stronie serwera.
+ */
+async function buildDisplay(filename) {
+  const source = path.join(UPLOADS_DIR, filename)
+  if (!fs.existsSync(source)) return null
+  const target = path.join(DISPLAY_DIR, displayNameFor(filename))
+
+  const pipeline = sharp(source)
+    .rotate()
+    .resize(DISPLAY_MAX_SIZE, DISPLAY_MAX_SIZE, { fit: 'inside', withoutEnlargement: true })
+
+  const meta = await pipeline.clone().jpeg({ quality: DISPLAY_QUALITY }).toBuffer({ resolveWithObject: true })
+  if (!WATERMARK) {
+    fs.writeFileSync(target, meta.data)
+    return displayNameFor(filename)
+  }
+
+  const { width, height } = meta.info
+  const size = Math.max(13, Math.round(Math.min(width, height) * 0.022))
+  const pad = Math.round(size * 1.4)
+  const mark = Buffer.from(
+    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+       <text x="${width - pad}" y="${height - pad}" text-anchor="end"
+             font-family="Georgia, 'Times New Roman', serif" font-size="${size}"
+             letter-spacing="${(size * 0.08).toFixed(2)}"
+             fill="#ffffff" fill-opacity="0.42"
+             stroke="#000000" stroke-opacity="0.18" stroke-width="${(size * 0.045).toFixed(2)}"
+             paint-order="stroke">${WATERMARK.replace(/[<>&]/g, '')}</text>
+     </svg>`,
+  )
+
+  await sharp(meta.data)
+    .composite([{ input: mark, top: 0, left: 0 }])
+    .jpeg({ quality: DISPLAY_QUALITY, progressive: true })
+    .toFile(target)
+  return displayNameFor(filename)
+}
+
+/** Zwraca nazwę wariantu poglądowego, dorabiając plik, gdy go jeszcze nie ma. */
+async function ensureDisplay(photo) {
+  const name = photo.display || displayNameFor(photo.filename)
+  if (fs.existsSync(path.join(DISPLAY_DIR, name))) return name
+  return (await buildDisplay(photo.filename)) || null
+}
+
 async function processUploadedPhoto(file, keepOriginal) {
   const exif = await extractExif(file.path)
 
@@ -215,8 +326,9 @@ async function processUploadedPhoto(file, keepOriginal) {
     .jpeg({ quality: LQIP_QUALITY })
     .toBuffer()
   const blurDataUrl = `data:image/jpeg;base64,${lqipBuffer.toString('base64')}`
+  const display = await buildDisplay(filename)
 
-  return { filename, thumb, width, height, fileSize, blurDataUrl, exif, originalQuality: !!keepOriginal }
+  return { filename, thumb, display, width, height, fileSize, blurDataUrl, exif, originalQuality: !!keepOriginal }
 }
 
 // ── Auth helpers ──────────────────────────────────────────────────────────────
@@ -287,17 +399,26 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, ts: Date.now() }))
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
+/**
+ * Publiczna postać zdjęcia: nazwa wariantu poglądowego zamiast nazwy pliku
+ * źródłowego. Gość nie dostaje nawet adresu oryginału.
+ */
+function publicPhoto(photo) {
+  const { filename, display, original_name: originalName, file_size: fileSize, ...rest } = photo
+  return { ...rest, view: display || displayNameFor(filename) }
+}
+
 app.get('/api/portfolio', (req, res) => {
   const db = getDb()
   const photos = db.prepare(`
-    SELECT p.id, p.filename, p.thumb, p.display_name, p.width, p.height, p.file_size, p.sort_order, p.is_portfolio,
+    SELECT p.id, p.filename, p.display, p.thumb, p.display_name, p.width, p.height, p.sort_order, p.is_portfolio,
       p.created_at, p.taken_at, p.camera_make, p.camera_model, p.lens, p.focal_length,
       p.aperture, p.shutter_speed, p.iso, p.blur_data_url
     FROM photos p LEFT JOIN albums a ON p.album_id = a.id
     WHERE p.is_portfolio = 1
     ORDER BY ${PHOTO_DATE_ORDER_DESC}
   `).all()
-  res.json(photos)
+  res.json(photos.map(publicPhoto))
 })
 
 app.post('/api/albums/:slug/verify', authLimiter, (req, res) => {
@@ -328,7 +449,10 @@ app.get('/api/albums/:slug', requireAlbumAccess, (req, res) => {
     WHERE album_id = ?
     ORDER BY ${PHOTO_DATE_ORDER_DESC}
   `).all(req.album.id)
-  res.json({ album: { ...req.album, has_password: !!req.album.password, password: undefined, token_version: undefined }, photos })
+  res.json({
+    album: { ...req.album, has_password: !!req.album.password, password: undefined, token_version: undefined },
+    photos: photos.map(publicPhoto),
+  })
 })
 
 // ── Admin API ─────────────────────────────────────────────────────────────────
@@ -416,10 +540,11 @@ app.put('/api/admin/albums/:id/cover', requireAdmin, (req, res) => {
 
 app.delete('/api/admin/albums/:id', requireAdmin, (req, res) => {
   const db = getDb()
-  const photos = db.prepare('SELECT filename,thumb FROM photos WHERE album_id=?').all(req.params.id)
+  const photos = db.prepare('SELECT filename,thumb,display FROM photos WHERE album_id=?').all(req.params.id)
   for (const p of photos) {
     try { fs.unlinkSync(path.join(UPLOADS_DIR, p.filename)) } catch {}
     try { fs.unlinkSync(path.join(THUMBS_DIR,  p.thumb))    } catch {}
+    try { fs.unlinkSync(path.join(DISPLAY_DIR, p.display || displayNameFor(p.filename))) } catch {}
   }
   db.prepare('DELETE FROM albums WHERE id=?').run(req.params.id)
   res.json({ ok: true })
@@ -432,15 +557,15 @@ app.post('/api/admin/albums/:id/upload', requireAdmin, upload.array('photos', MA
   const keepOriginal = req.body.quality === 'original'
   const results = []
   const insert = db.prepare(`
-    INSERT INTO photos (album_id,filename,thumb,original_name,width,height,file_size,blur_data_url,original_quality,
+    INSERT INTO photos (album_id,filename,thumb,display,original_name,width,height,file_size,blur_data_url,original_quality,
       taken_at,camera_make,camera_model,lens,focal_length,aperture,shutter_speed,iso)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `)
 
   for (const file of req.files || []) {
     try {
       const p = await processUploadedPhoto(file, keepOriginal)
-      const r = insert.run(albumId, p.filename, p.thumb, file.originalname, p.width, p.height, p.fileSize, p.blurDataUrl, p.originalQuality ? 1 : 0,
+      const r = insert.run(albumId, p.filename, p.thumb, p.display, file.originalname, p.width, p.height, p.fileSize, p.blurDataUrl, p.originalQuality ? 1 : 0,
         p.exif.taken_at, p.exif.camera_make, p.exif.camera_model, p.exif.lens, p.exif.focal_length, p.exif.aperture, p.exif.shutter_speed, p.exif.iso)
       results.push({ id: r.lastInsertRowid })
     } catch (e) { console.error('upload err:', e.message) }
@@ -455,15 +580,15 @@ app.post('/api/admin/portfolio/upload', requireAdmin, upload.array('photos', MAX
   const keepOriginal = req.body.quality === 'original'
   const results = []
   const insert = db.prepare(`
-    INSERT INTO photos (album_id,filename,thumb,original_name,width,height,file_size,is_portfolio,blur_data_url,original_quality,
+    INSERT INTO photos (album_id,filename,thumb,display,original_name,width,height,file_size,is_portfolio,blur_data_url,original_quality,
       taken_at,camera_make,camera_model,lens,focal_length,aperture,shutter_speed,iso)
-    VALUES (NULL,?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?)
+    VALUES (NULL,?,?,?,?,?,?,?,1,?,?,?,?,?,?,?,?,?,?)
   `)
 
   for (const file of req.files || []) {
     try {
       const p = await processUploadedPhoto(file, keepOriginal)
-      const r = insert.run(p.filename, p.thumb, file.originalname, p.width, p.height, p.fileSize, p.blurDataUrl, p.originalQuality ? 1 : 0,
+      const r = insert.run(p.filename, p.thumb, p.display, file.originalname, p.width, p.height, p.fileSize, p.blurDataUrl, p.originalQuality ? 1 : 0,
         p.exif.taken_at, p.exif.camera_make, p.exif.camera_model, p.exif.lens, p.exif.focal_length, p.exif.aperture, p.exif.shutter_speed, p.exif.iso)
       results.push({ id: r.lastInsertRowid })
     } catch (e) { console.error('upload err:', e.message) }
@@ -510,6 +635,7 @@ app.delete('/api/admin/photos/:id', requireAdmin, (req, res) => {
   if (!photo) return res.status(404).json({ error: 'Not found' })
   try { fs.unlinkSync(path.join(UPLOADS_DIR, photo.filename)) } catch {}
   try { fs.unlinkSync(path.join(THUMBS_DIR,  photo.thumb))    } catch {}
+  try { fs.unlinkSync(path.join(DISPLAY_DIR, photo.display || displayNameFor(photo.filename))) } catch {}
   db.prepare('DELETE FROM photos WHERE id=?').run(photo.id)
   db.prepare('UPDATE albums SET cover_photo_id=NULL WHERE cover_photo_id=?').run(photo.id)
   res.json({ ok: true })

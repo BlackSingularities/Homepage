@@ -21,6 +21,6 @@ COPY --from=backend-deps /app/node_modules ./node_modules
 COPY package*.json ./
 COPY server.js db.js ./
 COPY --from=frontend /build/client/dist ./public
-RUN mkdir -p /app/persist/uploads /app/persist/thumbs /app/persist/db
+RUN mkdir -p /app/persist/uploads /app/persist/thumbs /app/persist/display /app/persist/db
 EXPOSE 3002
 CMD ["node", "server.js"]

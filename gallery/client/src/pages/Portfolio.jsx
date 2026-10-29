@@ -1,28 +1,86 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { getPortfolio, fileUrl } from '../api'
+import { getPortfolio, thumbUrl } from '../api'
 import Grid from '../components/Grid'
 import SkeletonGrid from '../components/SkeletonGrid'
 import BackToTop from '../components/BackToTop'
+import GalleryToolbar, { photoWord } from '../components/GalleryToolbar'
+import { Nav, Footer } from '../components/Chrome'
+import { usePhotoView } from '../lib/photoView'
 import { setPageMeta } from '../lib/seo'
 import { IconImage } from '../components/icons'
+
+/**
+ * Galeria fotograficzna. Zdjęcia są tu do oglądania – nie ma pobierania,
+ * a przeglądarka dostaje wyłącznie wariant poglądowy z podpisem wypalonym
+ * w pliku. Pierwszy ekran to same zdjęcia: kilka kadrów przenika pod tytułem,
+ * a cała reszta strony stoi nieruchomo.
+ */
+
+const HERO_SLIDES = 5
+const HERO_MS = 6000
+
+function Hero({ photos }) {
+  const [current, setCurrent] = useState(0)
+
+  // Kadry wybieramy raz na wejście, żeby nie przeskakiwały przy każdym
+  // odświeżeniu stanu listy.
+  const slides = useMemo(() => photos.slice(0, HERO_SLIDES), [photos])
+
+  useEffect(() => {
+    if (slides.length < 2) return undefined
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
+    const timer = setInterval(() => setCurrent(i => (i + 1) % slides.length), HERO_MS)
+    return () => clearInterval(timer)
+  }, [slides.length])
+
+  const years = photos
+    .map(photo => (photo.taken_at ? new Date(photo.taken_at).getFullYear() : null))
+    .filter(Boolean)
+  const span = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : null
+
+  return (
+    <header className="hero">
+      <div className="hero-slides" aria-hidden="true">
+        {slides.map((photo, index) => (
+          <div
+            key={photo.id}
+            className={`hero-slide ${index === current ? 'is-current' : ''}`}
+            style={{ backgroundImage: `url(${thumbUrl(photo.thumb)})` }}
+          />
+        ))}
+        <div className="hero-overlay" />
+      </div>
+
+      <div className="hero-content">
+        <h1 className="hero-title">Światło, które <em>zdążyłem</em> zatrzymać</h1>
+        <p className="hero-lead">
+          Zdjęcia z plenerów, portretów i miejsc, w których akurat byłem. Bez retuszu rzeczywistości –
+          tak, jak wyglądały w chwili naciśnięcia spustu.
+        </p>
+        {photos.length > 0 && (
+          <p className="hero-facts">
+            <span><b>{photos.length}</b> {photoWord(photos.length)}</span>
+            {span && <span>z lat <b>{span}</b></span>}
+            <span>do oglądania, bez pobierania</span>
+          </p>
+        )}
+      </div>
+
+      <span className="hero-scroll" aria-hidden="true"><i /> przewiń</span>
+    </header>
+  )
+}
 
 export default function Portfolio() {
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-
-  // Picked once per load (not on every render) so the hero doesn't jump
-  // between photos while the page is open.
-  const heroPhoto = useMemo(
-    () => photos.length ? photos[Math.floor(Math.random() * photos.length)] : null,
-    [photos],
-  )
+  const { shown, controls } = usePhotoView(photos, 'portfolio')
 
   useEffect(() => {
     setPageMeta({
-      title: 'Adam Rędzikowski – Galeria fotograficzna',
-      description: 'Portfolio fotograficzne Adam Rędzikowski – wybrane prace, śluby, portrety i plenery.',
+      title: 'Galeria fotograficzna – Adam Rędzikowski',
+      description: 'Wybrane zdjęcia: plenery, portrety i reportaż. Galeria do oglądania w przeglądarce.',
     })
     getPortfolio()
       .then(setPhotos)
@@ -32,79 +90,52 @@ export default function Portfolio() {
 
   return (
     <div className="page">
-      {/* Nav */}
-      <nav className="nav">
-        <a href="/" className="nav-logo">Adam Rędzikowski</a>
-        <div className="nav-links">
-          <Link to="/" className="nav-link active">Portfolio</Link>
-          <Link to="/admin" className="nav-link admin-link">Admin</Link>
-        </div>
-      </nav>
+      <Nav />
+      {photos.length > 0 && <Hero photos={photos} />}
 
-      {/* Hero */}
-      <div className="hero">
-        <div
-          className={`hero-bg ${heroPhoto ? 'has-image' : ''}`}
-          style={heroPhoto ? { backgroundImage: `url(${fileUrl(heroPhoto.filename)})` } : undefined}
-        />
-        <div className="hero-overlay" />
-        <div className="hero-content">
-          <p className="hero-label">Fotografia</p>
-          <h1 className="hero-title">
-            Zamrożone<br /><em>chwile</em>
-          </h1>
-        </div>
-      </div>
-
-      {/* Heading */}
       <div className="section-wrap" style={{ paddingBottom: 0 }}>
-        <div className="section-heading-row">
-          <div>
-            <p className="section-label">Portfolio fotograficzne</p>
-            <h2 className="section-heading section-heading-single">
-              Moje ulubione <em>prace</em>
-            </h2>
-          </div>
-          {!loading && photos.length > 0 && (
-            <span className="section-count">{photos.length} {photos.length === 1 ? 'zdjęcie' : photos.length < 5 ? 'zdjęcia' : 'zdjęć'}</span>
-          )}
-        </div>
+        <p className="section-label">Portfolio fotograficzne</p>
+        <h2 className="section-heading">Wybrane <em>kadry</em></h2>
       </div>
 
-      {/* Grid */}
+      {!loading && !error && photos.length > 0 && <GalleryToolbar {...controls} />}
+
       <div className="gallery-wrap">
         {loading ? (
           <SkeletonGrid count={12} />
         ) : error ? (
           <div className="empty-state">
             <IconImage width={40} height={40} style={{ opacity: .3, margin: '0 auto' }} />
-            <p>Nie udało się wczytać galerii. Spróbuj odświeżyć stronę.</p>
+            <p>Nie udało się wczytać galerii. Odśwież stronę albo wróć za chwilę.</p>
           </div>
         ) : photos.length === 0 ? (
           <div className="empty-state">
             <IconImage width={40} height={40} style={{ opacity: .3, margin: '0 auto' }} />
-            <p style={{ marginTop: 12 }}>
-              Portfolio jeszcze w budowie.<br />
-              <Link to="/admin" style={{ color:'var(--gold)' }}>Dodaj pierwsze zdjęcia →</Link>
-            </p>
+            <p style={{ marginTop: 12 }}>Galeria jest jeszcze pusta.</p>
+          </div>
+        ) : shown.length === 0 ? (
+          <div className="empty-state">
+            <p>Żadne zdjęcie nie pasuje do wybranych filtrów.</p>
           </div>
         ) : (
-          <Grid photos={photos} syncUrl protectedPublic tileSizeStorageKey="portfolio_tile_size" />
+          <Grid
+            photos={shown}
+            syncUrl
+            tileSize={controls.tileSize}
+            layout={controls.layout}
+            showTileSizeControl={false}
+          />
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="site-footer-inner">
-          <span style={{ color:'var(--text-3)', fontSize:13 }}>
-            © {new Date().getFullYear()} Adam Rędzikowski
-          </span>
-          <a href="mailto:redzikowskia@gmail.com" style={{ color:'var(--gold)', fontSize:13 }}>
-            redzikowskia@gmail.com
-          </a>
-        </div>
-      </footer>
+      {photos.length > 0 && (
+        <p className="gal-note">
+          Zdjęcia są chronione: strona pokazuje pomniejszone kopie z podpisem, pliki źródłowe zostają na serwerze.
+          Potrzebujesz któregoś zdjęcia w pełnej jakości – napisz, chętnie je wyślę.
+        </p>
+      )}
 
+      <Footer />
       <BackToTop />
     </div>
   )

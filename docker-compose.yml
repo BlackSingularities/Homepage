@@ -44,6 +44,11 @@ services:
       GALLERY_JWT_SECRET: ${GALLERY_JWT_SECRET}
       UPLOADS_DIR: /app/persist/uploads
       THUMBS_DIR: /app/persist/thumbs
+      # Warianty poglądowe (z wypalonym podpisem) – jedyne pliki, jakie
+      # galeria wysyła gościom. Podpis zmienia GALLERY_WATERMARK, pusta
+      # wartość go wyłącza.
+      DISPLAY_DIR: /app/persist/display
+      GALLERY_WATERMARK: ${GALLERY_WATERMARK:-redzikowski.com}
       DB_PATH: /app/persist/db/galeria.db
     volumes:
       - ${HOMEPAGE_GALLERY_DATA_DIR:-./gallery/persist}:/app/persist

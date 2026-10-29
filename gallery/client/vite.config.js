@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
         [`${BASE}/api`]:     { target: 'http://localhost:3002', rewrite: p => p.replace(BASE, '') },
         [`${BASE}/uploads`]: { target: 'http://localhost:3002', rewrite: p => p.replace(BASE, '') },
         [`${BASE}/thumbs`]:  { target: 'http://localhost:3002', rewrite: p => p.replace(BASE, '') },
+        [`${BASE}/view`]:    { target: 'http://localhost:3002', rewrite: p => p.replace(BASE, '') },
       },
     },
   }

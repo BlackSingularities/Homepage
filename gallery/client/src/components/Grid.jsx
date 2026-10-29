@@ -2,25 +2,28 @@ import { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Lightbox from './Lightbox'
 import GlowEdge from './GlowEdge'
-import { thumbUrl, fileUrl } from '../api'
+import { thumbUrl } from '../api'
 import { IconCheck, IconTrash, IconImage, IconGrip, IconStar, IconEdit } from './icons'
 
-function PhotoImg({ photo, mediaToken }) {
+function PhotoImg({ photo, mediaToken, square }) {
   const [loaded, setLoaded] = useState(false)
-  const ratio = photo.width && photo.height ? `${photo.width} / ${photo.height}` : '4 / 3'
+  const ratio = square ? '1 / 1' : (photo.width && photo.height ? `${photo.width} / ${photo.height}` : '4 / 3')
   return (
     <GlowEdge media className="photo-item-frame" style={{ aspectRatio: ratio }}>
       {photo.blur_data_url && (
         <img src={photo.blur_data_url} alt="" aria-hidden className="photo-item-blur" style={{ opacity: loaded ? 0 : 1 }} />
       )}
       <img
-        src={thumbUrl(photo.thumb, mediaToken) || fileUrl(photo.filename, mediaToken)}
+        src={thumbUrl(photo.thumb, mediaToken)}
         alt={photo.display_name || ''}
         loading="lazy"
         onLoad={() => setLoaded(true)}
         style={{ opacity: loaded ? 1 : 0 }}
         draggable={false}
       />
+      {/* Warstwa nad zdjęciem: przytrzymanie palcem i prawy przycisk nie
+          trafiają w obrazek, więc nie ma skąd go zapisać jednym gestem. */}
+      <span className="photo-shield" aria-hidden="true" />
     </GlowEdge>
   )
 }
@@ -30,8 +33,9 @@ const BATCH_SIZE = 24
 export default function Grid({
   photos, adminMode = false, selectable = false, selected = [], onSelect, onDelete, syncUrl = false,
   reorderable = false, onReorder, onSetCover, onTogglePortfolio, onEditPhoto, mediaToken = null,
-  infiniteScroll = !reorderable, allowShareDownload = false, albumSlug = null, protectedPublic = false,
+  infiniteScroll = !reorderable, canShare = false, albumSlug = null,
   tileSizeStorageKey = 'gallery_tile_size', showTileSizeControl = true,
+  tileSize: tileSizeProp = null, layout = 'masonry',
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const dragFrom = useRef(null)
@@ -44,7 +48,11 @@ export default function Grid({
     return i >= 0 ? i : null
   })
   const openedFromUrl = useRef(lightboxIdx !== null)
-  const [tileSize, setTileSize] = useState(() => localStorage.getItem(tileSizeStorageKey) || 'medium')
+  const [ownTileSize, setOwnTileSize] = useState(() => localStorage.getItem(tileSizeStorageKey) || 'medium')
+  // Widoki publiczne sterują wielkością kafelków z własnego paska narzędzi;
+  // panel zostaje przy przełączniku wbudowanym w siatkę.
+  const tileSize = tileSizeProp || ownTileSize
+  const setTileSize = setOwnTileSize
   const [columnCount, setColumnCount] = useState(3)
 
   // Render photos in growing batches instead of all at once – keeps the
@@ -154,7 +162,7 @@ export default function Grid({
     localStorage.setItem(tileSizeStorageKey, size)
   }
   const showTileInfo = !selectable
-  const stableMasonry = infiniteScroll && !reorderable
+  const stableMasonry = infiniteScroll && !reorderable && layout !== 'grid'
   const masonryColumns = Array.from({ length: columnCount }, () => ({ items: [], height: 0 }))
   if (stableMasonry) {
     visiblePhotos.forEach((photo, index) => {
@@ -174,12 +182,12 @@ export default function Grid({
       role="button"
       aria-label={photo.original_name || 'Otwórz zdjęcie'}
       draggable={reorderable}
-      onDragStart={reorderable ? handleDragStart(i) : undefined}
       onDragOver={reorderable ? handleDragOver(i) : undefined}
       onDragEnd={() => { dragFrom.current = null; setDragOver(null) }}
       onDrop={reorderable ? handleDrop(i) : undefined}
-      onContextMenu={protectedPublic ? (e) => e.preventDefault() : undefined}
-      onCopy={protectedPublic ? (e) => e.preventDefault() : undefined}
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={reorderable ? handleDragStart(i) : (e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
       onClick={() => {
         if (selectable && onSelect) onSelect(photo.id)
         else openLightbox(i)
@@ -191,7 +199,7 @@ export default function Grid({
         else openLightbox(i)
       }}
     >
-      <PhotoImg photo={photo} mediaToken={mediaToken} />
+      <PhotoImg photo={photo} mediaToken={mediaToken} square={layout === 'grid'} />
       <div className="photo-item-overlay" />
       {showTileInfo && (photo.display_name || photo.camera_model || photo.taken_at) && (
         <div className="photo-item-info">
@@ -280,7 +288,7 @@ export default function Grid({
       )}
 
       <div
-        className={`photo-grid ${stableMasonry ? 'stable-masonry' : ''} tile-${tileSize} ${protectedPublic ? 'public-protected' : ''}`}
+        className={`photo-grid ${stableMasonry ? 'stable-masonry' : ''} ${layout === 'grid' ? 'is-even' : ''} tile-${tileSize}`}
         style={stableMasonry ? { '--masonry-columns': columnCount } : undefined}
       >
         {stableMasonry
@@ -303,9 +311,9 @@ export default function Grid({
           onClose={closeLightbox}
           onIndexChange={changeIndex}
           mediaToken={mediaToken}
-          allowShareDownload={allowShareDownload}
+          canShare={canShare}
           albumSlug={albumSlug}
-          protectedPublic={protectedPublic}
+          adminMode={adminMode}
         />
       )}
     </>
