@@ -78,9 +78,9 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
                         {project.icon && <img className="works-icon" src={project.icon} alt="" loading="lazy" />}
                         {project.name}
                       </strong>
+                      {/* Rok zostaje w portfolio – tu liczy się sama nazwa i rodzaj pracy. */}
                       <span className="works-meta">
                         <span>{project.label || t(`kind.${project.kind}`)}</span>
-                        {project.year && <span className="works-year mono">{project.year}</span>}
                       </span>
                     </a>
                   </li>
