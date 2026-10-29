@@ -9,7 +9,7 @@
   "theme_color": "#0c0b0a",
   "lang": "pl",
   "icons": [
-    { "src": "/assets/brand/favicon-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "/assets/brand/favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/assets/brand/favicon-r-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/assets/brand/favicon-r-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }

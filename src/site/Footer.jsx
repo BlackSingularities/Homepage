@@ -19,7 +19,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <img src="/assets/brand/logo-ar-web.png" alt="" />
+          <img src="/assets/brand/wordmark-redzikowski-com.png" alt="rędzikowski.com" />
           <p>{brand.tagline}</p>
         </div>
 

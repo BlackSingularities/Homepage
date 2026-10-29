@@ -17,7 +17,7 @@ export default function About({ data, brand }) {
       <header className="section-head">
         <h2><Heading title={data.title} accent={data.accent} /></h2>
         <div className="about-sign">
-          <img src="/assets/brand/logo-ar-web.png" alt="" />
+          <img src="/assets/brand/favicon-r-180.png" alt="" />
           <span>{brand.name}<i>{brand.location}</i></span>
         </div>
       </header>

@@ -10,7 +10,7 @@ export const SITE = 'https://redzikowski.com'
 const AUTHOR = 'Adam Rędzikowski'
 const GITHUB = 'https://github.com/BlackSingularities'
 const OG_IMAGE = `${SITE}/og.png`
-const LOGO = `${SITE}/assets/brand/favicon-512.png`
+const LOGO = `${SITE}/assets/brand/favicon-r-512.png`
 
 const T = {
   pl: {

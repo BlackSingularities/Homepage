@@ -264,7 +264,7 @@ function AuthScreen({ mode, onAuthenticated }) {
       <form className="ap-auth-card" onSubmit={submit}>
         <section className="ap-auth-intro">
           <a className="ap-auth-brand" href="/">
-            <img src="/assets/brand/logo-ar-web.png" alt="" />
+            <img src="/assets/brand/favicon-r-180.png" alt="" />
             <span>Adam Rędzikowski<i>Panel administracyjny</i></span>
           </a>
           <div className="ap-auth-promise">

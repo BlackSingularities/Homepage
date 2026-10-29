@@ -848,7 +848,7 @@
 }
 
 .wordmark { display: inline-flex; align-items: center; gap: 12px; }
-.wordmark img { width: 28px; height: 28px; }
+.wordmark img { width: clamp(155px, 20vw, 240px); height: auto; display: block; }
 .wordmark span { font-size: 15px; font-weight: 600; letter-spacing: -.005em; }
 
 .masthead-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
@@ -1502,7 +1502,7 @@
 }
 
 .footer-brand { display: flex; align-items: center; gap: 14px; }
-.footer-brand img { width: 30px; height: 30px; }
+.footer-brand img { width: 210px; max-width: 100%; height: auto; }
 .footer-brand p { max-width: 30ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 
 .footer-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; }
@@ -1955,3 +1955,5 @@
   .pv-stores { display: grid; }
   .pv-stores a { min-width: 0; grid-template-columns: 26px minmax(0, 1fr) 15px; }
 }
+
+@media (max-width: 600px) { .footer-brand { flex-direction: column; align-items: flex-start; } }

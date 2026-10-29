@@ -91,8 +91,7 @@ export default function Header({ brand, pages = [], home = true, path = '/', onN
     <>
       <header className={`masthead ${scrolled || !home ? 'is-solid' : ''}`}>
         <a className="wordmark" href={lp('/')} onClick={go}>
-          <img src="/assets/brand/logo-ar-web.png" alt="" />
-          <span>{brand.name}</span>
+          <img src="/assets/brand/wordmark-redzikowski-com.png" alt="rędzikowski.com" />
         </a>
 
         <nav className="masthead-nav" aria-label={t('nav.main')}>
