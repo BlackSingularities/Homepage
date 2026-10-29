@@ -101,6 +101,7 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
       event.project = clip(body?.project, 120)
       event.asset = clip(body?.asset, 60)
       event.platform = clip(body?.platform, 20)
+      event.version = clip(body?.version, 40)
     }
     if (type === 'event') event.name = clip(body?.name, 60)
     if (consent) {
@@ -166,6 +167,28 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
       map.set(key, (map.get(key) || 0) + 1)
     }
     return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([key, count]) => ({ key, count }))
+  }
+
+  /**
+   * Rozbicie pobrań ze strony: ile razy kliknięto konkretny plik konkretnej
+   * wersji. Liczymy z dziennika zdarzeń, więc zostają w nim także wersje,
+   * których nie ma już w bieżącym wydaniu.
+   */
+  const SEP = String.fromCharCode(31)
+  const detail = list => {
+    const map = new Map()
+    for (const event of list) {
+      if (!event.project) continue
+      const key = [event.project, event.asset || '', event.version || '', event.platform || ''].join(SEP)
+      map.set(key, (map.get(key) || 0) + 1)
+    }
+    return [...map.entries()]
+      .map(([key, count]) => {
+        const [project, asset, version, platform] = key.split(SEP)
+        return { project, asset, version, platform, count }
+      })
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 400)
   }
 
   /** Zestawienie dla panelu: liczby, dzienny wykres, rankingi. */
@@ -241,6 +264,7 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
       languages: tally(rich, event => event.lang, 8),
       screens: tally(rich, event => event.screen, 8),
       downloadsByProject: tally(downloads, event => event.project, 20),
+      downloadsDetail: detail(downloads),
       downloadsByPlatform: tally(downloads, event => event.platform, 8),
       consent: {
         granted: consentEvents.filter(event => event.value === 'granted').length,

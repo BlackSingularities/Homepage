@@ -115,6 +115,7 @@ export default function AnalyticsPanel() {
     ['Średni czas na podstronie', duration(totals.avgTimeMs), null],
   ]
   const allDownloads = data.apps.reduce((sum, app) => sum + app.total, 0)
+  const allSite = data.apps.reduce((sum, app) => sum + (app.siteTotal || 0), 0)
 
   return (
     <div className="ap-stack">
@@ -143,7 +144,7 @@ export default function AnalyticsPanel() {
 
       <Card
         title="Pobrania aplikacji"
-        description={`Łącznie ${number(allDownloads)} pobrań. Dla wydań z GitHuba liczba pochodzi z GitHuba i obejmuje też pobrania spoza strony.`}
+        description={`Łącznie ${number(allDownloads)} pobrań, w tym ${number(allSite)} kliknięć na tej stronie. Dla wydań z GitHuba liczba zbiorcza pochodzi z GitHuba i obejmuje też pobrania spoza strony – kolumna „stąd” liczy wyłącznie kliknięcia w portfolio.`}
       >
         {data.apps.length === 0 ? <Empty>Brak aplikacji w portfolio.</Empty> : (
           <div className="an-apps">
@@ -154,16 +155,39 @@ export default function AnalyticsPanel() {
                   <span className="mono">{SOURCE_LABEL[app.source] || app.source}</span>
                   <b className="mono">{number(app.total)}</b>
                 </header>
+
+                <p className="an-apps-site">
+                  Ze strony: <b className="mono">{number(app.siteTotal)}</b> od początku,
+                  {' '}<b className="mono">{number(app.sitePeriod)}</b> w wybranym okresie.
+                </p>
+
                 {app.files.length > 0 && (
                   <ul>
                     {app.files.map(file => (
                       <li key={file.id}>
                         <span>{PLATFORM_LABEL[file.platform] || file.platform}</span>
-                        <span className="mono">{[file.label, file.version].filter(Boolean).join(' · ')}</span>
+                        <span className="mono">{[file.label, file.version].filter(Boolean).join(' · ') || '—'}</span>
+                        <span className="an-apps-own mono" title="Kliknięcia na tej stronie (od początku / w okresie)">
+                          stąd {number(file.site)} / {number(file.sitePeriod)}
+                        </span>
                         <b className="mono">{number(file.count)}</b>
                       </li>
                     ))}
                   </ul>
+                )}
+
+                {app.versions.length > 0 && (
+                  <div className="an-apps-versions">
+                    <span>Pobierane wersje w okresie</span>
+                    <ul>
+                      {app.versions.map(item => (
+                        <li key={item.version}>
+                          <span className="mono">{item.version}</span>
+                          <b className="mono">{number(item.count)}</b>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </article>
             ))}

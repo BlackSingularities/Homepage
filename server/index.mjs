@@ -942,16 +942,48 @@ app.get('/api/admin/analytics', async (req, res) => {
   ])
   const apps = projects.filter(project => project.kind === 'app')
   const releaseMap = await releases.getMany(apps.filter(p => p.releaseSource === 'github').map(p => p.repo))
+  // Licznik GitHuba obejmuje też pobrania spoza strony, więc obok niego
+  // pokazujemy wyłącznie kliknięcia stąd: od zawsze i w wybranym okresie.
+  const detail = report.downloadsDetail || []
   res.json({
     ...report,
     apps: apps.map(project => {
       const files = downloadsFor(project, releaseMap[project.repo], counts)
+      const own = detail.filter(item => item.project === project.slug)
+      const sitePeriod = own.reduce((sum, item) => sum + item.count, 0)
+      const siteTotal = Object.entries(counts)
+        .filter(([key]) => key.startsWith(`${project.slug}/`))
+        .reduce((sum, [, value]) => sum + (Number(value) || 0), 0)
+
+      // Wersje bierzemy z dziennika zdarzeń: wydanie pokazuje tylko ostatnią,
+      // a dziennik pamięta też te, które już z GitHuba zniknęły.
+      const byVersion = new Map()
+      for (const item of own) {
+        const key = item.version || '(bez numeru)'
+        byVersion.set(key, (byVersion.get(key) || 0) + item.count)
+      }
+
       return {
         slug: project.slug,
         name: project.name,
         source: project.releaseSource,
-        total: totalDownloads(files),
-        files: files.map(file => ({ id: file.id, platform: file.platform, label: file.label, version: file.version, count: file.count })),
+        // Starsze wydania znikają z listy plików, ale ich kliknięcia zostają
+        // w liczniku – inaczej suma potrafiłaby być mniejsza niż „ze strony”.
+        total: Math.max(totalDownloads(files), siteTotal),
+        siteTotal,
+        sitePeriod,
+        versions: [...byVersion.entries()]
+          .map(([version, count]) => ({ version, count }))
+          .sort((a, b) => b.count - a.count),
+        files: files.map(file => ({
+          id: file.id,
+          platform: file.platform,
+          label: file.label,
+          version: file.version,
+          count: file.count,
+          site: Number(counts[`${project.slug}/${file.id}`]) || 0,
+          sitePeriod: own.filter(item => item.asset === file.id).reduce((sum, item) => sum + item.count, 0),
+        })),
       }
     }).sort((a, b) => b.total - a.total),
   })

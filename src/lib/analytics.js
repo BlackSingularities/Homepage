@@ -82,8 +82,10 @@ export function trackPageview(path = window.location.pathname) {
   send({ type: 'pageview', path, ...extra })
 }
 
-export function trackDownload({ project, asset, platform }) {
-  send({ type: 'download', path: window.location.pathname, project, asset, platform })
+export function trackDownload({ project, asset, platform, version }) {
+  // Wersję zapisujemy razem ze zdarzeniem: identyfikatory plików z GitHuba
+  // znikają z wydania przy kolejnej publikacji, a dziennik ma je pamiętać.
+  send({ type: 'download', path: window.location.pathname, project, asset, platform, version })
 }
 
 export function trackEvent(name) {

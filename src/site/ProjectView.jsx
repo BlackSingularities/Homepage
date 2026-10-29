@@ -64,7 +64,7 @@ function Downloads({ project }) {
               <a
                 href={file.url}
                 download
-                onClick={() => trackDownload({ project: project.slug, asset: file.id, platform: file.platform })}
+                onClick={() => trackDownload({ project: project.slug, asset: file.id, platform: file.platform, version: file.version })}
               >
                 <Icon size={18} aria-hidden="true" />
                 <span className="pv-file-main">
