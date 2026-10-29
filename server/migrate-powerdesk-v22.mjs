@@ -1,5 +1,5 @@
 /**
- * Dodaje PowerDesk (repozytorium OpenFilePowerWin) do portfolio, tuż przed
+ * Dodaje PowerDesk do portfolio, tuż przed
  * OpenFilePower, który zastępuje. Pliki do pobrania i aktualizacje w programie
  * idą z najnowszego wydania przez serwer portfolio (`releaseSource: 'github'`).
  *
@@ -49,7 +49,7 @@ const project = {
   shots: [],
   siteUrl: '',
   siteHidden: false,
-  repo: 'BlackSingularities/OpenFilePowerWin',
+  repo: 'BlackSingularities/PowerDesk',
   repoHidden: false,
   releaseSource: 'github',
   downloads: [],

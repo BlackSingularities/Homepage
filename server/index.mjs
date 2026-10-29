@@ -740,8 +740,14 @@ app.get(['/api/projects/:slug/asset/:assetId', '/api/projects/:slug/asset/:asset
  * aplikacja zmienia tylko adres – a pliki wskazują na proxy powyżej.
  * Udostępniamy wyłącznie repozytoria opublikowanych aplikacji z portfolio.
  */
+const REPO_RENAMES = {
+  'blacksingularities/openfilepowerwin': 'blacksingularities/powerdesk',
+}
+
 async function updateFeed(req) {
-  const repo = `${req.params.owner}/${req.params.repo}`.toLowerCase()
+  const asked = `${req.params.owner}/${req.params.repo}`.toLowerCase()
+  // Zainstalowane wcześniej wersje pytają o repozytorium pod dawną nazwą.
+  const repo = REPO_RENAMES[asked] || asked
   const projects = await readProjects()
   const project = projects.find(item => item.published !== false && item.kind === 'app'
     && item.releaseSource === 'github' && String(item.repo || '').toLowerCase() === repo)
