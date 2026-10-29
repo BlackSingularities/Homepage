@@ -1375,7 +1375,12 @@
 .ap-project-flags { display: flex; gap: 6px; color: var(--ink-3); }
 .ap-project-flags svg:last-child { color: var(--gold); }
 
-.ap-project-order { display: grid; gap: 3px; }
+.ap-project-order { display: grid; grid-template-columns: repeat(2, 24px); gap: 3px; }
+
+/* Przeciąganie wierszy: cel upuszczenia dostaje złotą obwódkę dookoła. */
+.ap-project-row[draggable] { cursor: grab; }
+.ap-project-row.is-dragging { opacity: .45; }
+.ap-project-row.is-drop { outline: 1px dashed var(--accent); outline-offset: 2px; border-radius: 12px; }
 
 .ap-project-order button {
   width: 24px;

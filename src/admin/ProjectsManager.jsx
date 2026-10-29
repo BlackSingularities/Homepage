@@ -520,14 +520,26 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
     notify('Praca usunięta.')
   }
 
-  const move = async (id, direction) => {
+  // Przenosi pracę na wskazaną pozycję – krok w górę, skok na sam koniec
+  // albo miejsce upuszczenia przy przeciąganiu.
+  const moveTo = async (id, target) => {
     const ids = projects.map(item => item.id)
     const index = ids.indexOf(id)
-    const target = index + direction
-    if (target < 0 || target >= ids.length) return
-    ids.splice(target, 0, ids.splice(index, 1)[0])
-    setProjects(await api('/api/admin/projects/reorder', json('POST', { ids })))
+    const clamped = Math.max(0, Math.min(target, ids.length - 1))
+    if (index === -1 || clamped === index) return
+    ids.splice(clamped, 0, ids.splice(index, 1)[0])
+    const byId = new Map(projects.map(item => [item.id, item]))
+    setProjects(ids.map(item => byId.get(item)))
+    try {
+      setProjects(await api('/api/admin/projects/reorder', json('POST', { ids })))
+    } catch (requestError) {
+      setError(requestError.message)
+    }
   }
+  const move = (id, direction) => moveTo(id, projects.findIndex(item => item.id === id) + direction)
+
+  const [dragging, setDragging] = useState(null)
+  const [dropAt, setDropAt] = useState(-1)
 
   if (!projects) {
     return <div className="ap-inline-loading"><LoaderCircle className="spin" size={18} /> Wczytuję portfolio…</div>
@@ -549,7 +561,16 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
           {!projects.length && <Empty>Portfolio jest puste. Dodaj pierwszą pracę.</Empty>}
 
           {projects.map((project, index) => (
-            <div key={project.id} className={`ap-project-row ${project.id === selected ? 'is-active' : ''}`}>
+            <div
+              key={project.id}
+              className={`ap-project-row ${project.id === selected ? 'is-active' : ''} ${dragging === project.id ? 'is-dragging' : ''} ${dropAt === index && dragging && dragging !== project.id ? 'is-drop' : ''}`}
+              draggable
+              onDragStart={event => { setDragging(project.id); event.dataTransfer.effectAllowed = 'move' }}
+              onDragOver={event => { if (!dragging) return; event.preventDefault(); setDropAt(index) }}
+              onDrop={event => { event.preventDefault(); if (dragging) moveTo(dragging, index); setDragging(null); setDropAt(-1) }}
+              onDragEnd={() => { setDragging(null); setDropAt(-1) }}
+              title="Przeciągnij, żeby zmienić kolejność"
+            >
               <button type="button" className="ap-project-pick" onClick={() => choose(project)}>
                 <span className="ap-project-thumb">
                   {project.icon || project.cover ? <img src={project.icon || project.cover} alt="" /> : <AppWindow size={15} />}
@@ -570,8 +591,10 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
                 </span>
               </button>
               <div className="ap-project-order">
-                <button type="button" onClick={() => move(project.id, -1)} disabled={index === 0} aria-label="Wyżej">↑</button>
-                <button type="button" onClick={() => move(project.id, 1)} disabled={index === projects.length - 1} aria-label="Niżej">↓</button>
+                <button type="button" onClick={() => moveTo(project.id, 0)} disabled={index === 0} aria-label="Na samą górę" title="Na samą górę">⤒</button>
+                <button type="button" onClick={() => move(project.id, -1)} disabled={index === 0} aria-label="Wyżej" title="Wyżej">↑</button>
+                <button type="button" onClick={() => move(project.id, 1)} disabled={index === projects.length - 1} aria-label="Niżej" title="Niżej">↓</button>
+                <button type="button" onClick={() => moveTo(project.id, projects.length - 1)} disabled={index === projects.length - 1} aria-label="Na sam dół" title="Na sam dół">⤓</button>
               </div>
             </div>
           ))}
