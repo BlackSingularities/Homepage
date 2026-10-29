@@ -848,7 +848,7 @@
 }
 
 .wordmark { display: inline-flex; align-items: center; gap: 12px; }
-.wordmark img { width: clamp(155px, 20vw, 240px); height: auto; display: block; }
+.wordmark img { width: clamp(124px, 16vw, 192px); height: auto; display: block; }
 .wordmark span { font-size: 15px; font-weight: 600; letter-spacing: -.005em; }
 
 .masthead-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
