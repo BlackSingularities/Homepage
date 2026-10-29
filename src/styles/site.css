@@ -1028,7 +1028,19 @@
 
 /* ── wybrane prace ──────────────────────────────────────────────── */
 
-.works { margin-top: clamp(64px, 9vw, 128px); }
+.works { position: relative; margin-top: clamp(64px, 9vw, 128px); }
+
+/* Sekcja leży jeszcze na animowanym tle, więc dostaje własny, miękki cień
+   pod spodem – nazwy prac nie konkurują wtedy ze znakami. */
+.works::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -34px clamp(-20px, -2vw, -8px) -40px;
+  border-radius: var(--radius-xl);
+  background: radial-gradient(120% 92% at 50% 42%, rgba(12, 11, 10, .95) 35%, rgba(12, 11, 10, .62) 72%, transparent);
+  pointer-events: none;
+}
 
 .works-head {
   display: flex;
@@ -1224,56 +1236,104 @@
 
 /* ── zakres ─────────────────────────────────────────────────────── */
 
-.scope-list { display: grid; margin: 0; border-top: 1px solid var(--line-strong); }
-
-.scope-item {
+/* Obszary pracy są równoległe, więc dostają osobne panele zamiast jednej
+   listy – i inną wagę niż oś procesu, która stoi zaraz pod nimi. */
+.scope-grid {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: 10px clamp(20px, 3vw, 48px);
-  padding: clamp(22px, 2.6vw, 34px) 0;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: clamp(14px, 1.6vw, 20px);
+  margin: 0;
 }
 
-.scope-item dt {
-  grid-row: span 2;
+.scope-panel {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: clamp(20px, 2vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+}
+
+.scope-panel dt {
   font-family: var(--font-display);
-  font-size: clamp(22px, 2vw, 28px);
+  font-size: clamp(20px, 1.7vw, 26px);
   line-height: 1.15;
   letter-spacing: -.015em;
   color: var(--accent);
 }
 
-.scope-item dd { margin: 0; font-size: 15px; line-height: 1.7; color: var(--ink-2); max-width: 60ch; }
-.scope-item dd.scope-lead { color: var(--ink); font-weight: 500; }
-
-@media (max-width: 640px) {
-  .scope-item { grid-template-columns: minmax(0, 1fr); }
-  .scope-item dt { grid-row: auto; }
-}
+.scope-panel dd { margin: 0; }
+.scope-panel .scope-lead { font-size: 15.5px; line-height: 1.5; color: var(--ink); }
+.scope-panel .scope-detail { font-size: 14.5px; line-height: 1.65; color: var(--ink-2); }
 
 /* ── proces ─────────────────────────────────────────────────────── */
 
-.proc-list { display: grid; border-top: 1px solid var(--line-strong); }
+/* Jedyna prawdziwa kolejność na stronie: wspólna oś, punkt na każdy krok. */
+.proc { display: grid; gap: clamp(30px, 4vw, 52px); }
+
+.proc-head {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(14px, 3vw, 56px);
+  align-items: end;
+}
+
+.proc-head h2 { max-width: 16ch; }
+.proc-head p { max-width: 54ch; font-size: 15.5px; line-height: 1.65; color: var(--ink-2); }
+
+.proc-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+  gap: clamp(18px, 2vw, 28px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
 .proc-step {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: 10px clamp(20px, 3vw, 48px);
-  align-items: baseline;
-  padding: clamp(22px, 2.6vw, 34px) 0;
-  border-bottom: 1px solid var(--line);
+  position: relative;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.proc-step::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .12);
+}
+
+.proc-no {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-4);
 }
 
 .proc-step h3 {
-  font-size: clamp(22px, 2vw, 28px);
-  line-height: 1.15;
-  color: var(--accent);
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.5vw, 24px);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
 }
 
-.proc-step p { max-width: 58ch; font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.proc-step p { margin: 0; font-size: 14px; line-height: 1.62; color: var(--ink-2); }
 
-@media (max-width: 640px) {
-  .proc-step { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 900px) {
+  .proc-head { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .proc-track { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .proc-step { padding: 24px 0 0; }
+  .proc-step:last-child { padding-bottom: 4px; }
+  .proc-step h3 { font-size: 21px; }
 }
 
 /* ── podstrony ──────────────────────────────────────────────────── */
@@ -1679,6 +1739,10 @@
 .site .about-strengths li,
 .site .footer-legal,
 .site .works-meta,
+/* Wąskie kolumny osi procesu i podpisy prac: justowanie rozrywałoby w nich
+   odstępy, więc zostają do lewej. */
+.site .proc-step p,
+.site .work-note,
 .site .form-hint,
 .site .form-privacy { text-align: left; hyphens: manual; }
 

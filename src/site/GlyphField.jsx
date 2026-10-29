@@ -15,8 +15,9 @@ import { useEffect, useRef } from 'react'
  * Wydajność: ciemne, nieruchome znaki rysujemy raz do bufora i co klatkę
  * kopiujemy go jednym `drawImage`. Na bieżąco liczymy tylko szum na rzadszej
  * siatce i rysujemy jasne znaki w dymie (z atlasu glifów, nie `fillText`).
- * Animacja chodzi w ~30 fps, staje w ukrytej karcie i wtedy, gdy pierwszy
- * ekran jest przewinięty, a tło zasłania treść. Przy `prefers-reduced-motion`
+ * Animacja chodzi w ~30 fps, staje w ukrytej karcie, przy przewiniętym
+ * pierwszym ekranie i przy oddaleniu widoku poniżej 90% – wtedy siatka
+ * rośnie tak bardzo, że ruch zaczyna się rwać, więc tło zostaje nieruchome. Przy `prefers-reduced-motion`
  * rysujemy tylko pojedyncze klatki po kliknięciu.
  */
 
@@ -151,6 +152,12 @@ export default function GlyphField({ intensity = 1 }) {
     let queue = new Int32Array(0)
     let dim = null
     let paused = false
+    // Oddalony widok = kilka razy więcej komórek na ekranie. Poniżej 90%
+    // zostawiamy jedną, nieruchomą klatkę zamiast rwącej animacji.
+    let frozen = false
+    let stirred = false
+    const zoom = () => (window.innerWidth ? window.outerWidth / window.innerWidth : 1)
+    const tooWide = () => zoom() < 0.895
     const ripples = []
     const pointer = { x: -9999, y: -9999, active: false }
     // środek pola goni kursor z bezwładnością, więc odepchnięcie jest płynne
@@ -160,7 +167,9 @@ export default function GlyphField({ intensity = 1 }) {
     let start = performance.now()
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      // Znaki mają 11 px – powyżej 1.5× dodatkowe piksele już nic nie wnoszą,
+      // a kosztują tyle samo, co cała reszta rysowania.
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       width = window.innerWidth
       height = window.innerHeight
       canvas.width = Math.round(width * dpr)
@@ -205,7 +214,11 @@ export default function GlyphField({ intensity = 1 }) {
     const dimAlpha = (col, row) => Math.min(1, (0.016 + hash(col, row, seed + 3) * 0.026) * intensity)
 
     // Fizyka znaków: odpychanie od środka soczewki, tarcie i sprężyna.
+    // `moving` zlicza komórki poza miejscem – gdy wszystkie wrócą, a kursora
+    // nie ma, cała pętla po siatce zostaje pominięta.
+    let moving = 0
     const step = () => {
+      if (!pointer.active && !moving && !stirred) return
       if (pointer.active) {
         lens.x = lens.x < -9000 ? pointer.x : lens.x + (pointer.x - lens.x) * 0.22
         lens.y = lens.y < -9000 ? pointer.y : lens.y + (pointer.y - lens.y) * 0.22
@@ -214,6 +227,7 @@ export default function GlyphField({ intensity = 1 }) {
       lens.px = lens.x
       lens.py = lens.y
       const r2 = FORCE_R * FORCE_R
+      moving = 0
       for (let row = 0; row < rows; row += 1) {
         for (let col = 0; col < cols; col += 1) {
           const idx = row * cols + col
@@ -235,6 +249,7 @@ export default function GlyphField({ intensity = 1 }) {
             }
           }
           if (s === 1 && scale[idx] === 1 && vx === 0 && vy === 0 && ox === 0 && oy === 0) continue
+          moving += 1
           vx = (vx - ox * RESTORE) * FRICTION
           vy = (vy - oy * RESTORE) * FRICTION
           ox += vx
@@ -254,7 +269,15 @@ export default function GlyphField({ intensity = 1 }) {
       }
 
       // ślad w dymie: im szybszy ruch, tym mocniej kursor go rozgania
-      for (let i = 0; i < stir.length; i += 1) stir[i] *= STIR_DECAY
+      if (stirred) {
+        let rest = 0
+        for (let i = 0; i < stir.length; i += 1) {
+          const v = stir[i] * STIR_DECAY
+          stir[i] = v < 0.004 ? 0 : v
+          if (stir[i]) rest += 1
+        }
+        stirred = rest > 0
+      }
       if (pointer.active) {
         const push = Math.min(0.5, 0.04 + speed * 0.025)
         const cw = CELL_W * STEP
@@ -269,6 +292,7 @@ export default function GlyphField({ intensity = 1 }) {
             if (d < STIR_R) {
               const i = fy * fw + fx
               stir[i] = Math.min(1, stir[i] + push * (1 - d / STIR_R))
+              stirred = true
             }
           }
         }
@@ -276,7 +300,9 @@ export default function GlyphField({ intensity = 1 }) {
     }
 
     const draw = now => {
-      if (!dimLayer || !glow || !dim) return
+      // Schowana karta albo panel o zerowej szerokości – bufor jest wtedy pusty
+      // i `drawImage` rzuciłoby wyjątkiem.
+      if (!dimLayer || !glow || !dim || !dimLayer.width || !dimLayer.height) return
       const t = (now - start) / 1000
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.globalAlpha = 1
@@ -322,7 +348,7 @@ export default function GlyphField({ intensity = 1 }) {
           const bottom = field[i0 + fw] + (field[i0 + fw + 1] - field[i0 + fw]) * tx
           let level = top + (bottom - top) * ty
 
-          for (const wave of waves) {
+          if (waves.length) for (const wave of waves) {
             const dx = px - wave.x
             const dy = py - wave.y
             const distance = Math.sqrt(dx * dx + dy * dy)
@@ -374,7 +400,7 @@ export default function GlyphField({ intensity = 1 }) {
     }
 
     const loop = now => {
-      if (paused) { raf = 0; return }
+      if (paused || frozen) { raf = 0; return }
       raf = requestAnimationFrame(loop)
       if (now - last < FRAME_MS) return
       last = now
@@ -427,10 +453,7 @@ export default function GlyphField({ intensity = 1 }) {
     const onVisibility = () => {
       if (reduced) return
       if (document.hidden) { cancelAnimationFrame(raf); raf = 0 }
-      else if (!paused) {
-        last = 0
-        raf = requestAnimationFrame(loop)
-      }
+      else resume()
     }
     // Pod pierwszym ekranem tło zasłania nieprzezroczysta treść, więc nie ma
     // sensu go animować – stoi, dopóki czytelnik nie wróci na górę.
@@ -438,15 +461,26 @@ export default function GlyphField({ intensity = 1 }) {
       const hidden = window.scrollY > window.innerHeight * 1.2
       if (hidden === paused) return
       paused = hidden
-      if (!paused && !reduced && !document.hidden && !raf) {
-        last = 0
-        raf = requestAnimationFrame(loop)
-      }
+      resume()
+    }
+
+    /** Wznawia pętlę, o ile nic jej nie wstrzymuje. */
+    function resume() {
+      if (paused || frozen || reduced || document.hidden || raf) return
+      last = 0
+      raf = requestAnimationFrame(loop)
     }
     let resizeTimer = 0
     const onResize = () => {
       window.clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => { resize(); draw(performance.now()) }, 120)
+      resizeTimer = window.setTimeout(() => {
+        // zmiana powiększenia przeglądarki przychodzi jako zwykły resize
+        frozen = tooWide()
+        if (frozen) { cancelAnimationFrame(raf); raf = 0 }
+        resize()
+        draw(performance.now())
+        resume()
+      }, 120)
     }
 
     const boot = () => {
@@ -454,7 +488,8 @@ export default function GlyphField({ intensity = 1 }) {
       start = performance.now()
       draw(start)
       paused = window.scrollY > window.innerHeight * 1.2
-      if (!reduced && !paused) raf = requestAnimationFrame(loop)
+      frozen = tooWide()
+      resume()
     }
     // atlas korzysta z fontu mono, więc czekamy aż się wczyta (z bezpiecznym limitem)
     let cancelled = false
