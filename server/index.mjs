@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
 import { PLATFORMS, STORES, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
+import { writeZip } from './zip.mjs'
 import { createAnalytics } from './analytics.mjs'
 import { langOf, localizePage, localizeProject } from './i18n.mjs'
 import { renderDocument, renderSitemap } from './seo.mjs'
@@ -1190,6 +1191,97 @@ async function adminProjectList() {
     release: project.releaseSource === 'github' ? map[project.repo] || null : null,
   }))
 }
+
+/* ── admin: pobieranie wszystkich aplikacji ──────────────────────────── */
+
+/**
+ * Pliki wszystkich aplikacji z portfolio w jednym miejscu – także tych
+ * ukrytych na stronie. Każdy plik ma adres w panelu, który działa niezależnie
+ * od publikacji, a nazwa pliku jest prawdziwa (z wydania albo z adresu).
+ */
+async function adminDownloads() {
+  const projects = sortProjects(await readProjects()).filter(project => project.kind === 'app')
+  const map = await releases.getMany(projects.map(project => (project.releaseSource === 'github' ? project.repo : '')))
+  return projects.map(project => {
+    const release = map[project.repo] || null
+    const files = downloadsFor(project, release).map(file => {
+      const asset = project.releaseSource === 'github'
+        ? [release, ...(release?.history || [])].flatMap(item => item?.assets || []).find(item => item.id === file.id)
+        : null
+      const fromUrl = decodeURIComponent(String(file.url || '').split(/[?#]/)[0].split('/').pop() || '')
+      const name = asset?.name || (/\.[a-z0-9]{2,5}$/i.test(fromUrl) ? fromUrl : `${project.slug}-${file.platform}.${file.platform === 'android' ? 'apk' : 'bin'}`)
+      return { ...file, name, href: `/api/admin/downloads/${encodeURIComponent(project.slug)}/${encodeURIComponent(file.id)}/${encodeURIComponent(name)}` }
+    })
+    return {
+      slug: project.slug,
+      name: project.name,
+      published: project.published !== false,
+      version: release?.tag || files[0]?.version || '',
+      error: release?.error || '',
+      files,
+    }
+  })
+}
+
+/** Strumień jednego pliku: wydanie z GitHuba przez token, ręczny wpis prosto z adresu. */
+async function openDownload(project, file) {
+  if (project.releaseSource === 'github') return (await releases.asset(project.repo, file.id)).body
+  const url = new URL(file.url, 'http://localhost')
+  if (!/^https?:$/.test(url.protocol) || url.hostname === 'localhost') throw new Error('Nieobsługiwany adres.')
+  const response = await fetch(url, { redirect: 'follow' })
+  if (!response.ok || !response.body) throw new Error(`Plik odpowiedział kodem ${response.status}.`)
+  return response.body
+}
+
+app.get('/api/admin/downloads', async (_req, res) => {
+  res.set('Cache-Control', 'no-store')
+  res.json({ apps: await adminDownloads() })
+})
+
+app.get('/api/admin/downloads/zip', async (req, res) => {
+  const platform = String(req.query.platform || 'all')
+  const projects = await readProjects()
+  const apps = await adminDownloads()
+  const entries = apps.flatMap(app => app.files
+    .filter(file => platform === 'all' || file.platform === platform)
+    .map(file => ({
+      name: `${app.name.replace(/[\\/:*?"<>|]/g, '_')}/${file.name}`,
+      open: () => openDownload(projects.find(item => item.slug === app.slug), file),
+    })))
+  if (!entries.length) return res.status(404).json({ error: 'Brak plików dla tej platformy.' })
+  const stamp = new Date().toISOString().slice(0, 10)
+  res.set('Content-Type', 'application/zip')
+  res.set('Content-Disposition', `attachment; filename="aplikacje-${platform === 'all' ? 'wszystkie' : platform}-${stamp}.zip"`)
+  res.set('Cache-Control', 'no-store')
+  try {
+    const failed = await writeZip(res, entries)
+    if (failed.length) console.warn(`ZIP aplikacji bez: ${failed.join(', ')}`)
+    res.end()
+  } catch (error) {
+    res.destroy(error)
+  }
+})
+
+app.get('/api/admin/downloads/:slug/:fileId/:name', async (req, res, next) => {
+  try {
+    const projects = await readProjects()
+    const project = projects.find(item => item.slug === req.params.slug)
+    const app = (await adminDownloads()).find(item => item.slug === req.params.slug)
+    const file = app?.files.find(item => item.id === req.params.fileId)
+    if (!project || !file) return res.status(404).json({ error: 'Nie znaleziono pliku.' })
+    const body = await openDownload(project, file)
+    res.set('Content-Type', file.name.endsWith('.apk') ? 'application/vnd.android.package-archive' : 'application/octet-stream')
+    res.set('Content-Disposition', `attachment; filename="${file.name.replace(/[^\w.\-]/g, '_')}"`)
+    res.set('Cache-Control', 'no-store')
+    if (file.size) res.set('Content-Length', String(file.size))
+    for await (const chunk of body) res.write(chunk)
+    res.end()
+  } catch (error) {
+    if (res.headersSent) return res.destroy(error)
+    if (error.status) return res.status(error.status).json({ error: error.message })
+    next(error)
+  }
+})
 
 app.get('/api/admin/projects', async (_req, res) => {
   res.json({ projects: await adminProjectList(), platforms: PLATFORMS, stores: STORES.map(([id, name]) => ({ id, name })) })

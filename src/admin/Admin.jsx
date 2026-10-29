@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, BarChart3, Boxes, Camera, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, BarChart3, Boxes, Camera, Download, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
@@ -10,6 +10,7 @@ import PagesManager from './PagesManager'
 import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
+import DownloadsPanel from './DownloadsPanel'
 import '../styles/admin.css'
 
 /** Zakładka, jej adres pod /admin, nazwa i ikona. */
@@ -18,6 +19,7 @@ const TABS = [
   ['analytics', 'analityka', 'Analityka', BarChart3],
   ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText],
   ['projects', 'portfolio', 'Portfolio', Boxes],
+  ['downloads', 'pobieranie', 'Pobieranie', Download],
   ['pages', 'podstrony', 'Podstrony', Files],
   ['content', 'tresci', 'Treści strony', FileStack],
   ['gallery', 'galeria', 'Galeria', Camera],
@@ -537,6 +539,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
           {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}
 
+          {tab === 'downloads' && <DownloadsPanel />}
           {tab === 'pages' && <PagesManager notify={notify} item={item} onItem={selectItem} />}
 
           {tab === 'content' && <ContentManager notify={notify} item={item} onItem={selectItem} />}

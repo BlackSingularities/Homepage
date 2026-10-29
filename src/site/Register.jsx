@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react'
-import { CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
+import { CATALOG_PATH, PLATFORM_LABEL, hostOf } from '../lib/projects'
+import PlatformIcon from '../lib/PlatformIcon'
 import { useT } from '../lib/i18n'
 import GlowEdge from '../lib/GlowEdge'
 import StoreIcon, { STORE_LABEL } from '../lib/StoreIcon'
@@ -34,10 +35,9 @@ function Proof({ project }) {
     return (
       <span className="work-proof">
         {project.platforms.map(platform => {
-          const Icon = PLATFORM_ICON[platform] || PLATFORM_ICON.other
           return (
             <span key={platform} className="work-platform">
-              <Icon size={14} aria-hidden="true" />
+              <PlatformIcon platform={platform} size={14} aria-hidden="true" />
               <i>{platformName(platform)}</i>
             </span>
           )

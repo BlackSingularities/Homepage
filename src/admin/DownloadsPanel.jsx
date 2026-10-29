@@ -1,0 +1,124 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Archive, Download, Files, LoaderCircle } from 'lucide-react'
+import { api } from '../lib/api'
+import { PLATFORM_LABEL, formatBytes } from '../lib/projects'
+import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
+import { Card, Empty, Notice } from './parts'
+
+const VARIANT_LABEL = { ...PLATFORM_LABEL, 'windows-portable': 'Windows portable', other: 'Plik' }
+const FILTERS = [
+  ['all', 'Wszystko'],
+  ['android', 'Android'],
+  ['windows', 'Windows'],
+  ['ios', 'iOS'],
+]
+
+/** Uruchamia pobranie pliku bez otwierania nowej karty. */
+function trigger(href) {
+  const link = document.createElement('a')
+  link.href = href
+  link.download = ''
+  document.body.append(link)
+  link.click()
+  link.remove()
+}
+
+/**
+ * Wszystkie pliki aplikacji z portfolio na jednym ekranie: jeden ZIP albo
+ * każdy plik osobno. Pobieranie idzie przez API panelu, więc działa także dla
+ * aplikacji ukrytych na stronie i prywatnych repozytoriów.
+ */
+export default function DownloadsPanel() {
+  const [apps, setApps] = useState(null)
+  const [error, setError] = useState('')
+  const [platform, setPlatform] = useState('all')
+  const [queue, setQueue] = useState(null)
+
+  useEffect(() => {
+    api('/api/admin/downloads').then(data => setApps(data.apps)).catch(requestError => setError(requestError.message))
+  }, [])
+
+  const visible = useMemo(() => (apps || [])
+    .map(app => ({ ...app, files: app.files.filter(file => platform === 'all' || file.platform === platform) }))
+    .filter(app => app.files.length), [apps, platform])
+  const files = visible.flatMap(app => app.files)
+  const total = files.reduce((sum, file) => sum + (Number(file.size) || 0), 0)
+  const counts = useMemo(() => Object.fromEntries(FILTERS.map(([id]) => [id,
+    (apps || []).flatMap(app => app.files).filter(file => id === 'all' || file.platform === id).length])), [apps])
+
+  // Przeglądarka przyjmuje kolejne pobrania chętniej, gdy nie lecą naraz.
+  const downloadEach = async () => {
+    setQueue({ done: 0, total: files.length })
+    for (const [index, file] of files.entries()) {
+      trigger(file.href)
+      setQueue({ done: index + 1, total: files.length })
+      await new Promise(resolve => setTimeout(resolve, 900))
+    }
+    setTimeout(() => setQueue(null), 1500)
+  }
+
+  if (error) return <Notice tone="error">{error}</Notice>
+  if (!apps) return <div className="ap-loading"><LoaderCircle className="spin" size={18} /> Wczytywanie plików…</div>
+
+  return (
+    <div className="ap-downloads">
+      <Card
+        title="Pobierz aplikacje"
+        description="Najnowsze wydania wszystkich aplikacji z portfolio – razem w jednym archiwum ZIP albo każdy plik osobno."
+      >
+        <div className="ap-filters">
+          {FILTERS.map(([id, label]) => (
+            <button key={id} type="button" className={platform === id ? 'is-active' : ''} onClick={() => setPlatform(id)}>
+              {label} <b>{counts[id]}</b>
+            </button>
+          ))}
+        </div>
+        <div className="ap-downloads-actions">
+          <a className="ap-btn ap-btn-primary" href={`/api/admin/downloads/zip?platform=${platform}`} download>
+            <Archive size={15} /> Pobierz ZIP <span className="mono">{formatBytes(total)}</span>
+          </a>
+          <button type="button" className="ap-btn" onClick={downloadEach} disabled={Boolean(queue) || !files.length}>
+            {queue ? <LoaderCircle className="spin" size={15} /> : <Files size={15} />}
+            {queue ? `Pobieranie ${queue.done} z ${queue.total}…` : `Pobierz osobno (${files.length})`}
+          </button>
+        </div>
+        <p className="ap-downloads-hint">
+          Przy pobieraniu osobno przeglądarka może raz zapytać o zgodę na wiele plików naraz.
+        </p>
+      </Card>
+
+      {!visible.length && <Empty>Brak plików dla tej platformy.</Empty>}
+
+      <div className="ap-downloads-list">
+        {visible.map(app => (
+          <section key={app.slug} className="ap-downloads-app">
+            <header>
+              <strong>{app.name}</strong>
+              {app.version && <span className="mono">{app.version}</span>}
+              {!app.published && <em>ukryta na stronie</em>}
+              {app.error && <em className="is-error" title={app.error}>błąd odświeżania</em>}
+            </header>
+            <ul>
+              {app.files.map(file => {
+                const variant = fileVariant(file)
+                return (
+                  <li key={file.id}>
+                    <a href={file.href} download>
+                      <PlatformIcon platform={variant} size={17} aria-hidden="true" />
+                      <span>
+                        <b>{VARIANT_LABEL[variant] || variant}</b>
+                        <i className="mono">{file.name}</i>
+                      </span>
+                      <span className="mono">{formatBytes(file.size)}</span>
+                      <Download size={15} aria-hidden="true" />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </div>
+  )
+}

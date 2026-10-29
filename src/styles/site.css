@@ -12,11 +12,18 @@
 
 .project-view { margin-top: 86px; }
 
+.pv-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: clamp(18px, 2.2vw, 30px);
+}
+.pv-crumbs-sep { font-size: 13px; color: var(--ink-4); }
 .pv-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: clamp(18px, 2.2vw, 30px);
   font-size: 13.5px;
   color: var(--ink-3);
   transition: color .2s;
@@ -42,7 +49,6 @@
   border-radius: 22%;
   object-fit: contain;
 }
-.pv-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
 .pv-tagline {
   max-width: 54ch;

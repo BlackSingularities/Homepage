@@ -59,6 +59,7 @@ export const STRINGS = {
     'kind.web': 'Strona',
     'kind.app': 'Aplikacja',
     'platform.other': 'Plik',
+    'platform.windowsPortable': 'Windows portable',
     'items': n => `${n} ${polishPlural(n, 'pozycja', 'pozycje', 'pozycji')}`,
     'downloads': n => `${number('pl', n)} ${polishPlural(n, 'pobranie', 'pobrania', 'pobrań')}`,
 
@@ -183,6 +184,7 @@ export const STRINGS = {
     'kind.web': 'Website',
     'kind.app': 'App',
     'platform.other': 'File',
+    'platform.windowsPortable': 'Windows portable',
     'items': n => `${n} ${n === 1 ? 'project' : 'projects'}`,
     'downloads': n => `${number('en', n)} ${Number(n) === 1 ? 'download' : 'downloads'}`,
 

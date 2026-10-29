@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
 import {
-  CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL,
+  CATALOG_PATH, PLATFORM_LABEL,
   formatBytes, formatReleaseDate, hostOf,
 } from '../lib/projects'
 import { LOCALE, useT } from '../lib/i18n'
 import { applySeo, describe } from '../lib/seo'
 import { trackDownload, trackStore } from '../lib/analytics'
 import StoreIcon from '../lib/StoreIcon'
+import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
 import GlowEdge from '../lib/GlowEdge'
@@ -65,7 +66,11 @@ function Stores({ project }) {
 function Downloads({ project }) {
   const { t, lang } = useT()
   if (project.stores?.length) return <Stores project={project} />
-  const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
+  const platformName = platform => {
+    if (platform === 'other') return t('platform.other')
+    if (platform === 'windows-portable') return t('platform.windowsPortable')
+    return PLATFORM_LABEL[platform] || platform
+  }
   if (!project.downloads.length) {
     if (project.kind !== 'app') return null
     return (
@@ -95,7 +100,7 @@ function Downloads({ project }) {
 
       <ul className="pv-files">
         {project.downloads.map(file => {
-          const Icon = PLATFORM_ICON[file.platform] || PLATFORM_ICON.other
+          const variant = fileVariant(file)
           return (
             <li key={file.id}>
               <a
@@ -103,9 +108,9 @@ function Downloads({ project }) {
                 download
                 onClick={() => trackDownload({ project: project.slug, asset: file.id, platform: file.platform, version: file.version })}
               >
-                <Icon size={18} aria-hidden="true" />
+                <PlatformIcon platform={variant} size={18} aria-hidden="true" />
                 <span className="pv-file-main">
-                  <strong>{platformName(file.platform)}</strong>
+                  <strong>{platformName(variant)}</strong>
                   {file.label && <span className="mono">{file.label}</span>}
                 </span>
                 <span className="pv-file-meta mono">
@@ -280,21 +285,22 @@ export default function ProjectView({ slug, onNavigate }) {
   return (
     <main className="project-view">
       <div className="section">
-        <a
-          className="pv-back"
-          href={catalog}
-          onClick={event => { event.preventDefault(); onNavigate(catalog) }}
-        >
-          <ArrowLeft size={15} /> {t('nav.portfolio')}
-        </a>
+        {/* Okruszek i rodzaj pracy w jednej linii – rok nie jest tu potrzebny. */}
+        <nav className="pv-crumbs" aria-label={t('nav.portfolio')}>
+          <a
+            className="pv-back"
+            href={catalog}
+            onClick={event => { event.preventDefault(); onNavigate(catalog) }}
+          >
+            <ArrowLeft size={15} /> {t('nav.portfolio')}
+          </a>
+          <span className="pv-crumbs-sep" aria-hidden="true">/</span>
+          <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>
+          {project.label && <span className="reg-label">{project.label}</span>}
+        </nav>
 
         <header className="pv-head">
           <div className="pv-head-main">
-            <span className="pv-tags">
-              <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>
-              {project.label && <span className="reg-label">{project.label}</span>}
-              {project.year && <span className="reg-year mono">{project.year}</span>}
-            </span>
             <div className="pv-title">
               {project.icon && <img className="pv-icon" src={project.icon} alt="" />}
               <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>
