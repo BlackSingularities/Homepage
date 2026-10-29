@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
 import { useT } from '../lib/i18n'
 import GlowEdge from '../lib/GlowEdge'
+import StoreIcon, { STORE_LABEL } from '../lib/StoreIcon'
 
 /**
  * Portfolio jako półka z dowodami: każda praca pokazuje swój ekran, a nie
@@ -17,6 +18,18 @@ function Proof({ project }) {
   const { t } = useT()
   const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
 
+  if (project.kind === 'app' && project.stores?.length) {
+    return (
+      <span className="work-proof">
+        {project.stores.map(store => (
+          <span key={store} className="work-platform">
+            <StoreIcon store={store} size={14} aria-hidden="true" />
+            <i>{STORE_LABEL[store]}</i>
+          </span>
+        ))}
+      </span>
+    )
+  }
   if (project.kind === 'app' && project.platforms.length) {
     return (
       <span className="work-proof">

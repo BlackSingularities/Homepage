@@ -23,6 +23,12 @@ const KIND_OPTIONS = [
   ['app', 'Aplikacja'],
 ]
 
+const STORE_FIELDS = [
+  ['google', 'Google Play', 'https://play.google.com/store/apps/details?id=…'],
+  ['microsoft', 'Microsoft Store', 'https://apps.microsoft.com/detail/…'],
+  ['apple', 'App Store', 'https://apps.apple.com/app/…'],
+]
+
 const RELEASE_OPTIONS = [
   ['github', 'Najnowsze wydanie z GitHuba'],
   ['manual', 'Ręczna lista plików'],
@@ -50,6 +56,7 @@ function emptyProject() {
     repo: '',
     repoHidden: true,
     releaseSource: 'none',
+    stores: {},
     downloads: [],
     published: false,
     featured: false,
@@ -325,6 +332,22 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
             onChange={releaseSource => update({ releaseSource })}
             options={RELEASE_OPTIONS}
           />
+
+          <div className="ap-grid-3">
+            {STORE_FIELDS.map(([id, name, placeholder]) => (
+              <Text
+                key={id}
+                label={name}
+                value={project.stores?.[id] || ''}
+                onChange={url => update({ stores: { ...project.stores, [id]: url } })}
+                placeholder={placeholder}
+              />
+            ))}
+          </div>
+          <p className="ap-hint">
+            Link do sklepu zastępuje na stronie pliki do pobrania – zamiast plików z GitHuba
+            pojawią się plakietki sklepów. Kliknięcia w nie liczy analityka.
+          </p>
 
           {project.releaseSource === 'github' && (
             <>

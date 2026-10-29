@@ -7,7 +7,8 @@ import {
 } from '../lib/projects'
 import { LOCALE, useT } from '../lib/i18n'
 import { applySeo, describe } from '../lib/seo'
-import { trackDownload } from '../lib/analytics'
+import { trackDownload, trackStore } from '../lib/analytics'
+import StoreIcon from '../lib/StoreIcon'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
 import GlowEdge from '../lib/GlowEdge'
@@ -26,8 +27,44 @@ function Paragraphs({ text }) {
  * Pliki z prywatnych repozytoriów lecą przez proxy API, więc adres jest
  * zawsze względny i nie ujawnia tokenu.
  */
+/**
+ * Plakietki sklepów. Gdy aplikacja jest w sklepie, zastępują pliki z wydania
+ * – jedna ścieżka instalacji na platformę zamiast dwóch konkurujących.
+ */
+function Stores({ project }) {
+  const { t } = useT()
+  return (
+    <div className="pv-downloads">
+      <div className="pv-downloads-head">
+        <h2>{t('project.stores')}</h2>
+      </div>
+      <ul className="pv-stores">
+        {project.stores.map(store => (
+          <li key={store.id}>
+            <a
+              href={store.url}
+              target="_blank"
+              rel="noreferrer"
+              data-store={store.id}
+              onClick={() => trackStore({ project: project.slug, store: store.id })}
+            >
+              <StoreIcon store={store.id} size={26} aria-hidden="true" />
+              <span>
+                <small>{t('project.storeCta')}</small>
+                <strong>{store.name}</strong>
+              </span>
+              <ExternalLink size={15} aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 function Downloads({ project }) {
   const { t, lang } = useT()
+  if (project.stores?.length) return <Stores project={project} />
   const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
   if (!project.downloads.length) {
     if (project.kind !== 'app') return null

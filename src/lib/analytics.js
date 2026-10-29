@@ -88,6 +88,11 @@ export function trackDownload({ project, asset, platform, version }) {
   send({ type: 'download', path: window.location.pathname, project, asset, platform, version })
 }
 
+export function trackStore({ project, store }) {
+  // Instalacji w sklepie nie widać, więc liczymy przejście z plakietki.
+  send({ type: 'store', path: window.location.pathname, project, store })
+}
+
 export function trackEvent(name) {
   send({ type: 'event', path: window.location.pathname, name })
 }

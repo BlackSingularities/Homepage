@@ -14,11 +14,13 @@ import path from 'node:path'
  *   źródło wejścia, rozdzielczość, język, czas na stronie.
  *
  * Adresów IP nie zapisujemy. Pobrania plików liczymy zawsze – to licznik, nie
- * profil – i trzymamy je osobno, żeby strona mogła je szybko pokazać.
+ * profil – i trzymamy je osobno, żeby strona mogła je szybko pokazać. Tak samo
+ * przejścia do sklepów (Google Play, Microsoft Store, App Store): samej
+ * instalacji w sklepie nie widzimy, ale kliknięcie w plakietkę – tak.
  */
 
 const RETENTION_MONTHS = 13
-const TYPES = ['pageview', 'download', 'leave', 'consent', 'event']
+const TYPES = ['pageview', 'download', 'store', 'leave', 'consent', 'event']
 
 const clip = (value, max) => String(value ?? '').replace(/[\u0000-\u001f]/g, '').slice(0, max)
 const cleanId = value => (/^[a-z0-9-]{8,64}$/i.test(String(value || '')) ? String(value) : '')
@@ -103,6 +105,11 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
       event.platform = clip(body?.platform, 20)
       event.version = clip(body?.version, 40)
     }
+    if (type === 'store') {
+      event.project = clip(body?.project, 120)
+      event.store = ['google', 'microsoft', 'apple'].includes(body?.store) ? body.store : ''
+      if (!event.project || !event.store) return null
+    }
     if (type === 'event') event.name = clip(body?.name, 60)
     if (consent) {
       event.vid = cleanId(body?.vid)
@@ -127,6 +134,13 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
     if (event.type === 'download' && event.project && event.asset) {
       await updateJson(countsFile, {}, current => {
         const key = `${event.project}/${event.asset}`
+        return { ...current, [key]: (Number(current[key]) || 0) + 1 }
+      })
+    }
+    if (event.type === 'store') {
+      // Osobny przedrostek – suma pobrań z pliku nie może łapać sklepów.
+      await updateJson(countsFile, {}, current => {
+        const key = `store:${event.project}/${event.store}`
         return { ...current, [key]: (Number(current[key]) || 0) + 1 }
       })
     }
@@ -221,6 +235,7 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
         bounceRate: sessions.size ? Math.round((bounces / sessions.size) * 100) : 0,
         avgTimeMs: durations.length ? Math.round(durations.reduce((sum, ms) => sum + ms, 0) / durations.length) : 0,
         downloads: list.filter(event => event.type === 'download').length,
+        stores: list.filter(event => event.type === 'store').length,
       }
     }
 
@@ -228,18 +243,19 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
     const byDay = new Map()
     for (const event of events) {
       const day = event.t.slice(0, 10)
-      const bucket = byDay.get(day) || { views: 0, visitors: new Set(), downloads: 0 }
+      const bucket = byDay.get(day) || { views: 0, visitors: new Set(), downloads: 0, stores: 0 }
       if (event.type === 'pageview') {
         bucket.views += 1
         if (event.vid) bucket.visitors.add(event.vid)
       }
       if (event.type === 'download') bucket.downloads += 1
+      if (event.type === 'store') bucket.stores += 1
       byDay.set(day, bucket)
     }
     for (let index = span - 1; index >= 0; index -= 1) {
       const day = new Date(to.getTime() - index * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
       const bucket = byDay.get(day)
-      series.push({ day, views: bucket?.views || 0, visitors: bucket?.visitors.size || 0, downloads: bucket?.downloads || 0 })
+      series.push({ day, views: bucket?.views || 0, visitors: bucket?.visitors.size || 0, downloads: bucket?.downloads || 0, stores: bucket?.stores || 0 })
     }
 
     const hours = Array.from({ length: 24 }, () => 0)
@@ -247,6 +263,7 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
     for (const event of views) hours[new Date(event.t).getHours()] += 1
     const rich = views.filter(event => event.consent)
     const downloads = events.filter(event => event.type === 'download')
+    const storeClicks = events.filter(event => event.type === 'store')
     const consentEvents = events.filter(event => event.type === 'consent')
 
     return {
@@ -266,6 +283,9 @@ export function createAnalytics({ dir, readJson, updateJson, countsFile }) {
       downloadsByProject: tally(downloads, event => event.project, 20),
       downloadsDetail: detail(downloads),
       downloadsByPlatform: tally(downloads, event => event.platform, 8),
+      storesByProject: tally(storeClicks, event => event.project, 20),
+      storesByStore: tally(storeClicks, event => event.store, 3),
+      storesDetail: tally(storeClicks, event => `${event.project}/${event.store}`, 200),
       consent: {
         granted: consentEvents.filter(event => event.value === 'granted').length,
         denied: consentEvents.filter(event => event.value === 'denied').length,

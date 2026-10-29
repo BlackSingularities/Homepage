@@ -25,6 +25,35 @@ export const PLATFORMS = [
   ['other', 'Inny plik'],
 ]
 
+/**
+ * Sklepy z aplikacjami. Gdy aplikacja ma choć jeden link do sklepu, strona
+ * pokazuje plakietki sklepów zamiast plików do pobrania. Platforma służy liście
+ * w portfolio – ikonki systemów wynikają wtedy ze sklepów.
+ */
+export const STORES = [
+  ['google', 'Google Play', 'android'],
+  ['microsoft', 'Microsoft Store', 'windows'],
+  ['apple', 'App Store', 'ios'],
+]
+export const STORE_IDS = STORES.map(([id]) => id)
+
+function sanitizeStores(input) {
+  const result = {}
+  for (const id of STORE_IDS) {
+    const url = cleanLink(input?.[id])
+    if (/^https:\/\//i.test(url)) result[id] = url
+  }
+  return result
+}
+
+/** Linki do sklepów w stałej kolejności – pusta lista, gdy żadnego nie ma. */
+export function storesFor(project) {
+  if (project.kind !== 'app') return []
+  return STORES
+    .filter(([id]) => project.stores?.[id])
+    .map(([id, name, platform]) => ({ id, name, platform, url: project.stores[id] }))
+}
+
 const PLATFORM_IDS = PLATFORMS.map(([id]) => id)
 const PLATFORM_ORDER = new Map(PLATFORM_IDS.map((id, index) => [id, index]))
 
@@ -99,6 +128,7 @@ export function sanitizeProject(input, existing = {}) {
     repo: cleanRepo(input?.repo),
     repoHidden: input?.repoHidden !== false,
     releaseSource: kind === 'app' ? releaseSource : 'none',
+    stores: kind === 'app' ? sanitizeStores(input?.stores) : {},
     downloads: (Array.isArray(input?.downloads) ? input.downloads : [])
       .slice(0, 12).map(sanitizeDownload).filter(item => item.url),
     en: sanitizeProjectTranslation(input?.en),
@@ -137,10 +167,11 @@ export function projectSummary(project, release, counts = {}) {
     thumb: thumbFor(cover),
     featured: project.featured,
     site: project.siteHidden ? '' : project.siteUrl,
-    platforms: [...new Set(downloadsFor(project, release).map(item => item.platform))]
+    platforms: [...new Set((storesFor(project).length ? storesFor(project) : downloadsFor(project, release)).map(item => item.platform))]
       .sort((a, b) => (PLATFORM_ORDER.get(a) ?? 99) - (PLATFORM_ORDER.get(b) ?? 99)),
     shots: project.shots.length,
-    downloadCount: totalDownloads(downloadsFor(project, release, counts)),
+    stores: storesFor(project).map(store => store.id),
+    downloadCount: storesFor(project).length ? 0 : totalDownloads(downloadsFor(project, release, counts)),
   }
 }
 
@@ -176,15 +207,19 @@ export function downloadsFor(project, release, counts = {}) {
 export const totalDownloads = downloads => downloads.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
 
 export function publicProject(project, release, counts = {}) {
-  const downloads = downloadsFor(project, release, counts)
+  // Sklep zastępuje pliki: kto wystawił aplikację w sklepie, ten nie chce,
+  // żeby obok wisiał instalator z GitHuba.
+  const stores = storesFor(project)
+  const downloads = stores.length ? [] : downloadsFor(project, release, counts)
   const { en: _translation, ...rest } = project
   return {
     ...rest,
     siteUrl: project.siteHidden ? '' : project.siteUrl,
     repo: project.repoHidden ? '' : project.repo,
+    stores,
     downloads,
     downloadCount: totalDownloads(downloads),
-    release: project.releaseSource === 'github' && release
+    release: !stores.length && project.releaseSource === 'github' && release
       ? { tag: release.tag, name: release.name, publishedAt: release.publishedAt, url: release.url }
       : null,
   }

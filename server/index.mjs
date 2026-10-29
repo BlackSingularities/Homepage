@@ -7,7 +7,7 @@ import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
-import { PLATFORMS, downloadsFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
+import { PLATFORMS, STORES, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { createAnalytics } from './analytics.mjs'
 import { langOf, localizePage, localizeProject } from './i18n.mjs'
@@ -975,6 +975,13 @@ app.get('/api/admin/analytics', async (req, res) => {
         versions: [...byVersion.entries()]
           .map(([version, count]) => ({ version, count }))
           .sort((a, b) => b.count - a.count),
+        stores: storesFor(project).map(store => ({
+          id: store.id,
+          name: store.name,
+          url: store.url,
+          total: Number(counts[`store:${project.slug}/${store.id}`]) || 0,
+          period: (report.storesDetail || []).find(item => item.key === `${project.slug}/${store.id}`)?.count || 0,
+        })),
         files: files.map(file => ({
           id: file.id,
           platform: file.platform,
@@ -985,7 +992,9 @@ app.get('/api/admin/analytics', async (req, res) => {
           sitePeriod: own.filter(item => item.asset === file.id).reduce((sum, item) => sum + item.count, 0),
         })),
       }
-    }).sort((a, b) => b.total - a.total),
+    })
+      .map(app => ({ ...app, storeTotal: app.stores.reduce((sum, store) => sum + store.total, 0) }))
+      .sort((a, b) => (b.total + b.storeTotal) - (a.total + a.storeTotal)),
   })
 })
 
@@ -1087,7 +1096,7 @@ async function adminProjectList() {
 }
 
 app.get('/api/admin/projects', async (_req, res) => {
-  res.json({ projects: await adminProjectList(), platforms: PLATFORMS })
+  res.json({ projects: await adminProjectList(), platforms: PLATFORMS, stores: STORES.map(([id, name]) => ({ id, name })) })
 })
 
 app.post('/api/admin/projects', enforceSameOrigin, async (req, res) => {

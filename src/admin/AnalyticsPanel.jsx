@@ -3,6 +3,7 @@ import { LoaderCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import { PLATFORM_LABEL } from '../lib/projects'
 import { Card, Empty } from './parts'
+import StoreIcon, { STORE_LABEL } from '../lib/StoreIcon'
 
 const RANGES = [[7, '7 dni'], [30, '30 dni'], [90, '90 dni'], [365, 'Rok']]
 const DEVICE_LABEL = { desktop: 'Komputer', mobile: 'Telefon', tablet: 'Tablet' }
@@ -33,7 +34,7 @@ function Trend({ series }) {
     <div className="an-trend">
       <div className="an-trend-info mono">
         {active
-          ? <>{active.day} · {number(active.views)} odsłon · {number(active.visitors)} osób · {number(active.downloads)} pobrań</>
+          ? <>{active.day} · {number(active.views)} odsłon · {number(active.visitors)} osób · {number(active.downloads)} pobrań · {number(active.stores)} do sklepów</>
           : <>najedź na słupek, żeby zobaczyć dzień</>}
       </div>
       <div className="an-bars" onMouseLeave={() => setHover(null)}>
@@ -109,6 +110,7 @@ export default function AnalyticsPanel() {
     ['Unikalni odwiedzający', number(totals.visitors), <Delta now={totals.visitors} before={previous.visitors} />],
     ['Sesje', number(totals.sessions), <Delta now={totals.sessions} before={previous.sessions} />],
     ['Kliknięcia „pobierz”', number(totals.downloads), <Delta now={totals.downloads} before={previous.downloads} />],
+    ['Przejścia do sklepów', number(totals.stores), <Delta now={totals.stores} before={previous.stores} />],
     ['Nowi odwiedzający', number(totals.newVisitors), null],
     ['Stron na sesję', totals.pagesPerSession.toLocaleString('pl-PL'), null],
     ['Współczynnik odrzuceń', `${totals.bounceRate}%`, <Delta now={totals.bounceRate} before={previous.bounceRate} invert />],
@@ -116,6 +118,7 @@ export default function AnalyticsPanel() {
   ]
   const allDownloads = data.apps.reduce((sum, app) => sum + app.total, 0)
   const allSite = data.apps.reduce((sum, app) => sum + (app.siteTotal || 0), 0)
+  const allStores = data.apps.reduce((sum, app) => sum + (app.storeTotal || 0), 0)
 
   return (
     <div className="ap-stack">
@@ -144,7 +147,7 @@ export default function AnalyticsPanel() {
 
       <Card
         title="Pobrania aplikacji"
-        description={`Łącznie ${number(allDownloads)} pobrań, w tym ${number(allSite)} kliknięć na tej stronie. Dla wydań z GitHuba liczba zbiorcza pochodzi z GitHuba i obejmuje też pobrania spoza strony – kolumna „stąd” liczy wyłącznie kliknięcia w portfolio.`}
+        description={`Łącznie ${number(allDownloads)} pobrań, w tym ${number(allSite)} kliknięć na tej stronie. Dla wydań z GitHuba liczba zbiorcza pochodzi z GitHuba i obejmuje też pobrania spoza strony – kolumna „stąd” liczy wyłącznie kliknięcia w portfolio. Przejścia do sklepów: ${number(allStores)} – samej instalacji sklep nie zgłasza.`}
       >
         {data.apps.length === 0 ? <Empty>Brak aplikacji w portfolio.</Empty> : (
           <div className="an-apps">
@@ -160,6 +163,21 @@ export default function AnalyticsPanel() {
                   Ze strony: <b className="mono">{number(app.siteTotal)}</b> od początku,
                   {' '}<b className="mono">{number(app.sitePeriod)}</b> w wybranym okresie.
                 </p>
+
+                {app.stores?.length > 0 && (
+                  <ul className="an-apps-stores">
+                    {app.stores.map(store => (
+                      <li key={store.id}>
+                        <span><StoreIcon store={store.id} size={13} aria-hidden="true" /> {store.name}</span>
+                        <a className="mono" href={store.url} target="_blank" rel="noreferrer">{store.url.replace(/^https:\/\//, '')}</a>
+                        <span className="an-apps-own mono" title="Przejścia ze strony do sklepu (w okresie)">
+                          w okresie {number(store.period)}
+                        </span>
+                        <b className="mono">{number(store.total)}</b>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
                 {app.files.length > 0 && (
                   <ul>
@@ -200,6 +218,8 @@ export default function AnalyticsPanel() {
         <Ranking title="Źródła wejść" description="Skąd przychodzą odwiedzający (tylko ze zgodą)." items={data.referrers} />
         <Ranking title="Kliknięcia pobierania" description="Według aplikacji, w wybranym okresie." items={data.downloadsByProject} />
         <Ranking title="Pobrania wg platformy" items={data.downloadsByPlatform} label={key => PLATFORM_LABEL[key] || key} />
+        <Ranking title="Przejścia do sklepów" description="Według aplikacji, w wybranym okresie." items={data.storesByProject || []} />
+        <Ranking title="Przejścia wg sklepu" items={data.storesByStore || []} label={key => STORE_LABEL[key] || key} />
         <Ranking title="Urządzenia" items={data.devices} label={key => DEVICE_LABEL[key] || key} />
         <Hours hours={data.hours} />
         <Ranking title="Przeglądarki" items={data.browsers} />

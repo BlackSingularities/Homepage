@@ -1569,3 +1569,8 @@
 .ap-lang-tabs button.is-active { color: var(--ink); border-color: var(--ap-line-strong); background: rgba(231, 198, 138, .08); }
 .ap-lang-tabs button.is-active b { color: var(--gold); }
 .ap-lang-tabs p { margin: 0; font-size: 12px; color: var(--ink-3); }
+
+/* Sklep nie zgłasza instalacji – liczymy przejścia z plakietki na stronie. */
+.an-apps-stores li > span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.an-apps-stores li a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--ink-4); }
+.an-apps-stores li a:hover { color: var(--accent); }
