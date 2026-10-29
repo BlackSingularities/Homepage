@@ -82,5 +82,6 @@ jobs:
 
             docker compose exec -T homepage_api node server/migrate-apps-refresh-v21.mjs
             docker compose exec -T homepage_api node server/migrate-powerdesk-v22.mjs
+            docker compose exec -T homepage_api node server/migrate-openfilepowerwin-v23.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f
