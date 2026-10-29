@@ -4,7 +4,13 @@ import { useEffect, useRef } from 'react'
  * Tło z „systemowych” znaków – ten sam układ, co w Arcadii: siatka losowych
  * liter i cyfr, przez którą unoszą się jaśniejsze, złote smugi dymu
  * (szum wartości w 3D, z czasem jako trzecim wymiarem). Kliknięcie w puste tło wypuszcza falę, która
- * rozjaśnia i przetasowuje znaki po drodze, a kursor podświetla otoczenie.
+ * rozjaśnia i przetasowuje znaki po drodze.
+ *
+ * Każdy znak jest też cząstką na sprężynie: kursor (albo palec) odpycha
+ * znaki w promieniu `FORCE_R`, a potem wracają na swoje miejsce. Bliżej
+ * kursora litery rosną jak pod soczewką – to daje wrażenie głębi bez
+ * rozjaśniania. Ruch kursora rozgania też dym: zostawia za sobą przerzedzony
+ * ślad, który powoli zarasta.
  *
  * Wydajność: ciemne, nieruchome znaki rysujemy raz do bufora i co klatkę
  * kopiujemy go jednym `drawImage`. Na bieżąco liczymy tylko szum na rzadszej
@@ -22,6 +28,16 @@ const FRAME_MS = 1000 / 30
 // Szum liczymy co drugą kolumnę i wiersz, a między punktami interpolujemy:
 // dym jest i tak miękki, a obliczeń jest czterokrotnie mniej.
 const STEP = 2
+// pole siłowe kursora: promień, siła odpychania, tarcie i powrót sprężyny
+const FORCE_R = 150
+const FORCE = 2.4
+const FRICTION = 0.84
+const RESTORE = 0.07
+// powiększenie znaku w środku soczewki (0 = bez zmian)
+const LENS = 0.95
+// rozganianie dymu: promień śladu i tempo, w jakim dym wraca
+const STIR_R = 120
+const STIR_DECAY = 0.965
 
 // deterministyczny hash siatki → [0, 1)
 function hash(ix, iy, seed) {
@@ -126,9 +142,19 @@ export default function GlyphField({ intensity = 1 }) {
     let fw = 0
     let fh = 0
     let field = new Float32Array(0)
+    let stir = new Float32Array(0)
+    let offX = new Float32Array(0)
+    let offY = new Float32Array(0)
+    let velX = new Float32Array(0)
+    let velY = new Float32Array(0)
+    let scale = new Float32Array(0)
+    let queue = new Int32Array(0)
+    let dim = null
     let paused = false
     const ripples = []
     const pointer = { x: -9999, y: -9999, active: false }
+    // środek pola goni kursor z bezwładnością, więc odepchnięcie jest płynne
+    const lens = { x: -9999, y: -9999, px: -9999, py: -9999 }
     let raf = 0
     let last = 0
     let start = performance.now()
@@ -149,7 +175,14 @@ export default function GlyphField({ intensity = 1 }) {
       fw = Math.ceil(cols / STEP) + 1
       fh = Math.ceil(rows / STEP) + 1
       field = new Float32Array(fw * fh)
-      const dim = buildAtlas('#a3998a', dpr)
+      stir = new Float32Array(fw * fh)
+      offX = new Float32Array(cols * rows)
+      offY = new Float32Array(cols * rows)
+      velX = new Float32Array(cols * rows)
+      velY = new Float32Array(cols * rows)
+      scale = new Float32Array(cols * rows).fill(1)
+      queue = new Int32Array(cols * rows)
+      dim = buildAtlas('#a3998a', dpr)
       glow = buildAtlas('#efcb45', dpr)
 
       // nieruchoma warstwa ciemnych znaków – rysowana raz, nie co klatkę
@@ -163,14 +196,87 @@ export default function GlyphField({ intensity = 1 }) {
       const sh = CELL_H * dpr
       for (let row = 0; row < rows; row += 1) {
         for (let col = 0; col < cols; col += 1) {
-          layer.globalAlpha = Math.min(1, (0.016 + hash(col, row, seed + 3) * 0.026) * intensity)
+          layer.globalAlpha = dimAlpha(col, row)
           layer.drawImage(dim, glyphs[row * cols + col] * sw, 0, sw, sh, col * CELL_W, row * CELL_H, CELL_W, CELL_H)
         }
       }
     }
 
+    const dimAlpha = (col, row) => Math.min(1, (0.016 + hash(col, row, seed + 3) * 0.026) * intensity)
+
+    // Fizyka znaków: odpychanie od środka soczewki, tarcie i sprężyna.
+    const step = () => {
+      if (pointer.active) {
+        lens.x = lens.x < -9000 ? pointer.x : lens.x + (pointer.x - lens.x) * 0.22
+        lens.y = lens.y < -9000 ? pointer.y : lens.y + (pointer.y - lens.y) * 0.22
+      }
+      const speed = lens.px < -9000 ? 0 : Math.hypot(lens.x - lens.px, lens.y - lens.py)
+      lens.px = lens.x
+      lens.py = lens.y
+      const r2 = FORCE_R * FORCE_R
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          const idx = row * cols + col
+          let vx = velX[idx]
+          let vy = velY[idx]
+          let ox = offX[idx]
+          let oy = offY[idx]
+          let s = 1
+          if (pointer.active) {
+            const dx = col * CELL_W + ox - lens.x
+            const dy = row * CELL_H + oy - lens.y
+            const d2 = dx * dx + dy * dy
+            if (d2 < r2) {
+              const d = Math.sqrt(d2) || 1
+              const k = 1 - d / FORCE_R
+              vx += (dx / d) * k * FORCE
+              vy += (dy / d) * k * FORCE
+              s = 1 + LENS * k * k
+            }
+          }
+          if (s === 1 && scale[idx] === 1 && vx === 0 && vy === 0 && ox === 0 && oy === 0) continue
+          vx = (vx - ox * RESTORE) * FRICTION
+          vy = (vy - oy * RESTORE) * FRICTION
+          ox += vx
+          oy += vy
+          // drobne drgania zerujemy, żeby znak wrócił do warstwy stałej
+          if (Math.abs(ox) < 0.05 && Math.abs(oy) < 0.05 && Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02) {
+            ox = 0; oy = 0; vx = 0; vy = 0
+          }
+          velX[idx] = vx
+          velY[idx] = vy
+          offX[idx] = ox
+          offY[idx] = oy
+          // soczewka narasta i opada miękko, a nie skokowo
+          scale[idx] += (s - scale[idx]) * 0.35
+          if (Math.abs(scale[idx] - 1) < 0.01) scale[idx] = 1
+        }
+      }
+
+      // ślad w dymie: im szybszy ruch, tym mocniej kursor go rozgania
+      for (let i = 0; i < stir.length; i += 1) stir[i] *= STIR_DECAY
+      if (pointer.active) {
+        const push = Math.min(0.5, 0.04 + speed * 0.025)
+        const cw = CELL_W * STEP
+        const ch = CELL_H * STEP
+        const x0 = Math.max(0, Math.floor((lens.x - STIR_R) / cw))
+        const x1 = Math.min(fw - 1, Math.ceil((lens.x + STIR_R) / cw))
+        const y0 = Math.max(0, Math.floor((lens.y - STIR_R) / ch))
+        const y1 = Math.min(fh - 1, Math.ceil((lens.y + STIR_R) / ch))
+        for (let fy = y0; fy <= y1; fy += 1) {
+          for (let fx = x0; fx <= x1; fx += 1) {
+            const d = Math.hypot(fx * cw - lens.x, fy * ch - lens.y)
+            if (d < STIR_R) {
+              const i = fy * fw + fx
+              stir[i] = Math.min(1, stir[i] + push * (1 - d / STIR_R))
+            }
+          }
+        }
+      }
+    }
+
     const draw = now => {
-      if (!dimLayer || !glow) return
+      if (!dimLayer || !glow || !dim) return
       const t = (now - start) / 1000
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.globalAlpha = 1
@@ -186,7 +292,8 @@ export default function GlyphField({ intensity = 1 }) {
         const ny = row / 24
         const rise = Math.max(0, 1 - row / rows)
         for (let fx = 0; fx < fw; fx += 1) {
-          field[fy * fw + fx] = smoothstep(0.4, 0.72, smoke((fx * STEP) / 26, ny, rise, t, seed))
+          const i = fy * fw + fx
+          field[i] = smoothstep(0.4, 0.72, smoke((fx * STEP) / 26, ny, rise, t, seed)) * (1 - stir[i] * 0.9)
         }
       }
 
@@ -197,8 +304,10 @@ export default function GlyphField({ intensity = 1 }) {
         return { x: ripple.x, y: ripple.y, r: age * 620, fade: Math.max(0, 1 - age / 2.6) }
       })
 
-      const sw = CELL_W * dpr
-      const sh = CELL_H * dpr
+      // Pierwsze przejście liczy dym i czyści z warstwy stałej miejsca znaków,
+      // które się przesunęły albo świecą. Rysujemy dopiero w drugim, żeby
+      // czyszczenie jednej komórki nie zjadało sąsiada, który na nią wjechał.
+      let queued = 0
       for (let row = 0; row < rows; row += 1) {
         const py = row * CELL_H
         const fy = Math.floor(row / STEP)
@@ -213,12 +322,6 @@ export default function GlyphField({ intensity = 1 }) {
           const bottom = field[i0 + fw] + (field[i0 + fw + 1] - field[i0 + fw]) * tx
           let level = top + (bottom - top) * ty
 
-          if (pointer.active) {
-            const dx = px - pointer.x
-            const dy = py - pointer.y
-            const d2 = dx * dx + dy * dy
-            if (d2 < 32400) level += (1 - Math.sqrt(d2) / 180) * 0.55
-          }
           for (const wave of waves) {
             const dx = px - wave.x
             const dy = py - wave.y
@@ -235,17 +338,36 @@ export default function GlyphField({ intensity = 1 }) {
           const h = Math.max(level, heat[idx] * 0.955)
           heat[idx] = h
 
-          // Poza dymem zostaje gotowa ciemna warstwa – nic tu nie rysujemy.
-          const density = Math.min(1, h)
-          if (density > 0.04) {
+          const moved = offX[idx] !== 0 || offY[idx] !== 0 || scale[idx] !== 1
+          if (h > 0.04 || moved) {
             // znaki w dymie podmieniają się rzadko – migotanie wyglądało jak deszcz
-            if (Math.random() < h * 0.018) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
-            // ciemny znak spod spodu znika, żeby nie nakładał się na jasny
+            if (h > 0.04 && Math.random() < h * 0.018) glyphs[idx] = Math.floor(Math.random() * CHARS.length)
             ctx.clearRect(px, py, CELL_W, CELL_H)
-            const sx = glyphs[idx] * sw
-            ctx.globalAlpha = Math.min(0.85, Math.pow(density, 1.5) * 0.9 * intensity)
-            ctx.drawImage(glow, sx, 0, sw, sh, px, py, CELL_W, CELL_H)
+            queue[queued] = idx
+            queued += 1
           }
+        }
+      }
+
+      const sw = CELL_W * dpr
+      const sh = CELL_H * dpr
+      for (let q = 0; q < queued; q += 1) {
+        const idx = queue[q]
+        const col = idx % cols
+        const row = (idx - col) / cols
+        const s = scale[idx]
+        const w = CELL_W * s
+        const hgt = CELL_H * s
+        const x = col * CELL_W + offX[idx] - (w - CELL_W) / 2
+        const y = row * CELL_H + offY[idx] - (hgt - CELL_H) / 2
+        const sx = glyphs[idx] * sw
+        const density = Math.min(1, heat[idx])
+        if (density > 0.04) {
+          ctx.globalAlpha = Math.min(0.85, Math.pow(density, 1.5) * 0.9 * intensity)
+          ctx.drawImage(glow, sx, 0, sw, sh, x, y, w, hgt)
+        } else {
+          ctx.globalAlpha = dimAlpha(col, row)
+          ctx.drawImage(dim, sx, 0, sw, sh, x, y, w, hgt)
         }
       }
       ctx.globalAlpha = 1
@@ -256,6 +378,7 @@ export default function GlyphField({ intensity = 1 }) {
       raf = requestAnimationFrame(loop)
       if (now - last < FRAME_MS) return
       last = now
+      step()
       draw(now)
     }
 
@@ -280,18 +403,27 @@ export default function GlyphField({ intensity = 1 }) {
     }
 
     const onPointerDown = event => {
+      if (event.pointerType !== 'mouse') {
+        pointer.x = event.clientX
+        pointer.y = event.clientY
+        pointer.active = true
+        lens.x = event.clientX
+        lens.y = event.clientY
+      }
       if (event.button !== 0 || !isBackground(event.target)) return
       ripples.push({ x: event.clientX, y: event.clientY, t0: performance.now() })
       if (ripples.length > 6) ripples.shift()
       animateBriefly()
     }
+    // mysz działa cały czas, palec – dopóki dotyka ekranu
     const onPointerMove = event => {
-      if (event.pointerType !== 'mouse') return
+      if (event.pointerType !== 'mouse' && event.buttons === 0) return
       pointer.x = event.clientX
       pointer.y = event.clientY
       pointer.active = true
     }
     const onPointerLeave = () => { pointer.active = false }
+    const onPointerUp = event => { if (event.pointerType !== 'mouse') pointer.active = false }
     const onVisibility = () => {
       if (reduced) return
       if (document.hidden) { cancelAnimationFrame(raf); raf = 0 }
@@ -333,6 +465,8 @@ export default function GlyphField({ intensity = 1 }) {
 
     window.addEventListener('pointerdown', onPointerDown)
     window.addEventListener('pointermove', onPointerMove, { passive: true })
+    window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerUp)
     document.documentElement.addEventListener('pointerleave', onPointerLeave)
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('resize', onResize)
@@ -345,6 +479,8 @@ export default function GlyphField({ intensity = 1 }) {
       window.clearTimeout(resizeTimer)
       window.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerUp)
       document.documentElement.removeEventListener('pointerleave', onPointerLeave)
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('resize', onResize)
