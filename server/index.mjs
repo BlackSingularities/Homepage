@@ -690,8 +690,10 @@ function findAsset(release, assetId) {
  * Pobieranie plików aplikacji. Repozytoria są prywatne, więc każdy plik idzie
  * przez serwer, który dokłada token – ten nie opuszcza serwera. Nagłówek
  * `Range` przechodzi dalej, żeby aplikacje mogły wznowić przerwane pobieranie.
+ * Opcjonalna nazwa pliku na końcu adresu jest tylko dla aplikacji, które
+ * biorą nazwę z adresu – serwer jej nie sprawdza.
  */
-app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
+app.get(['/api/projects/:slug/asset/:assetId', '/api/projects/:slug/asset/:assetId/:name'], async (req, res, next) => {
   try {
     const projects = await readProjects()
     const project = projects.find(item => item.slug === req.params.slug && item.published !== false)
@@ -750,12 +752,18 @@ async function updateFeed(req) {
       size: asset.size,
       content_type: asset.contentType || 'application/octet-stream',
       download_count: asset.downloadCount,
-      browser_download_url: `${origin}/api/projects/${project.slug}/asset/${asset.id}`,
+      browser_download_url: `${origin}/api/projects/${project.slug}/asset/${asset.id}/${encodeURIComponent(asset.name)}`,
     })),
   })
   const history = release.history?.length ? release.history : [release]
   return { latest: toGithub(release), list: history.map(toGithub) }
 }
+
+// Aktualizator OpenPano pyta z webview, więc odpowiedź musi przejść przez CORS.
+app.use('/api/github', (_req, res, next) => {
+  res.set('Access-Control-Allow-Origin', '*')
+  next()
+})
 
 app.get('/api/github/repos/:owner/:repo/releases/latest', async (req, res, next) => {
   try {
