@@ -700,10 +700,18 @@ app.get(['/api/projects/:slug/asset/:assetId', '/api/projects/:slug/asset/:asset
     if (!project || project.releaseSource !== 'github' || !project.repo) {
       return res.status(404).json({ error: 'Nie znaleziono pliku.' })
     }
-    const asset = findAsset(await releases.get(project.repo), req.params.assetId)
+    const release = await releases.get(project.repo)
+    const asset = findAsset(release, req.params.assetId)
     if (!asset) return res.status(404).json({ error: 'Nie znaleziono pliku.' })
 
-    const file = await releases.asset(project.repo, asset.id, { range: req.get('range') || '' })
+    let file
+    try {
+      file = await releases.asset(project.repo, asset.id, { range: req.get('range') || '' })
+    } catch (error) {
+      // Bez tokenu publiczne repozytorium wciąż da się pobrać wprost z GitHuba.
+      if (error.status === 409 && !release.private && asset.directUrl) return res.redirect(302, asset.directUrl)
+      throw error
+    }
     res.status(file.status === 206 ? 206 : 200)
     res.set('Content-Type', asset.name.endsWith('.apk') ? 'application/vnd.android.package-archive' : file.type)
     res.set('Content-Disposition', `attachment; filename="${asset.name.replace(/[^\w.\-]/g, '_')}"`)
