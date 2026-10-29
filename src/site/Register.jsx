@@ -1,88 +1,87 @@
 import { ArrowUpRight } from 'lucide-react'
 import { CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
 import { useT } from '../lib/i18n'
-import { Reveal } from '../lib/ui'
 import GlowEdge from '../lib/GlowEdge'
 
 /**
- * Lista prac. Każdy wiersz niesie informację, a nie ozdobę:
- * rodzaj treści, rok, i po prawej dowód – adres działającej strony albo
- * platformy, na które jest plik do pobrania.
+ * Portfolio jako półka z dowodami: każda praca pokazuje swój ekran, a nie
+ * wiersz tabeli. Zrzut niesie rozpoznanie, ikona siedzi na jego krawędzi,
+ * rok stoi w rogu kadru, a pod spodem zostaje tylko to, co da się sprawdzić –
+ * rodzaj pracy i adres działającej strony albo platformy z plikiem.
  *
- * `lead` wyróżnia pierwszą pozycję dużą okładką; hierarchia bierze się wtedy
- * z kolejności ustawionej w panelu, nie z dodatkowej dekoracji.
+ * `lead` daje pierwszej pozycji kadr na pełną szerokość; hierarchia bierze się
+ * wtedy z kolejności ustawionej w panelu, nie z dodatkowej dekoracji.
  */
 
-function Platforms({ project }) {
+function Proof({ project }) {
   const { t } = useT()
   const platformName = platform => (platform === 'other' ? t('platform.other') : PLATFORM_LABEL[platform] || platform)
+
   if (project.kind === 'app' && project.platforms.length) {
     return (
-      <span className="reg-platforms">
+      <span className="work-proof">
         {project.platforms.map(platform => {
           const Icon = PLATFORM_ICON[platform] || PLATFORM_ICON.other
           return (
-            <span key={platform} title={platformName(platform)}>
+            <span key={platform} className="work-platform">
               <Icon size={14} aria-hidden="true" />
               <i>{platformName(platform)}</i>
             </span>
           )
         })}
-        {project.downloadCount > 0 && <span className="reg-downloads mono">{t('downloads', project.downloadCount)}</span>}
+        {project.downloadCount > 0 && <span className="work-downloads mono">{t('downloads', project.downloadCount)}</span>}
       </span>
     )
   }
-  if (project.site) return <span className="reg-host mono">{hostOf(project.site)}</span>
-  return <span className="reg-host mono is-quiet">{t('register.onRequest')}</span>
+  if (project.site) return <span className="work-proof mono">{hostOf(project.site)}</span>
+  return <span className="work-proof mono is-quiet">{t('register.onRequest')}</span>
 }
 
-function Row({ project, onNavigate, lead }) {
+function Card({ project, onNavigate, lead }) {
   const { t, lp } = useT()
   const href = lp(`${CATALOG_PATH}/${project.slug}`)
+  const shot = project.thumb || project.cover
+
   return (
     <a
-      className={`reg-row ${lead ? 'is-lead' : ''}`}
+      className={`work-card ${lead ? 'is-lead' : ''}`}
       href={href}
       onClick={event => { event.preventDefault(); onNavigate(href) }}
     >
-      <GlowEdge as="span" media className="reg-shot">
-        {project.thumb || project.cover
-          ? <img src={project.thumb || project.cover} alt="" loading={lead ? 'eager' : 'lazy'} />
+      <GlowEdge as="span" media className="work-shot">
+        {shot
+          ? <img src={shot} alt="" loading={lead ? 'eager' : 'lazy'} />
           : <i aria-hidden="true">{project.name.slice(0, 2)}</i>}
+        <span className="work-shot-veil" aria-hidden="true" />
+        {project.year && <span className="work-year mono">{project.year}</span>}
       </GlowEdge>
 
-      <span className="reg-main">
-        <span className="reg-title">
-          {project.icon && <img className="reg-icon" src={project.icon} alt="" loading="lazy" />}
+      <span className="work-body">
+        <span className="work-head">
+          {project.icon && <img className="work-icon" src={project.icon} alt="" loading="lazy" />}
           <strong>{project.name}</strong>
+          <ArrowUpRight className="work-go" size={lead ? 22 : 18} aria-hidden="true" />
         </span>
-        {project.tagline && <span className="reg-tagline">{project.tagline}</span>}
-        <span className="reg-tags">
-          <span className="reg-kind" data-kind={project.kind}>{t(`kind.${project.kind}`)}</span>
-          {project.label && <span className="reg-label">{project.label}</span>}
+
+        {project.tagline && <span className="work-note">{project.tagline}</span>}
+
+        <span className="work-foot">
+          <span className="work-kind" data-kind={project.kind}>{project.label || t(`kind.${project.kind}`)}</span>
+          <Proof project={project} />
         </span>
       </span>
-
-      <span className="reg-side">
-        <Platforms project={project} />
-        {project.year && <span className="reg-year mono">{project.year}</span>}
-      </span>
-
-      <ArrowUpRight className="reg-go" size={18} aria-hidden="true" />
     </a>
   )
 }
 
-export default function Register({ projects, onNavigate, lead = false, empty }) {
+export default function Register({ projects, onNavigate, lead = true, empty }) {
   const { t } = useT()
-  if (!projects.length) return <p className="reg-empty">{empty || t('register.empty')}</p>
+  if (!projects.length) return <p className="work-empty">{empty || t('register.empty')}</p>
 
   return (
-    <div className="register">
+    <div className="works-grid">
       {projects.map((project, index) => (
-        <Reveal key={project.id} delay={Math.min(index, 5) * 0.05} amount={0.15} y={18}>
-          <Row project={project} onNavigate={onNavigate} lead={lead && index === 0} />
-        </Reveal>
+        <Card key={project.id} project={project} onNavigate={onNavigate} lead={lead && index === 0} />
       ))}
     </div>
   )

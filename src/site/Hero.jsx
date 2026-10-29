@@ -47,6 +47,21 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
           </div>
 
           <div className="works-body">
+            <figure className="works-stage" aria-hidden="true">
+              <GlowEdge media className="works-frame">
+                {featured.map((project, index) => (
+                  project.thumb || project.cover
+                    ? <img key={project.id} src={project.thumb || project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
+                    : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
+                ))}
+              </GlowEdge>
+              {/* Wszystkie podpisy leżą w jednej komórce siatki, więc jej wysokość
+                  wyznacza najdłuższy z nich i podgląd nie skacze przy przełączaniu. */}
+              {featured.map((project, index) => (
+                <figcaption key={project.id} className={index === current ? 'is-current' : ''}>{project.tagline}</figcaption>
+              ))}
+            </figure>
+
             <ol className="works-list">
               {featured.map((project, index) => {
                 const href = lp(`${CATALOG_PATH}/${project.slug}`)
@@ -65,28 +80,13 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
                       </strong>
                       <span className="works-meta">
                         <span>{project.label || t(`kind.${project.kind}`)}</span>
-                        {project.year && <span>{project.year}</span>}
+                        {project.year && <span className="works-year mono">{project.year}</span>}
                       </span>
                     </a>
                   </li>
                 )
               })}
             </ol>
-
-            <figure className="works-preview" aria-hidden="true">
-              <GlowEdge media className="works-frame">
-                {featured.map((project, index) => (
-                  project.thumb || project.cover
-                    ? <img key={project.id} src={project.thumb || project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
-                    : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
-                ))}
-              </GlowEdge>
-              {/* Wszystkie podpisy leżą w jednej komórce siatki, więc jej wysokość
-                  wyznacza najdłuższy z nich i podgląd nie skacze przy przełączaniu. */}
-              {featured.map((project, index) => (
-                <figcaption key={project.id} className={index === current ? 'is-current' : ''}>{project.tagline}</figcaption>
-              ))}
-            </figure>
           </div>
 
           {rest > 0 && (
