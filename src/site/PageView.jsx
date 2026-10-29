@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, LoaderCircle, Quote } from 'lucide-react'
 import { Reveal } from '../lib/ui'
 import Heading from './Heading'
 import Lightbox from './Lightbox'
+import GlowEdge from '../lib/GlowEdge'
 import { localePath, useLang, useT } from '../lib/i18n'
 import { applySeo, describe } from '../lib/seo'
 
@@ -25,9 +26,9 @@ function Block({ block, onZoom, onNavigate }) {
     case 'image':
       return block.src ? (
         <Reveal className={`pb pb-image ${block.layout === 'full' ? 'is-full' : ''}`}>
-          <button type="button" onClick={() => onZoom([block], 0)}>
+          <GlowEdge as="button" media type="button" onClick={() => onZoom([block], 0)}>
             <img src={block.src} alt={block.alt} loading="lazy" />
-          </button>
+          </GlowEdge>
           {block.caption && <span className="pb-caption">{block.caption}</span>}
         </Reveal>
       ) : null
@@ -38,9 +39,9 @@ function Block({ block, onZoom, onNavigate }) {
           {block.heading && <h2>{block.heading}</h2>}
           <div className="pb-gallery-grid">
             {block.images.map((image, index) => (
-              <button type="button" key={image.src} onClick={() => onZoom(block.images, index)}>
+              <GlowEdge as="button" media type="button" key={image.src} onClick={() => onZoom(block.images, index)}>
                 <img src={image.src} alt={image.alt} loading="lazy" />
-              </button>
+              </GlowEdge>
             ))}
           </div>
         </Reveal>

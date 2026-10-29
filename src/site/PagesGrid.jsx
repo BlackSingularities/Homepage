@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react'
 import SectionHead from './SectionHead'
 import { useT } from '../lib/i18n'
+import GlowEdge from '../lib/GlowEdge'
 
 /**
  * Podstrony z panelu jako wejścia: każda pozycja jest obwiedzionym polem
@@ -15,7 +16,8 @@ export default function PagesGrid({ data, pages, onNavigate }) {
       <ul className="pages-list">
         {pages.map(page => (
           <li key={page.id}>
-            <a
+            <GlowEdge
+              as="a"
               href={lp(`/p/${page.slug}`)}
               onClick={event => { event.preventDefault(); onNavigate(lp(`/p/${page.slug}`)) }}
             >
@@ -25,7 +27,7 @@ export default function PagesGrid({ data, pages, onNavigate }) {
                 <em>{t('pages.details')}</em>
               </span>
               <i className="pages-go" aria-hidden="true"><ArrowUpRight size={20} /></i>
-            </a>
+            </GlowEdge>
           </li>
         ))}
       </ul>

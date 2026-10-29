@@ -1159,7 +1159,50 @@ app.delete('/api/admin/media/:name', enforceSameOrigin, async (req, res) => {
   const name = path.basename(cleanText(req.params.name, 200))
   if (!name || name.startsWith('.')) return res.status(400).json({ error: 'Niepoprawna nazwa pliku.' })
   await fs.unlink(path.join(UPLOAD_DIR, name)).catch(() => undefined)
+  await fs.unlink(path.join(UPLOAD_DIR, 'thumbs', `${name}.webp`)).catch(() => undefined)
   res.json({ ok: true })
+})
+
+/*
+ * Miniatury list portfolio. Generowane leniwie przy pierwszym żądaniu
+ * i trzymane obok uploadów, więc działają też dla starszych okładek.
+ */
+const THUMB_DIR = path.resolve(UPLOAD_DIR, 'thumbs')
+const THUMB_SIZE = [960, 600]
+const thumbJobs = new Map()
+
+function makeThumb(source, target) {
+  if (!thumbJobs.has(target)) {
+    const job = (async () => {
+      await fs.mkdir(THUMB_DIR, { recursive: true })
+      const buffer = await sharp(source)
+        .rotate()
+        .resize(...THUMB_SIZE, { fit: 'cover', position: 'attention', kernel: sharp.kernel.lanczos3 })
+        .webp({ quality: 82 })
+        .toBuffer()
+      await fs.writeFile(target, buffer)
+    })().finally(() => thumbJobs.delete(target))
+    thumbJobs.set(target, job)
+  }
+  return thumbJobs.get(target)
+}
+
+app.get('/uploads/thumbs/:file', async (req, res) => {
+  const file = path.basename(req.params.file)
+  if (!/^[\w\-.]+\.webp$/.test(file) || file.startsWith('.')) return res.status(404).end()
+  const target = path.join(THUMB_DIR, file)
+  const source = path.join(UPLOAD_DIR, file.slice(0, -'.webp'.length))
+  try {
+    const exists = await fs.stat(target).catch(() => null)
+    if (!exists) {
+      if (!(await fs.stat(source).catch(() => null))?.isFile()) return res.status(404).end()
+      await makeThumb(source, target)
+    }
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.sendFile(target, { maxAge: '365d' })
+  } catch {
+    res.status(404).end()
+  }
 })
 
 app.use('/uploads', express.static(UPLOAD_DIR, {

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Lightbox from './Lightbox'
+import GlowEdge from './GlowEdge'
 import { thumbUrl, fileUrl } from '../api'
 import { IconCheck, IconTrash, IconImage, IconGrip, IconStar, IconEdit } from './icons'
 
@@ -8,7 +9,7 @@ function PhotoImg({ photo, mediaToken }) {
   const [loaded, setLoaded] = useState(false)
   const ratio = photo.width && photo.height ? `${photo.width} / ${photo.height}` : '4 / 3'
   return (
-    <div className="photo-item-frame" style={{ aspectRatio: ratio }}>
+    <GlowEdge media className="photo-item-frame" style={{ aspectRatio: ratio }}>
       {photo.blur_data_url && (
         <img src={photo.blur_data_url} alt="" aria-hidden className="photo-item-blur" style={{ opacity: loaded ? 0 : 1 }} />
       )}
@@ -20,7 +21,7 @@ function PhotoImg({ photo, mediaToken }) {
         style={{ opacity: loaded ? 1 : 0 }}
         draggable={false}
       />
-    </div>
+    </GlowEdge>
   )
 }
 

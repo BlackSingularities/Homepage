@@ -110,8 +110,20 @@ export function sanitizeProject(input, existing = {}) {
   }
 }
 
+/**
+ * Miniatura obrazka z panelu: przycięta do 16:10 kopia w WebP, którą serwer
+ * generuje przy pierwszym żądaniu (`/uploads/thumbs/…`). Pliki spoza uploadów
+ * leżą w statycznym buildzie, więc dla nich zostaje oryginał.
+ */
+export function thumbFor(src) {
+  if (!src || !src.startsWith('/uploads/') || src.startsWith('/uploads/thumbs/') || /\.gif$/i.test(src)) return src || ''
+  return `/uploads/thumbs/${src.slice('/uploads/'.length)}.webp`
+}
+
 /** Wiersz listy na stronie głównej i w portfolio – bez pełnego opisu i galerii. */
 export function projectSummary(project, release, counts = {}) {
+  // Bez okładki lista dostaje pierwszy zrzut ekranu – kafelek nie stoi pusty.
+  const cover = project.cover || project.shots[0]?.src || ''
   return {
     id: project.id,
     slug: project.slug,
@@ -121,7 +133,8 @@ export function projectSummary(project, release, counts = {}) {
     year: project.year,
     tagline: project.tagline,
     icon: project.icon || '',
-    cover: project.cover,
+    cover,
+    thumb: thumbFor(cover),
     featured: project.featured,
     site: project.siteHidden ? '' : project.siteUrl,
     platforms: [...new Set(downloadsFor(project, release).map(item => item.platform))]

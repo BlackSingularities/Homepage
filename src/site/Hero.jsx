@@ -2,6 +2,7 @@ import Heading from './Heading'
 import { useState } from 'react'
 import { CATALOG_PATH } from '../lib/projects'
 import { useT } from '../lib/i18n'
+import GlowEdge from '../lib/GlowEdge'
 
 /**
  * Pierwszy ekran to od razu indeks prac. Zdanie o tym, co robię, stoi nad
@@ -58,7 +59,10 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
                       onFocus={() => setCurrent(index)}
                       onClick={event => open(event, href)}
                     >
-                      <strong>{project.name}</strong>
+                      <strong>
+                        {project.icon && <img className="works-icon" src={project.icon} alt="" loading="lazy" />}
+                        {project.name}
+                      </strong>
                       <span className="works-meta">
                         <span>{project.label || t(`kind.${project.kind}`)}</span>
                         {project.year && <span>{project.year}</span>}
@@ -70,11 +74,13 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
             </ol>
 
             <figure className="works-preview" aria-hidden="true">
-              {featured.map((project, index) => (
-                project.cover
-                  ? <img key={project.id} src={project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
-                  : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
-              ))}
+              <GlowEdge media className="works-frame">
+                {featured.map((project, index) => (
+                  project.thumb || project.cover
+                    ? <img key={project.id} src={project.thumb || project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
+                    : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
+                ))}
+              </GlowEdge>
               {/* Wszystkie podpisy leżą w jednej komórce siatki, więc jej wysokość
                   wyznacza najdłuższy z nich i podgląd nie skacze przy przełączaniu. */}
               {featured.map((project, index) => (

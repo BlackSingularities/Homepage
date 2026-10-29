@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { CATALOG_PATH, PLATFORM_ICON, PLATFORM_LABEL, hostOf } from '../lib/projects'
 import { useT } from '../lib/i18n'
 import { Reveal } from '../lib/ui'
+import GlowEdge from '../lib/GlowEdge'
 
 /**
  * Lista prac. Każdy wiersz niesie informację, a nie ozdobę:
@@ -44,11 +45,11 @@ function Row({ project, onNavigate, lead }) {
       href={href}
       onClick={event => { event.preventDefault(); onNavigate(href) }}
     >
-      <span className="reg-shot">
-        {project.cover
-          ? <img src={project.cover} alt="" loading={lead ? 'eager' : 'lazy'} />
+      <GlowEdge as="span" media className="reg-shot">
+        {project.thumb || project.cover
+          ? <img src={project.thumb || project.cover} alt="" loading={lead ? 'eager' : 'lazy'} />
           : <i aria-hidden="true">{project.name.slice(0, 2)}</i>}
-      </span>
+      </GlowEdge>
 
       <span className="reg-main">
         <span className="reg-title">

@@ -10,6 +10,7 @@ import { applySeo, describe } from '../lib/seo'
 import { trackDownload } from '../lib/analytics'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
+import GlowEdge from '../lib/GlowEdge'
 
 function Paragraphs({ text }) {
   return String(text || '')
@@ -96,13 +97,13 @@ function Gallery({ shots, name, onZoom }) {
       aria-label={t('project.shots', name)}
     >
       {shots.map((shot, index) => (
-        <button type="button" key={shot.src} onClick={() => onZoom(index)}>
+        <GlowEdge as="button" media type="button" key={shot.src} onClick={() => onZoom(index)}>
           <img
             src={shot.src}
             alt={shot.alt || t('project.shot', name, index + 1)}
             loading={index === 0 ? 'eager' : 'lazy'}
           />
-        </button>
+        </GlowEdge>
       ))}
     </Reveal>
   )
