@@ -86,8 +86,8 @@ function Downloads({ project }) {
           <p className="pv-release">
             <span className="mono">{project.release.tag}</span>
             {project.release.publishedAt && <> · {t('project.released', formatReleaseDate(project.release.publishedAt, LOCALE[lang]))}</>}
-            {project.release.url && (
-              <> · <a href={project.release.url} target="_blank" rel="noreferrer">{t('project.history')}</a></>
+            {project.release.history?.some(item => item.notes) && (
+              <> · <a href="#zmiany">{t('project.history')}</a></>
             )}
           </p>
         )}
@@ -120,6 +120,63 @@ function Downloads({ project }) {
         })}
       </ul>
     </div>
+  )
+}
+
+/**
+ * Notatki wydania z GitHuba w uproszczonym Markdownie: nagłówki, punkty
+ * i zwykłe akapity. Pogrubienia i kod tracą znaczniki – zostaje sama treść.
+ */
+function Notes({ text }) {
+  const plain = line => line.replace(/\*\*|__|`/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+  const blocks = []
+  for (const raw of String(text || '').split('\n')) {
+    const line = raw.trim()
+    if (!line) { blocks.push(null); continue }
+    const bullet = line.match(/^[-*•]\s+(.*)$/)
+    const heading = line.match(/^#{1,6}\s+(.*)$/)
+    const last = blocks[blocks.length - 1]
+    if (bullet) {
+      if (last?.type === 'list') last.items.push(plain(bullet[1]))
+      else blocks.push({ type: 'list', items: [plain(bullet[1])] })
+    } else if (heading) {
+      blocks.push({ type: 'heading', text: plain(heading[1]) })
+    } else if (last?.type === 'text') {
+      last.text += ` ${plain(line)}`
+    } else {
+      blocks.push({ type: 'text', text: plain(line) })
+    }
+  }
+  return blocks.filter(Boolean).map((block, index) => {
+    if (block.type === 'list') return <ul key={index}>{block.items.map((item, i) => <li key={i}>{item}</li>)}</ul>
+    if (block.type === 'heading') return <h4 key={index}>{block.text}</h4>
+    return <p key={index}>{block.text}</p>
+  })
+}
+
+/** Historia wydań – zastępuje stronę wydań na GitHubie, bo repozytoria są prywatne. */
+function Changelog({ project }) {
+  const { t, lang } = useT()
+  const history = (project.release?.history || []).filter(item => item.notes)
+  if (!history.length) return null
+  return (
+    <section className="pv-changelog" id="zmiany">
+      <h2>{t('project.changelog')}</h2>
+      <ol>
+        {history.map((item, index) => (
+          <li key={item.tag}>
+            <details open={index === 0}>
+              <summary>
+                <span className="mono">{item.tag}</span>
+                {item.prerelease && <span className="pv-changelog-pre mono">{t('project.prerelease')}</span>}
+                {item.publishedAt && <time className="mono" dateTime={item.publishedAt}>{formatReleaseDate(item.publishedAt, LOCALE[lang])}</time>}
+              </summary>
+              <div className="pv-changelog-notes"><Notes text={item.notes} /></div>
+            </details>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 
@@ -302,6 +359,8 @@ export default function ProjectView({ slug, onNavigate }) {
         </div>
 
         <Downloads project={project} />
+
+        <Changelog project={project} />
 
         {(previous || next) && (
           <nav className="pv-nav" aria-label={t('project.others')}>

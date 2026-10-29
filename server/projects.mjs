@@ -177,8 +177,8 @@ export function projectSummary(project, release, counts = {}) {
 
 /**
  * Łączy ręczne pozycje z plikami wydania – zależnie od wybranego źródła.
- * Pliki z prywatnego repozytorium nie mają publicznego adresu, więc kierujemy
- * je przez proxy serwera, które dokłada token.
+ * Pliki z wydań zawsze idą przez proxy serwera: repozytoria są prywatne,
+ * a pobieranie ma się odbywać wyłącznie przez portfolio.
  */
 export function downloadsFor(project, release, counts = {}) {
   if (project.kind !== 'app') return []
@@ -197,9 +197,7 @@ export function downloadsFor(project, release, counts = {}) {
       // GitHub liczy każde pobranie (także te spoza strony); proxy prywatnych
       // wydań też przechodzi przez GitHuba, więc lokalny licznik to tylko zapas.
       count: Math.max(Number(asset.downloadCount) || 0, local(asset.id)),
-      url: release.private || !asset.directUrl
-        ? `/api/projects/${project.slug}/asset/${asset.id}`
-        : asset.directUrl,
+      url: `/api/projects/${project.slug}/asset/${asset.id}`,
     }))
     .sort(sortByPlatform)
 }
@@ -215,12 +213,20 @@ export function publicProject(project, release, counts = {}) {
   return {
     ...rest,
     siteUrl: project.siteHidden ? '' : project.siteUrl,
-    repo: project.repoHidden ? '' : project.repo,
+    // Prywatne repozytorium dałoby odwiedzającym tylko 404 na GitHubie.
+    repo: project.repoHidden || release?.private ? '' : project.repo,
     stores,
     downloads,
     downloadCount: totalDownloads(downloads),
     release: !stores.length && project.releaseSource === 'github' && release
-      ? { tag: release.tag, name: release.name, publishedAt: release.publishedAt, url: release.url }
+      ? {
+        tag: release.tag,
+        name: release.name,
+        publishedAt: release.publishedAt,
+        // Historia zmian jest na stronie, bo wydania na GitHubie nie są publiczne.
+        history: (release.history?.length ? release.history : [release])
+          .map(item => ({ tag: item.tag, publishedAt: item.publishedAt, prerelease: item.prerelease === true, notes: item.notes || '' })),
+      }
       : null,
   }
 }

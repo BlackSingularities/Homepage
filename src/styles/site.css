@@ -179,6 +179,32 @@
 .pv-release a { color: var(--ink-2); text-decoration: underline; text-decoration-color: var(--line-strong); }
 .pv-release a:hover { color: var(--accent); }
 
+.pv-changelog { display: grid; gap: 14px; scroll-margin-top: 96px; }
+.pv-changelog h2 { font-size: clamp(22px, 2.2vw, 30px); }
+.pv-changelog ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pv-changelog details {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .02);
+}
+.pv-changelog summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  list-style: none;
+}
+.pv-changelog summary::-webkit-details-marker { display: none; }
+.pv-changelog summary .mono:first-child { color: var(--accent); }
+.pv-changelog summary time { margin-left: auto; font-size: 12px; color: var(--ink-3); }
+.pv-changelog-pre { padding: 2px 8px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 11px; color: var(--ink-3); }
+.pv-changelog-notes { display: grid; gap: 10px; padding: 0 16px 16px; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.pv-changelog-notes p, .pv-changelog-notes ul { margin: 0; }
+.pv-changelog-notes ul { padding-left: 18px; }
+.pv-changelog-notes h4 { margin: 4px 0 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+
 .pv-downloads.is-empty p {
   padding: 22px;
   border: 1px dashed var(--line-strong);

@@ -677,7 +677,20 @@ app.get('/api/projects/:slug', async (req, res) => {
   res.json({ project: publicProject(localizeProject(project, lang), release, counts), previous: neighbour(-1), next: neighbour(1) })
 })
 
-/** Proxy pobierania dla prywatnych wydań – token nie opuszcza serwera. */
+/** Plik z dowolnego wydania trzymanego w historii, po identyfikatorze. */
+function findAsset(release, assetId) {
+  for (const item of [release, ...(release?.history || [])]) {
+    const asset = (item?.assets || []).find(entry => entry.id === assetId)
+    if (asset) return asset
+  }
+  return null
+}
+
+/**
+ * Pobieranie plików aplikacji. Repozytoria są prywatne, więc każdy plik idzie
+ * przez serwer, który dokłada token – ten nie opuszcza serwera. Nagłówek
+ * `Range` przechodzi dalej, żeby aplikacje mogły wznowić przerwane pobieranie.
+ */
 app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
   try {
     const projects = await readProjects()
@@ -685,20 +698,82 @@ app.get('/api/projects/:slug/asset/:assetId', async (req, res, next) => {
     if (!project || project.releaseSource !== 'github' || !project.repo) {
       return res.status(404).json({ error: 'Nie znaleziono pliku.' })
     }
-    const release = await releases.get(project.repo)
-    const asset = (release?.assets || []).find(item => item.id === req.params.assetId)
+    const asset = findAsset(await releases.get(project.repo), req.params.assetId)
     if (!asset) return res.status(404).json({ error: 'Nie znaleziono pliku.' })
 
-    const file = await releases.asset(project.repo, asset.id)
-    res.set('Content-Type', file.type)
+    const file = await releases.asset(project.repo, asset.id, { range: req.get('range') || '' })
+    res.status(file.status === 206 ? 206 : 200)
+    res.set('Content-Type', asset.name.endsWith('.apk') ? 'application/vnd.android.package-archive' : file.type)
     res.set('Content-Disposition', `attachment; filename="${asset.name.replace(/[^\w.\-]/g, '_')}"`)
+    res.set('Accept-Ranges', 'bytes')
+    res.set('Cache-Control', 'no-store')
+    if (file.range) res.set('Content-Range', file.range)
     if (file.size) res.set('Content-Length', file.size)
     for await (const chunk of file.body) res.write(chunk)
     res.end()
   } catch (error) {
+    if (res.headersSent) return res.destroy(error)
     if (error.status) return res.status(error.status).json({ error: error.message })
     next(error)
   }
+})
+
+/**
+ * Zamiennik `api.github.com/repos/:owner/:repo/releases` dla aktualizatorów
+ * w aplikacjach. Kształt odpowiedzi jest taki sam jak w GitHubie, więc
+ * aplikacja zmienia tylko adres – a pliki wskazują na proxy powyżej.
+ * Udostępniamy wyłącznie repozytoria opublikowanych aplikacji z portfolio.
+ */
+async function updateFeed(req) {
+  const repo = `${req.params.owner}/${req.params.repo}`.toLowerCase()
+  const projects = await readProjects()
+  const project = projects.find(item => item.published !== false && item.kind === 'app'
+    && item.releaseSource === 'github' && String(item.repo || '').toLowerCase() === repo)
+  if (!project) return null
+  const release = await releases.get(project.repo)
+  if (!release?.tag) return null
+  // TLS kończy się przed kontenerem, więc protokół z nagłówków bywa `http`.
+  const host = req.get('host')
+  const origin = `${/^(localhost|127\.)/.test(host) ? req.protocol : 'https'}://${host}`
+  const page = `${origin}/portfolio/${project.slug}`
+  const toGithub = item => ({
+    tag_name: item.tag,
+    name: item.name,
+    body: item.notes || '',
+    html_url: page,
+    published_at: item.publishedAt,
+    prerelease: item.prerelease === true,
+    draft: false,
+    assets: (item.assets || []).map(asset => ({
+      id: Number(asset.id),
+      name: asset.name,
+      size: asset.size,
+      content_type: asset.contentType || 'application/octet-stream',
+      download_count: asset.downloadCount,
+      browser_download_url: `${origin}/api/projects/${project.slug}/asset/${asset.id}`,
+    })),
+  })
+  const history = release.history?.length ? release.history : [release]
+  return { latest: toGithub(release), list: history.map(toGithub) }
+}
+
+app.get('/api/github/repos/:owner/:repo/releases/latest', async (req, res, next) => {
+  try {
+    const feed = await updateFeed(req)
+    if (!feed) return res.status(404).json({ message: 'Not Found' })
+    res.set('Cache-Control', 'no-cache')
+    res.json(feed.latest)
+  } catch (error) { next(error) }
+})
+
+app.get('/api/github/repos/:owner/:repo/releases', async (req, res, next) => {
+  try {
+    const feed = await updateFeed(req)
+    if (!feed) return res.status(404).json({ message: 'Not Found' })
+    const limit = Math.min(Math.max(Number(req.query.per_page) || 30, 1), 100)
+    res.set('Cache-Control', 'no-cache')
+    res.json(feed.list.slice(0, limit))
+  } catch (error) { next(error) }
 })
 
 /**

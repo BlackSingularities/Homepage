@@ -12,7 +12,10 @@ import { detectPlatform } from './projects.mjs'
 
 const TTL_MS = 30 * 60 * 1000
 // Podbijane, gdy zmienia się kształt wpisu – stare wpisy odświeżają się od razu.
-const CACHE_VERSION = 2
+const CACHE_VERSION = 3
+// Ile wydań wstecz trzymamy – starczy na historię zmian i na aplikacje, które
+// przeglądają listę zamiast samego „latest”.
+const HISTORY = 15
 const API = 'https://api.github.com'
 const USER_AGENT = 'redzikowski-homepage'
 
@@ -54,47 +57,61 @@ async function request(path, token, accept) {
   return response.json()
 }
 
-/** Najpierw oficjalne „latest”, a gdy go nie ma – najnowsze wydanie z listy (także wersje wstępne). */
-async function fetchRelease(repo, token) {
-  try {
-    return await request(`/repos/${repo}/releases/latest`, token)
-  } catch (error) {
-    if (error.status !== 404) throw error
-    const list = await request(`/repos/${repo}/releases?per_page=1`, token)
-    if (!Array.isArray(list) || !list.length) {
-      const empty = new Error('To repozytorium nie ma jeszcze żadnego wydania.')
-      empty.status = 404
-      throw empty
-    }
-    return list[0]
+/** Opis wydania bez stopki dopisywanej przez CI (wszystko po linii `---`). */
+function releaseNotes(body) {
+  return String(body || '').replace(/\r\n/g, '\n').split(/\n---\s*(?:\n|$)/)[0].trim()
+}
+
+function mapAsset(asset, tag) {
+  return {
+    id: String(asset.id),
+    name: asset.name || '',
+    label: assetLabel(asset.name),
+    platform: detectPlatform(asset.name),
+    size: Number(asset.size) || 0,
+    contentType: asset.content_type || '',
+    downloadCount: Number(asset.download_count) || 0,
+    version: tag,
+    directUrl: asset.browser_download_url || '',
   }
 }
 
+const mapRelease = item => ({
+  tag: item.tag_name || '',
+  name: item.name || item.tag_name || '',
+  publishedAt: item.published_at || item.created_at || '',
+  prerelease: item.prerelease === true,
+  notes: releaseNotes(item.body),
+  assets: (item.assets || []).map(asset => mapAsset(asset, item.tag_name || '')),
+})
+
+/**
+ * Ostatnie wydania jednym zapytaniem. „Aktualne” to pierwsze pełne wydanie,
+ * a gdy są same wstępne – najnowsze z nich (tak samo jak wcześniej robiło
+ * `releases/latest` z zapasem na listę).
+ */
 async function fetchEntry(repo, token) {
-  const [meta, release] = await Promise.all([
+  const [meta, list] = await Promise.all([
     request(`/repos/${repo}`, token).catch(() => null),
-    fetchRelease(repo, token),
+    request(`/repos/${repo}/releases?per_page=${HISTORY}`, token),
   ])
+  const published = (Array.isArray(list) ? list : []).filter(item => !item.draft)
+  const release = published.find(item => !item.prerelease) || published[0]
+  if (!release) {
+    const empty = new Error('To repozytorium nie ma jeszcze żadnego wydania.')
+    empty.status = 404
+    throw empty
+  }
+  const current = mapRelease(release)
   return {
     v: CACHE_VERSION,
     repo,
     fetchedAt: new Date().toISOString(),
     private: meta?.private === true,
     error: '',
-    tag: release.tag_name || '',
-    name: release.name || release.tag_name || '',
-    publishedAt: release.published_at || release.created_at || '',
+    ...current,
     url: release.html_url || `https://github.com/${repo}/releases`,
-    assets: (release.assets || []).map(asset => ({
-      id: String(asset.id),
-      name: asset.name || '',
-      label: assetLabel(asset.name),
-      platform: detectPlatform(asset.name),
-      size: Number(asset.size) || 0,
-      downloadCount: Number(asset.download_count) || 0,
-      version: release.tag_name || '',
-      directUrl: asset.browser_download_url || '',
-    })),
+    history: published.map(mapRelease),
   }
 }
 
@@ -150,14 +167,15 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
   }
 
   /**
-   * Strumień pliku z prywatnego wydania. GitHub odpowiada przekierowaniem do
+   * Strumień pliku z wydania – wszystkie pobrania idą przez stronę, także z
+ * repozytoriów prywatnych. GitHub odpowiada przekierowaniem do
    * magazynu, do którego nie wolno przesłać nagłówka autoryzacji – dlatego
    * przekierowanie obsługujemy ręcznie.
    */
-  async function asset(repo, assetId) {
+  async function asset(repo, assetId, { range = '' } = {}) {
     const token = await getToken()
     if (!token) {
-      const error = new Error('Pobieranie z prywatnego repozytorium wymaga tokenu GitHuba w panelu.')
+      const error = new Error('Pobieranie z repozytorium wymaga tokenu GitHuba w panelu.')
       error.status = 409
       throw error
     }
@@ -166,7 +184,9 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
       redirect: 'manual',
     })
     const location = first.headers.get('location')
-    const response = location ? await fetch(location, { headers: { 'User-Agent': USER_AGENT } }) : first
+    // Zakres idzie dalej, żeby menedżer pobierania mógł wznowić duży plik.
+    const extra = range ? { Range: range } : {}
+    const response = location ? await fetch(location, { headers: { 'User-Agent': USER_AGENT, ...extra } }) : first
     if (!response.ok || !response.body) {
       const error = new Error('Nie udało się pobrać pliku z GitHuba.')
       error.status = response.status === 404 ? 404 : 502
@@ -174,6 +194,8 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     }
     return {
       body: response.body,
+      status: response.status,
+      range: response.headers.get('content-range') || '',
       size: response.headers.get('content-length') || '',
       type: response.headers.get('content-type') || 'application/octet-stream',
     }
