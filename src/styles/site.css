@@ -1632,7 +1632,6 @@
   justify-content: center;
   gap: 12px;
   min-width: 0;
-  padding: 0 28px;
 }
 
 .work-icon {
@@ -1654,18 +1653,6 @@
 
 .work-card:hover .work-head strong { color: var(--accent); }
 .work-card:focus-visible .work-head strong { color: var(--accent); }
-
-.work-go {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto 0;
-  color: var(--ink-4);
-  transition: color .2s, transform .3s var(--ease);
-}
-
-.work-card:hover .work-go { color: var(--accent); transform: translate(3px, -3px); }
 
 .work-note {
   display: -webkit-box;

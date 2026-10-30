@@ -1,4 +1,3 @@
-import { ArrowUpRight } from 'lucide-react'
 import { CATALOG_PATH, PLATFORM_LABEL, hostOf } from '../lib/projects'
 import PlatformIcon from '../lib/PlatformIcon'
 import { useT } from '../lib/i18n'
@@ -72,7 +71,6 @@ function Card({ project, onNavigate, lead }) {
         <span className="work-head">
           {project.icon && <img className="work-icon" src={project.icon} alt="" loading="lazy" />}
           <strong>{project.name}</strong>
-          <ArrowUpRight className="work-go" size={lead ? 22 : 18} aria-hidden="true" />
         </span>
 
         {project.tagline && <span className="work-note">{project.tagline}</span>}
