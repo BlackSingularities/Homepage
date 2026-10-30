@@ -86,5 +86,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-powerdesk-shots-v24.mjs
             docker compose exec -T homepage_api node server/migrate-travels-v25.mjs
             docker compose exec -T homepage_api node server/migrate-icons-v26.mjs
+            docker compose exec -T homepage_api node server/migrate-opencalc-v27.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f
