@@ -1534,14 +1534,19 @@
 
 .footer-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .footer-brand img { width: 210px; max-width: 100%; height: auto; }
-.footer-brand p { max-width: 30ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.footer-brand p { font-size: 14px; line-height: 1.5; color: var(--ink-2); text-align: left; white-space: nowrap; }
+@media (max-width: 480px) { .footer-brand p { white-space: normal; } }
 
-.footer-nav { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; }
-.footer-nav a { font-size: 14.5px; color: var(--ink-2); transition: color .2s; }
+.footer-nav { display: grid; grid-template-columns: repeat(3, max-content); gap: 10px 44px; justify-content: end; align-content: start; padding-top: 6px; }
+.footer-nav a { font-size: 13px; color: var(--ink-2); transition: color .2s; }
 .footer-nav a:hover { color: var(--accent); }
 
 .footer-legal {
   grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
   padding-top: 24px;
   border-top: 1px solid var(--line-soft);
   font-size: 13px;
@@ -1550,6 +1555,7 @@
 
 @media (max-width: 900px) {
   .footer-inner { grid-template-columns: minmax(0, 1fr); }
+  .footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); justify-content: start; gap: 10px 24px; }
 }
 
 /* ── portfolio, realizacja, podstrona ───────────────────────────── */
@@ -1669,7 +1675,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px 18px;
   margin-top: 2px;
   padding-top: 12px;
@@ -1685,7 +1691,7 @@
   white-space: nowrap;
 }
 
-.work-proof { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; color: var(--ink-2); }
+.work-proof { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 12px; color: var(--ink-2); }
 .work-proof.is-quiet { color: var(--ink-4); }
 .work-platform { display: inline-flex; align-items: center; gap: 5px; }
 .work-platform i { font-style: normal; font-size: 12px; color: var(--ink-3); }

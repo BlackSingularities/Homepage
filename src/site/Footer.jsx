@@ -37,8 +37,8 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
         </nav>
 
         <p className="footer-legal">
-          © {year} {brand.name}. {brand.location}.
-          {' '}<button type="button" className="footer-consent" onClick={openConsent}>{t('footer.privacy')}</button>
+          <span>© {year} {brand.name}. {brand.location}.</span>
+          <button type="button" className="footer-consent" onClick={openConsent}>{t('footer.privacy')}</button>
         </p>
       </div>
     </footer>
