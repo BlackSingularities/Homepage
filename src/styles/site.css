@@ -1625,7 +1625,15 @@
 
 .work-body { display: grid; align-content: start; gap: 10px; min-width: 0; }
 
-.work-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.work-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 28px;
+}
 
 .work-icon {
   flex: none;
@@ -1648,8 +1656,11 @@
 .work-card:focus-visible .work-head strong { color: var(--accent); }
 
 .work-go {
-  flex: none;
-  margin-left: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto 0;
   color: var(--ink-4);
   transition: color .2s, transform .3s var(--ease);
 }
