@@ -312,7 +312,7 @@ function projectView({ lang, project }) {
     <main>
       <p><a href="${escapeHtml(localePath('/portfolio', lang))}">${escapeHtml(t.portfolio)}</a></p>
       <h1>${escapeHtml(project.name)}</h1>
-      <p>${escapeHtml([isApp ? t.app : t.web, project.label, project.year].filter(Boolean).join(' · '))}</p>
+      <p>${escapeHtml([isApp ? t.app : t.web, project.label].filter(Boolean).join(' · '))}</p>
       ${project.tagline ? `<p><strong>${escapeHtml(project.tagline)}</strong></p>` : ''}
       ${project.summary ? `<p>${escapeHtml(project.summary)}</p>` : ''}
       ${paragraphs(project.body)}
@@ -340,7 +340,6 @@ function projectView({ lang, project }) {
     ...(project.cover ? { image: asset(project.cover) } : {}),
     ...(shots.length ? { screenshot: shots } : {}),
     ...(project.features?.length ? { featureList: project.features.join(', ') } : {}),
-    ...(project.year ? { dateCreated: project.year } : {}),
     ...(project.release?.tag ? { softwareVersion: project.release.tag.replace(/^v/i, '') } : {}),
     ...(project.release?.publishedAt ? { datePublished: project.release.publishedAt.slice(0, 10) } : {}),
     ...(project.downloads?.length && project.downloads[0].url.startsWith('http') ? { downloadUrl: project.downloads[0].url } : {}),

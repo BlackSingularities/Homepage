@@ -315,7 +315,6 @@ function Editor({ project, platforms, onChange, onSave, onDelete, saving, dirty 
 
       <div className="ap-grid-2">
         <Text label="Etykieta" value={value('label')} onChange={next => set('label', next)} placeholder={original('label') || 'OSINT / analiza danych'} />
-        <Text label="Rok" value={project.year} onChange={year => update({ year })} />
       </div>
 
       <Text label="Zdanie na liście" value={value('tagline')} onChange={next => set('tagline', next)} wide

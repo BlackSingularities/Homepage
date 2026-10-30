@@ -66,7 +66,6 @@ function Card({ project, onNavigate, lead }) {
           ? <img src={shot} alt="" loading={lead ? 'eager' : 'lazy'} />
           : <i aria-hidden="true">{project.name.slice(0, 2)}</i>}
         <span className="work-shot-veil" aria-hidden="true" />
-        {project.year && <span className="work-year mono">{project.year}</span>}
       </GlowEdge>
 
       <span className="work-body">

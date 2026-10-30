@@ -1239,7 +1239,6 @@
 }
 
 .works-list a.is-current .works-meta { color: var(--ink-2); }
-.works-year { font-variant-numeric: tabular-nums; }
 
 .works-more {
   display: inline-block;
@@ -1533,7 +1532,7 @@
   padding: 56px var(--gutter) 40px;
 }
 
-.footer-brand { display: flex; align-items: center; gap: 14px; }
+.footer-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .footer-brand img { width: 210px; max-width: 100%; height: auto; }
 .footer-brand p { max-width: 30ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 
@@ -1624,20 +1623,6 @@
 
 .work-card:hover .work-shot-veil { opacity: .45; }
 
-.work-year {
-  position: absolute;
-  z-index: 2;
-  top: 10px;
-  right: 10px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(10, 9, 8, .62);
-  backdrop-filter: blur(7px);
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-}
-
 .work-body { display: grid; align-content: start; gap: 10px; min-width: 0; }
 
 .work-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -1727,7 +1712,6 @@
   .work-card.is-lead .work-icon { width: 54px; height: 54px; border-radius: 16px; }
   .work-card.is-lead .work-head strong { font-size: clamp(34px, 3.6vw, 54px); }
   .work-card.is-lead .work-note { -webkit-line-clamp: 4; max-width: 46ch; font-size: 16px; }
-  .work-card.is-lead .work-year { top: 14px; right: 14px; font-size: 12.5px; }
 }
 
 @media (max-width: 480px) {
@@ -1988,4 +1972,3 @@
   .pv-stores a { min-width: 0; grid-template-columns: 26px minmax(0, 1fr) 15px; }
 }
 
-@media (max-width: 600px) { .footer-brand { flex-direction: column; align-items: flex-start; } }
