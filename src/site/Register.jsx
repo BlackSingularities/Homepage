@@ -41,7 +41,6 @@ function Proof({ project }) {
             </span>
           )
         })}
-        {project.downloadCount > 0 && <span className="work-downloads mono">{t('downloads', project.downloadCount)}</span>}
       </span>
     )
   }
@@ -50,7 +49,7 @@ function Proof({ project }) {
 }
 
 function Card({ project, onNavigate, lead }) {
-  const { t, lp } = useT()
+  const { lp } = useT()
   const href = lp(`${CATALOG_PATH}/${project.slug}`)
   const shot = project.thumb || project.cover
 
@@ -76,7 +75,6 @@ function Card({ project, onNavigate, lead }) {
         {project.tagline && <span className="work-note">{project.tagline}</span>}
 
         <span className="work-foot">
-          <span className="work-kind" data-kind={project.kind}>{project.label || t(`kind.${project.kind}`)}</span>
           <Proof project={project} />
         </span>
       </span>
