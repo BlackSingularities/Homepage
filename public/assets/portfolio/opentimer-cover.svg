@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="OpenTimer – zegar, budzik, stoper i minutnik">
+  <rect width="1600" height="1000" fill="#000000"/>
+  <g fill="#ffffff">
+    <text x="96" y="150" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-1">OpenTimer</text>
+    <text x="96" y="206" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="27" fill="#8a8a8a" letter-spacing="3">ZEGAR · BUDZIK · STOPER · MINUTNIK</text>
+  </g>
+
+  <!-- tarcza analogowa -->
+  <g>
+    <rect x="96" y="268" width="620" height="620" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <circle cx="406" cy="578" r="226" fill="#ffffff" fill-opacity="0.04"/>
+    <g stroke="#ffffff" stroke-linecap="round">
+      <path d="M406 362V392" stroke-width="7"/>
+      <path d="M406 764V794" stroke-width="7"/>
+      <path d="M190 578H220" stroke-width="7"/>
+      <path d="M592 578H622" stroke-width="7"/>
+      <g stroke-opacity="0.3" stroke-width="3">
+        <path d="M519 383L507 403"/><path d="M601 465L581 477"/><path d="M601 691L581 679"/>
+        <path d="M519 773L507 753"/><path d="M293 773L305 753"/><path d="M211 691L231 679"/>
+        <path d="M211 465L231 477"/><path d="M293 383L305 403"/>
+      </g>
+    </g>
+    <path d="M406 578L406 436" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+    <path d="M406 578L524 644" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+    <path d="M406 578L318 500" stroke="#ff3b47" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="406" cy="578" r="12" fill="#ff3b47"/>
+    <text x="406" y="856" text-anchor="middle" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="25" fill="#c8c8c8">Najbliższy budzik: pn 6:30</text>
+  </g>
+
+  <!-- panel minutnika i stopera -->
+  <g>
+    <rect x="764" y="268" width="740" height="292" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="812" y="348" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="25" fill="#8a8a8a" letter-spacing="3">MINUTNIK</text>
+    <circle cx="900" cy="462" r="58" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="10"/>
+    <path d="M900 404a58 58 0 0 1 41 99" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+    <text x="992" y="446" font-family="monospace" font-size="62" font-weight="700" fill="#ffffff">07:12</text>
+    <text x="994" y="492" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" fill="#8a8a8a">herbata · koniec o 21:04</text>
+
+    <rect x="764" y="596" width="740" height="292" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="812" y="676" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="25" fill="#8a8a8a" letter-spacing="3">STOPER</text>
+    <text x="812" y="762" font-family="monospace" font-size="62" font-weight="700" fill="#ffffff">12:04,37</text>
+    <g font-family="monospace" font-size="24" fill="#c8c8c8">
+      <rect x="812" y="790" width="644" height="38" rx="14" fill="#ffffff" fill-opacity="0.1"/>
+      <text x="832" y="816">03   01:58,22   najszybsze</text>
+      <text x="1272" y="816" fill="#8a8a8a">06:12,04</text>
+      <text x="832" y="864">02   02:11,86</text>
+      <text x="1272" y="864" fill="#8a8a8a">04:13,82</text>
+    </g>
+  </g>
+
+  <text x="96" y="946" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="23" fill="#6a6a6a">Adam Rędzikowski · redzikowski.com</text>
+</svg>
