@@ -93,13 +93,20 @@ const mapRelease = item => ({
 async function fetchEntry(repo, token) {
   const [meta, list] = await Promise.all([
     request(`/repos/${repo}`, token).catch(() => null),
-    request(`/repos/${repo}/releases?per_page=${HISTORY}`, token),
+    request(`/repos/${repo}/releases?per_page=${HISTORY}`, token).catch(error => {
+      error.repoPrivate = null
+      throw error
+    }),
   ])
   const published = (Array.isArray(list) ? list : []).filter(item => !item.draft)
   const release = published.find(item => !item.prerelease) || published[0]
+  // Gdy GitHub nie pokazał repozytorium, jego widoczność jest nieznana (null)
+  // i strona traktuje je jak prywatne.
+  const isPrivate = meta ? meta.private === true : null
   if (!release) {
     const empty = new Error('To repozytorium nie ma jeszcze żadnego wydania.')
     empty.status = 404
+    empty.repoPrivate = isPrivate
     throw empty
   }
   const current = mapRelease(release)
@@ -107,7 +114,7 @@ async function fetchEntry(repo, token) {
     v: CACHE_VERSION,
     repo,
     fetchedAt: new Date().toISOString(),
-    private: meta?.private === true,
+    private: isPrivate,
     error: '',
     ...current,
     url: release.html_url || `https://github.com/${repo}/releases`,
@@ -133,7 +140,8 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
       } catch (error) {
         const cached = (await read())[repo]
         const failure = {
-          ...(cached || { repo, private: false, tag: '', name: '', publishedAt: '', url: `https://github.com/${repo}/releases`, assets: [] }),
+          ...(cached || { repo, private: null, tag: '', name: '', publishedAt: '', url: `https://github.com/${repo}/releases`, assets: [] }),
+          ...(error.repoPrivate !== undefined && { private: error.repoPrivate }),
           v: CACHE_VERSION,
           checkedAt: new Date().toISOString(),
           error: error.message,

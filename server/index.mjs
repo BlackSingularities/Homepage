@@ -341,8 +341,13 @@ function sortProjects(projects) {
 /** Opublikowane realizacje z dołożonymi plikami z najnowszych wydań. */
 async function publishedProjects() {
   const projects = sortProjects(await readProjects()).filter(project => project.published !== false)
-  const map = await releases.getMany(projects.map(project => (project.releaseSource === 'github' ? project.repo : '')))
-  return projects.map(project => ({ project, release: map[project.repo] || null }))
+  // Repozytoria odpytujemy także bez wydań z GitHuba, żeby znać ich widoczność.
+  const map = await releases.getMany(projects.map(project => project.repo))
+  return projects.map(project => {
+    const info = map[project.repo] || null
+    if (project.releaseSource === 'github') return { project, release: info }
+    return { project: info?.private === false ? project : { ...project, repoHidden: true }, release: null }
+  })
 }
 
 /* ── pages (CMS subpages) ────────────────────────────────────────────── */
@@ -715,7 +720,7 @@ app.get(['/api/projects/:slug/asset/:assetId', '/api/projects/:slug/asset/:asset
       file = await releases.asset(project.repo, asset.id, { range: req.get('range') || '' })
     } catch (error) {
       // Bez tokenu publiczne repozytorium wciąż da się pobrać wprost z GitHuba.
-      if (error.status === 409 && !release.private && asset.directUrl) return res.redirect(302, asset.directUrl)
+      if (error.status === 409 && release.private === false && asset.directUrl) return res.redirect(302, asset.directUrl)
       throw error
     }
     res.status(file.status === 206 ? 206 : 200)

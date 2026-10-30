@@ -215,8 +215,9 @@ export function publicProject(project, release, counts = {}, { changelog = false
   return {
     ...rest,
     siteUrl: project.siteHidden ? '' : project.siteUrl,
-    // Prywatne repozytorium dałoby odwiedzającym tylko 404 na GitHubie.
-    repo: project.repoHidden || release?.private ? '' : project.repo,
+    // Link tylko do repozytorium, które GitHub potwierdził jako publiczne –
+    // prywatne dałoby odwiedzającym tylko 404.
+    repo: project.repoHidden || release?.private !== false ? '' : project.repo,
     stores,
     downloads,
     downloadCount: totalDownloads(downloads),
