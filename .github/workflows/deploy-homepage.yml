@@ -90,5 +90,6 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-opentimer-v28.mjs
             docker compose exec -T homepage_api node server/migrate-shots-v29.mjs
             docker compose exec -T homepage_api node server/migrate-app-icons-v30.mjs
+            docker compose exec -T homepage_api node server/migrate-app-icons-v31.mjs
             docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
             docker image prune -f
