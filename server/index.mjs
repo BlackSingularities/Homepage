@@ -747,6 +747,7 @@ app.get(['/api/projects/:slug/asset/:assetId', '/api/projects/:slug/asset/:asset
  */
 const REPO_RENAMES = {
   'blacksingularities/openfilepowerwin': 'blacksingularities/powerdesk',
+  'blacksingularities/opencall': 'blacksingularities/opendial',
 }
 
 async function updateFeed(req) {
