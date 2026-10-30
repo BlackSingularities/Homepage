@@ -46,7 +46,6 @@
   flex: none;
   width: clamp(52px, 6vw, 80px);
   height: clamp(52px, 6vw, 80px);
-  border-radius: 22%;
   object-fit: contain;
 }
 
@@ -1169,8 +1168,9 @@
 
 .works-list a {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: baseline;
   gap: 8px 24px;
   padding: clamp(13px, 1.5vw, 20px) 0;
@@ -1212,7 +1212,6 @@
   flex: none;
   width: .74em;
   height: .74em;
-  border-radius: 22%;
   object-fit: contain;
   opacity: .6;
   transition: opacity .25s;
@@ -1231,6 +1230,7 @@
   justify-items: end;
   gap: 4px;
   max-width: 20ch;
+  margin-left: auto;
   font-size: 13px;
   line-height: 1.4;
   text-align: right;
@@ -1631,9 +1631,7 @@
   flex: none;
   width: 38px;
   height: 38px;
-  border-radius: 11px;
   object-fit: contain;
-  background: rgba(255, 255, 255, .04);
 }
 
 .work-head strong {
@@ -1709,7 +1707,7 @@
 
   .work-card.is-lead .work-shot { aspect-ratio: 16 / 10; border-radius: var(--radius-xl); }
   .work-card.is-lead .work-body { gap: 14px; }
-  .work-card.is-lead .work-icon { width: 54px; height: 54px; border-radius: 16px; }
+  .work-card.is-lead .work-icon { width: 54px; height: 54px; }
   .work-card.is-lead .work-head strong { font-size: clamp(34px, 3.6vw, 54px); }
   .work-card.is-lead .work-note { -webkit-line-clamp: 4; max-width: 46ch; font-size: 16px; }
 }
