@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="OpenCalc – kalkulator naukowy z wykresami">
+  <rect width="1600" height="1000" fill="#000000"/>
+  <g fill="#ffffff">
+    <text x="96" y="150" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-1">OpenCalc</text>
+    <text x="96" y="206" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="27" fill="#8a8a8a" letter-spacing="3">KALKULATOR NAUKOWY · WYKRESY · PRZELICZNIKI</text>
+  </g>
+
+  <!-- panel wykresu -->
+  <g>
+    <rect x="96" y="268" width="760" height="620" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <g stroke="#ffffff" stroke-opacity="0.08" stroke-width="1">
+      <path d="M176 348V808M296 348V808M416 348V808M536 348V808M656 348V808M776 348V808"/>
+      <path d="M136 408H816M136 486H816M136 578H816M136 656H816M136 734H816"/>
+    </g>
+    <path d="M136 578H816" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+    <path d="M476 348V808" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+    <path d="M136 578C196 430 236 430 296 578C356 726 396 726 456 578C516 430 556 430 616 578C676 726 716 726 776 578" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+    <path d="M136 760C216 744 296 700 376 630C456 560 536 470 616 414C696 358 756 350 816 352" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="4" stroke-dasharray="14 12" stroke-linecap="round"/>
+    <circle cx="456" cy="578" r="11" fill="#000000" stroke="#ffffff" stroke-width="5"/>
+    <text x="136" y="862" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="25" fill="#c8c8c8">f(x) = sin(x) · x² − 3x</text>
+  </g>
+
+  <!-- panel klawiatury -->
+  <g>
+    <rect x="904" y="268" width="600" height="620" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="952" y="352" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="25" fill="#8a8a8a" letter-spacing="3">WYNIK</text>
+    <text x="1456" y="420" text-anchor="end" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">1 234,567 89</text>
+    <path d="M952 460H1456" stroke="#ffffff" stroke-opacity="0.14" stroke-width="2"/>
+    <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="32" fill="#ffffff" text-anchor="middle">
+      <g>
+        <rect x="952" y="500" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1007" y="553">sin</text>
+        <rect x="1082" y="500" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1137" y="553">ln</text>
+        <rect x="1212" y="500" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1267" y="553">x²</text>
+        <rect x="1342" y="500" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1397" y="553">√</text>
+      </g>
+      <g>
+        <rect x="952" y="602" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1007" y="655">7</text>
+        <rect x="1082" y="602" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1137" y="655">8</text>
+        <rect x="1212" y="602" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1267" y="655">9</text>
+        <rect x="1342" y="602" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1397" y="655">÷</text>
+      </g>
+      <g>
+        <rect x="952" y="704" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1007" y="757">4</text>
+        <rect x="1082" y="704" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1137" y="757">5</text>
+        <rect x="1212" y="704" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1267" y="757">6</text>
+        <rect x="1342" y="704" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1397" y="757">×</text>
+      </g>
+      <g>
+        <rect x="952" y="806" width="240" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1072" y="859">0</text>
+        <rect x="1212" y="806" width="110" height="84" rx="26" fill="#ffffff" fill-opacity="0.1"/><text x="1267" y="859">,</text>
+        <rect x="1342" y="806" width="110" height="84" rx="26" fill="#ffffff"/><text x="1397" y="859" fill="#000000">=</text>
+      </g>
+    </g>
+  </g>
+
+  <text x="96" y="946" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="23" fill="#6a6a6a">Adam Rędzikowski · redzikowski.com</text>
+</svg>
