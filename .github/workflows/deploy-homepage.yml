@@ -24,7 +24,7 @@ jobs:
         with:
           host: ${{ secrets.HOMEPAGE_SSH_HOST }}
           username: ${{ secrets.HOMEPAGE_SSH_USER }}
-          password: ${{ secrets.HOMEPAGE_SSH_PASSWORD }}
+          key: ${{ secrets.HOMEPAGE_SSH_KEY }}
           port: ${{ secrets.HOMEPAGE_SSH_PORT }}
           source: "."
           target: "/opt/apps/homepage"
@@ -37,7 +37,7 @@ jobs:
         with:
           host: ${{ secrets.HOMEPAGE_SSH_HOST }}
           username: ${{ secrets.HOMEPAGE_SSH_USER }}
-          password: ${{ secrets.HOMEPAGE_SSH_PASSWORD }}
+          key: ${{ secrets.HOMEPAGE_SSH_KEY }}
           port: ${{ secrets.HOMEPAGE_SSH_PORT }}
           script_stop: true
           script: |
