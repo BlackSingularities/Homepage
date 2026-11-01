@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
 import {
-  Area, Card, Dropzone, Empty, ImagePicker, LangTabs, Notice, Repeater, SaveBar, Select, Text, Toggle, useMedia,
+  Area, Card, Dropzone, Empty, ImagePicker, LangTabs, toast, Repeater, SaveBar, Select, Text, Toggle, useMedia,
 } from './parts'
 
 const BLOCK_TYPES = [
@@ -211,7 +211,6 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
   const [original, setOriginal] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [lang, setLang] = useState('pl')
 
@@ -230,7 +229,7 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
         setOriginal(structuredClone(next))
       }
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setLoading(false)
     }
@@ -242,7 +241,6 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
     setSelectedId(page.id)
     setDraft(structuredClone(page))
     setOriginal(structuredClone(page))
-    setError('')
     onItem(page.slug)
   }
 
@@ -277,7 +275,7 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
       select(page)
       notify('Utworzyłem szkic nowej strony. Uzupełnij treść i opublikuj.')
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setSaving(false)
     }
@@ -286,7 +284,6 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
   const save = async () => {
     if (!draft) return
     setSaving(true)
-    setError('')
     try {
       const saved = await api(`/api/admin/pages/${draft.id}`, json('PUT', draft))
       setPages(current => current.map(page => (page.id === saved.id ? saved : page)))
@@ -294,7 +291,7 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
       setOriginal(structuredClone(saved))
       notify(`Zapisano stronę „${saved.title}”.`)
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setSaving(false)
     }
@@ -361,7 +358,6 @@ export default function PagesManager({ notify, item = '', onItem = () => {} }) {
       </aside>
 
       <div className="ap-pages-editor">
-        {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
         {!draft ? (
           <Empty>Wybierz stronę z listy albo utwórz nową – dodasz do niej opisy, zdjęcia i galerie.</Empty>

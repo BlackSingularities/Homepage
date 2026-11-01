@@ -3,7 +3,7 @@ import { Archive, Download, Files, LoaderCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import { PLATFORM_LABEL, formatBytes } from '../lib/projects'
 import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
-import { Card, Empty, Notice } from './parts'
+import { Card, Empty, GithubRefreshButton, Notice } from './parts'
 
 const VARIANT_LABEL = { ...PLATFORM_LABEL, 'windows-portable': 'Windows portable', other: 'Plik' }
 const FILTERS = [
@@ -34,9 +34,11 @@ export default function DownloadsPanel() {
   const [platform, setPlatform] = useState('all')
   const [queue, setQueue] = useState(null)
 
-  useEffect(() => {
-    api('/api/admin/downloads').then(data => setApps(data.apps)).catch(requestError => setError(requestError.message))
-  }, [])
+  const load = () => api('/api/admin/downloads')
+    .then(data => setApps(data.apps))
+    .catch(requestError => setError(requestError.message))
+
+  useEffect(() => { load() }, [])
 
   const visible = useMemo(() => (apps || [])
     .map(app => ({ ...app, files: app.files.filter(file => platform === 'all' || file.platform === platform) }))
@@ -65,6 +67,7 @@ export default function DownloadsPanel() {
       <Card
         title="Pobierz aplikacje"
         description="Najnowsze wydania wszystkich aplikacji z portfolio – razem w jednym archiwum ZIP albo każdy plik osobno."
+        actions={<GithubRefreshButton compact onDone={load} />}
       >
         <div className="ap-filters">
           {FILTERS.map(([id, label]) => (

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   ArrowLeft, ArrowUpRight, BarChart3, Boxes, Camera, Download, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
-import { Card, Empty, Notice, Text, Toggle } from './parts'
+import { Card, Empty, Notice, Text, Toaster, Toggle, toast } from './parts'
 import PagesManager from './PagesManager'
 import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
@@ -367,24 +367,17 @@ function AdminPanel({ admin, onLogout }) {
   const [outbox, setOutbox] = useState([])
   const [settings, setSettings] = useState(EMPTY_SETTINGS)
   const [loading, setLoading] = useState(false)
-  const [notice, setNotice] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
-  const [error, setError] = useState('')
 
-  const notify = useCallback(message => {
-    setNotice(message)
-    setError('')
-    setTimeout(() => setNotice(current => (current === message ? '' : current)), 5000)
-  }, [])
+  const notify = useCallback(message => toast.success(message), [])
 
   const run = useCallback(async (action, success = '') => {
     setLoading(true)
-    setError('')
     try {
       await action()
       if (success) notify(success)
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setLoading(false)
     }
@@ -417,7 +410,7 @@ function AdminPanel({ admin, onLogout }) {
 
   const refresh = () => {
     if (tab === 'dashboard') return loadOverview()
-    if (tab === 'analytics') return setRefreshKey(value => value + 1)
+    if (tab === 'analytics' || tab === 'downloads') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
     if (tab === 'inbox') return run(async () => setInbox(await api('/api/admin/inbox')))
     if (tab === 'outbox') return run(async () => setOutbox(await api('/api/admin/outbox')))
@@ -429,7 +422,6 @@ function AdminPanel({ admin, onLogout }) {
   }
 
   const loadTab = next => {
-    setError('')
     if (next === 'inbox' && !inbox.length) run(async () => setInbox(await api('/api/admin/inbox')))
     if (next === 'outbox' && !outbox.length) run(async () => setOutbox(await api('/api/admin/outbox')))
     if (next === 'settings') run(async () => {
@@ -508,7 +500,6 @@ function AdminPanel({ admin, onLogout }) {
       <main className={`ap-main ${tab === 'gallery' ? 'is-gallery' : ''}`}>
         {tab !== 'gallery' && <header className="ap-header">
           <div>
-            <span>redzikowski.com / {admin.username}</span>
             <h1>{active?.[2]}</h1>
           </div>
           <div className="ap-header-actions">
@@ -524,11 +515,6 @@ function AdminPanel({ admin, onLogout }) {
           </div>
         </header>}
 
-        <AnimatePresence>
-          {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
-          {notice && <Notice tone="success" onClose={() => setNotice('')}>{notice}</Notice>}
-        </AnimatePresence>
-
         <motion.div className={`ap-body ${tab === 'gallery' ? 'is-gallery' : ''}`} key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
 
@@ -539,7 +525,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
           {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}
 
-          {tab === 'downloads' && <DownloadsPanel />}
+          {tab === 'downloads' && <DownloadsPanel key={refreshKey} />}
           {tab === 'pages' && <PagesManager notify={notify} item={item} onItem={selectItem} />}
 
           {tab === 'content' && <ContentManager notify={notify} item={item} onItem={selectItem} />}
@@ -590,6 +576,7 @@ function AdminPanel({ admin, onLogout }) {
         {loading && (
           <div className="ap-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>
         )}
+        <Toaster />
       </main>
     </div>
   )

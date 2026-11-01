@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown, LoaderCircle, RotateCcw } from 'lucide-react'
 import { api, json, uid } from '../lib/api'
-import { Area, Field, LangTabs, Notice, Repeater, SaveBar, Text, Toggle } from './parts'
+import { Area, Field, LangTabs, toast, Repeater, SaveBar, Text, Toggle } from './parts'
 
 /**
  * Teksty strony głównej i portfolio. Prace mają własną zakładkę, bo są
@@ -71,7 +71,6 @@ export default function ContentManager({ notify, item = '', onItem = () => {} })
   const [original, setOriginal] = useState(null)
   const [open, setOpen] = useState('hero')
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
 
   const load = async () => {
     try {
@@ -80,7 +79,7 @@ export default function ContentManager({ notify, item = '', onItem = () => {} })
       setDraft(structuredClone(content))
       setOriginal(structuredClone(content))
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     }
   }
 
@@ -101,14 +100,13 @@ export default function ContentManager({ notify, item = '', onItem = () => {} })
 
   const save = async () => {
     setSaving(true)
-    setError('')
     try {
       const saved = await api(`/api/admin/content?lang=${lang}`, json('PUT', draft))
       setDraft(structuredClone(saved))
       setOriginal(structuredClone(saved))
       notify(lang === 'en' ? 'Angielskie treści strony zostały zaktualizowane.' : 'Treści strony zostały zaktualizowane.')
     } catch (requestError) {
-      setError(requestError.message)
+      toast.error(requestError.message)
     } finally {
       setSaving(false)
     }
@@ -138,7 +136,6 @@ export default function ContentManager({ notify, item = '', onItem = () => {} })
 
   return (
     <div className="ap-content-editor">
-      {error && <Notice tone="error" onClose={() => setError('')}>{error}</Notice>}
 
       {tabs}
 

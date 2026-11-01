@@ -1,9 +1,112 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowDown, ArrowUp, Check, ImagePlus, LoaderCircle, Plus, Trash2, Upload, X,
+  ArrowDown, ArrowUp, Check, CircleAlert, CircleCheck, ImagePlus, Info, LoaderCircle, Plus, RefreshCw, Trash2, Upload, X,
 } from 'lucide-react'
-import { api, uploadImage } from '../lib/api'
+import { api, json, uploadImage } from '../lib/api'
+
+/* ── toasts ─────────────────────────────────────────────────────── */
+
+const TOAST_EVENT = 'admin:toast'
+const TOAST_TIME = { success: 4500, info: 5500, error: 9000 }
+const TOAST_ICON = { success: CircleCheck, info: Info, error: CircleAlert }
+
+function emitToast(tone, message) {
+  if (!message) return
+  window.dispatchEvent(new CustomEvent(TOAST_EVENT, { detail: { tone, message: String(message) } }))
+}
+
+/** Wyskakujące powiadomienia panelu – można je wołać z każdego miejsca. */
+export const toast = {
+  success: message => emitToast('success', message),
+  info: message => emitToast('info', message),
+  error: message => emitToast('error', message),
+}
+
+let toastSeq = 0
+
+/** Stos powiadomień w prawym górnym rogu; błędy wiszą dłużej. */
+export function Toaster() {
+  const [items, setItems] = useState([])
+
+  const dismiss = useCallback(id => setItems(current => current.filter(item => item.id !== id)), [])
+
+  useEffect(() => {
+    const onToast = event => {
+      const { tone, message } = event.detail
+      const id = ++toastSeq
+      // To samo powiadomienie drugi raz nie dubluje się, tylko wraca na wierzch.
+      setItems(current => [...current.filter(item => item.message !== message).slice(-3), { id, tone, message }])
+      setTimeout(() => dismiss(id), TOAST_TIME[tone] || 5000)
+    }
+    window.addEventListener(TOAST_EVENT, onToast)
+    return () => window.removeEventListener(TOAST_EVENT, onToast)
+  }, [dismiss])
+
+  return (
+    <div className="ap-toasts" role="status" aria-live="polite">
+      <AnimatePresence initial={false}>
+        {items.map(item => {
+          const Icon = TOAST_ICON[item.tone] || Info
+          return (
+            <motion.div
+              key={item.id}
+              layout
+              className={`ap-toast is-${item.tone}`}
+              initial={{ opacity: 0, x: 40, scale: .96 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 40, transition: { duration: .18 } }}
+              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            >
+              <Icon size={16} />
+              <span>{item.message}</span>
+              <button type="button" onClick={() => dismiss(item.id)} aria-label="Zamknij"><X size={13} /></button>
+              <i style={{ animationDuration: `${TOAST_TIME[item.tone] || 5000}ms` }} />
+            </motion.div>
+          )
+        })}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ── github ─────────────────────────────────────────────────────── */
+
+/**
+ * Strona trzyma wydania z GitHuba przez 30 minut – to pobiera wszystkie od
+ * razu, także dla aktualizacji w aplikacjach. Wynik idzie w powiadomieniach.
+ */
+export function GithubRefreshButton({ onDone, compact }) {
+  const [busy, setBusy] = useState(false)
+
+  const refresh = async () => {
+    setBusy(true)
+    try {
+      const result = await api('/api/admin/github/refresh-all', json('POST', {}))
+      await onDone?.()
+      const failed = result.results.filter(item => item.error)
+      if (failed.length) toast.error(`Nie udało się odświeżyć: ${failed.map(item => item.repo).join(', ')}.`)
+      toast.success(`Pobrano na nowo wydania ${result.refreshed} repozytoriów z GitHuba.`)
+    } catch (requestError) {
+      toast.error(requestError.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      className={`ap-btn ap-btn-ghost ${compact ? 'ap-btn-sm' : ''}`}
+      onClick={refresh}
+      disabled={busy}
+      title="Pobiera od razu najnowsze wydania wszystkich repozytoriów z GitHuba."
+    >
+      <RefreshCw className={busy ? 'spin' : ''} size={14} />
+      {busy ? 'Pobieram z GitHuba…' : 'Odśwież wydania z GitHuba'}
+    </button>
+  )
+}
 
 /* ── primitives ─────────────────────────────────────────────────── */
 
@@ -49,6 +152,30 @@ export function Select({ label, value, onChange, options, hint }) {
         {options.map(([id, text]) => <option key={id} value={id}>{text}</option>)}
       </select>
     </Field>
+  )
+}
+
+/** Przełącznik kilku wariantów w jednym rzędzie – zamiast listy rozwijanej. */
+export function Segmented({ label, value, onChange, options, hint }) {
+  return (
+    <div className="ap-field">
+      {label && <span>{label}</span>}
+      <div className="ap-segmented" role="radiogroup" aria-label={label}>
+        {options.map(([id, text, Icon]) => (
+          <button
+            key={id}
+            type="button"
+            role="radio"
+            aria-checked={value === id}
+            className={value === id ? 'is-active' : ''}
+            onClick={() => onChange(id)}
+          >
+            {Icon && <Icon size={14} />}{text}
+          </button>
+        ))}
+      </div>
+      {hint && <i>{hint}</i>}
+    </div>
   )
 }
 
