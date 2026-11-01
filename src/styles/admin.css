@@ -1906,7 +1906,8 @@
 .ap-dl-actions a { text-decoration: none; }
 .ap-dl-actions .mono { font-size: 11px; opacity: .75; }
 
-.ap-dl-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 10px; align-items: start; }
+.ap-dl-list { display: flex; gap: 10px; align-items: flex-start; }
+.ap-dl-col { flex: 1 1 0; min-width: 0; display: grid; gap: 10px; }
 
 .ap-dl-app { border: 1px solid var(--ap-line); border-radius: 13px; background: var(--ap-surface); overflow: hidden; }
 .ap-dl-app header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--ap-line); }

@@ -13,6 +13,40 @@ const FILTERS = [
   ['ios', 'iOS'],
 ]
 
+const COLUMN_MIN = 330
+
+/**
+ * Układ „murowany”: karty idą po kolei od lewej, każda do najniższej
+ * kolumny. Wysokość karty to nagłówek plus wiersze plików, więc wystarczy
+ * liczyć wiersze – bez mierzenia DOM.
+ */
+function useMasonry(items) {
+  // Lista pojawia się dopiero po wczytaniu danych, stąd ref jako stan.
+  const [node, ref] = useState(null)
+  const [count, setCount] = useState(1)
+
+  useEffect(() => {
+    if (!node) return undefined
+    const observer = new ResizeObserver(([entry]) => {
+      setCount(Math.max(1, Math.floor((entry.contentRect.width + 10) / (COLUMN_MIN + 10))))
+    })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [node])
+
+  const columns = useMemo(() => {
+    const result = Array.from({ length: count }, () => ({ height: 0, items: [] }))
+    for (const item of items) {
+      const shortest = result.reduce((low, column) => (column.height < low.height ? column : low))
+      shortest.items.push(item)
+      shortest.height += 1.6 + item.files.length
+    }
+    return result.map(column => column.items)
+  }, [items, count])
+
+  return [ref, columns]
+}
+
 /** Uruchamia pobranie pliku bez otwierania nowej karty. */
 function trigger(href) {
   const link = document.createElement('a')
@@ -43,6 +77,7 @@ export default function DownloadsPanel() {
   const visible = useMemo(() => (apps || [])
     .map(app => ({ ...app, files: app.files.filter(file => platform === 'all' || file.platform === platform) }))
     .filter(app => app.files.length), [apps, platform])
+  const [listRef, columns] = useMasonry(visible)
   const files = visible.flatMap(app => app.files)
   const total = files.reduce((sum, file) => sum + (Number(file.size) || 0), 0)
   const counts = useMemo(() => Object.fromEntries(FILTERS.map(([id]) => [id,
@@ -92,8 +127,10 @@ export default function DownloadsPanel() {
 
       {!visible.length && <Empty>Brak plików dla tej platformy.</Empty>}
 
-      <div className="ap-dl-list">
-        {visible.map(app => (
+      <div className="ap-dl-list" ref={listRef}>
+        {columns.map((column, index) => (
+          <div className="ap-dl-col" key={index}>
+            {column.map(app => (
           <section key={app.slug} className="ap-dl-app">
             <header>
               <strong>{app.name}</strong>
@@ -118,6 +155,8 @@ export default function DownloadsPanel() {
               })}
             </ul>
           </section>
+            ))}
+          </div>
         ))}
       </div>
     </div>
