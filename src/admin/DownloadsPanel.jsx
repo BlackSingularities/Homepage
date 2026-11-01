@@ -3,7 +3,7 @@ import { Archive, Download, Files, LoaderCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import { PLATFORM_LABEL, formatBytes } from '../lib/projects'
 import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
-import { Card, Empty, GithubRefreshButton, Notice } from './parts'
+import { Empty, GithubRefreshButton, Notice } from './parts'
 
 const VARIANT_LABEL = { ...PLATFORM_LABEL, 'windows-portable': 'Windows portable', other: 'Plik' }
 const FILTERS = [
@@ -64,41 +64,41 @@ export default function DownloadsPanel() {
 
   return (
     <div className="ap-downloads">
-      <Card
-        title="Pobierz aplikacje"
-        description="Najnowsze wydania wszystkich aplikacji z portfolio – razem w jednym archiwum ZIP albo każdy plik osobno."
-        actions={<GithubRefreshButton compact onDone={load} />}
-      >
-        <div className="ap-filters">
+      <div className="ap-dl-bar">
+        <div className="ap-segmented" role="radiogroup" aria-label="Platforma">
           {FILTERS.map(([id, label]) => (
-            <button key={id} type="button" className={platform === id ? 'is-active' : ''} onClick={() => setPlatform(id)}>
+            <button key={id} type="button" role="radio" aria-checked={platform === id} className={platform === id ? 'is-active' : ''} onClick={() => setPlatform(id)}>
               {label} <b>{counts[id]}</b>
             </button>
           ))}
         </div>
-        <div className="ap-downloads-actions">
-          <a className="ap-btn ap-btn-primary" href={`/api/admin/downloads/zip?platform=${platform}`} download>
-            <Archive size={15} /> Pobierz ZIP <span className="mono">{formatBytes(total)}</span>
-          </a>
-          <button type="button" className="ap-btn" onClick={downloadEach} disabled={Boolean(queue) || !files.length}>
-            {queue ? <LoaderCircle className="spin" size={15} /> : <Files size={15} />}
-            {queue ? `Pobieranie ${queue.done} z ${queue.total}…` : `Pobierz osobno (${files.length})`}
+        <div className="ap-dl-actions">
+          <GithubRefreshButton compact onDone={load} />
+          <button
+            type="button"
+            className="ap-btn ap-btn-ghost ap-btn-sm"
+            onClick={downloadEach}
+            disabled={Boolean(queue) || !files.length}
+            title="Przeglądarka może raz zapytać o zgodę na wiele plików naraz."
+          >
+            {queue ? <LoaderCircle className="spin" size={14} /> : <Files size={14} />}
+            {queue ? `${queue.done} z ${queue.total}…` : `Osobno (${files.length})`}
           </button>
+          <a className="ap-btn ap-btn-primary ap-btn-sm" href={`/api/admin/downloads/zip?platform=${platform}`} download>
+            <Archive size={14} /> ZIP <span className="mono">{formatBytes(total)}</span>
+          </a>
         </div>
-        <p className="ap-downloads-hint">
-          Przy pobieraniu osobno przeglądarka może raz zapytać o zgodę na wiele plików naraz.
-        </p>
-      </Card>
+      </div>
 
       {!visible.length && <Empty>Brak plików dla tej platformy.</Empty>}
 
-      <div className="ap-downloads-list">
+      <div className="ap-dl-list">
         {visible.map(app => (
-          <section key={app.slug} className="ap-downloads-app">
+          <section key={app.slug} className="ap-dl-app">
             <header>
               <strong>{app.name}</strong>
               {app.version && <span className="mono">{app.version}</span>}
-              {!app.published && <em>ukryta na stronie</em>}
+              {!app.published && <em>ukryta</em>}
               {app.error && <em className="is-error" title={app.error}>błąd odświeżania</em>}
             </header>
             <ul>
@@ -106,14 +106,12 @@ export default function DownloadsPanel() {
                 const variant = fileVariant(file)
                 return (
                   <li key={file.id}>
-                    <a href={file.href} download>
-                      <PlatformIcon platform={variant} size={17} aria-hidden="true" />
-                      <span>
-                        <b>{VARIANT_LABEL[variant] || variant}</b>
-                        <i className="mono">{file.name}</i>
-                      </span>
+                    <a href={file.href} download title={file.name}>
+                      <PlatformIcon platform={variant} size={15} aria-hidden="true" />
+                      <b>{VARIANT_LABEL[variant] || variant}</b>
+                      <i className="mono">{file.name}</i>
                       <span className="mono">{formatBytes(file.size)}</span>
-                      <Download size={15} aria-hidden="true" />
+                      <Download size={14} aria-hidden="true" />
                     </a>
                   </li>
                 )
