@@ -1227,6 +1227,7 @@ async function adminDownloads() {
     return {
       slug: project.slug,
       name: project.name,
+      repo: project.repo || '',
       published: project.published !== false,
       version: release?.tag || files[0]?.version || '',
       error: release?.error || '',

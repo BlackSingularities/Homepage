@@ -1915,6 +1915,9 @@
 .ap-dl-app header .mono { font-size: 11px; color: var(--gold); }
 .ap-dl-app header em { margin-left: auto; font-style: normal; font-size: 10.5px; color: var(--ink-4); }
 .ap-dl-app header em.is-error { color: #ffb3b3; }
+.ap-dl-app header em + a.ap-dl-repo { margin-left: 0; }
+.ap-dl-app header a.ap-dl-repo { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; padding: 2px 6px; border-radius: 6px; font-size: 10.5px; color: var(--ink-4); text-decoration: none; }
+.ap-dl-app header a.ap-dl-repo:hover { color: var(--gold); background: rgba(231, 198, 138, .07); }
 .ap-dl-app ul { display: grid; margin: 0; padding: 4px; list-style: none; }
 
 .ap-dl-app a {

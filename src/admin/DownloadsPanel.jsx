@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Archive, Download, Files, LoaderCircle } from 'lucide-react'
+import { Archive, Download, ExternalLink, Files, LoaderCircle } from 'lucide-react'
 import { api } from '../lib/api'
 import { PLATFORM_LABEL, formatBytes } from '../lib/projects'
 import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
@@ -137,6 +137,11 @@ export default function DownloadsPanel() {
               {app.version && <span className="mono">{app.version}</span>}
               {!app.published && <em>ukryta</em>}
               {app.error && <em className="is-error" title={app.error}>błąd odświeżania</em>}
+              {app.repo && (
+                <a className="ap-dl-repo" href={`https://github.com/${app.repo}`} target="_blank" rel="noreferrer" title={`github.com/${app.repo}`}>
+                  GitHub <ExternalLink size={12} aria-hidden="true" />
+                </a>
+              )}
             </header>
             <ul>
               {app.files.map(file => {
