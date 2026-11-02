@@ -25,7 +25,7 @@ export function Footer() {
         <span>© {new Date().getFullYear()} Adam Rędzikowski</span>
         <span className="site-footer-links">
           <a href="/">redzikowski.com</a>
-          <a href="mailto:redzikowskia@gmail.com">redzikowskia@gmail.com</a>
+          <a href="mailto:kontakt@redzikowski.com">kontakt@redzikowski.com</a>
         </span>
       </div>
     </footer>
