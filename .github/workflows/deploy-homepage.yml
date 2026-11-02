@@ -101,4 +101,5 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-simrail-trail-v37.mjs
             docker compose exec -T homepage_api node server/migrate-opentests-shots-v38.mjs
             docker compose exec -T homepage_api node server/migrate-real-shots-v39.mjs
+            docker compose exec -T homepage_api node server/migrate-open3dmaze-v40.mjs
             docker image prune -f
