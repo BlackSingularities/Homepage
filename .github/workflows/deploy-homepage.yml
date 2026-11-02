@@ -99,4 +99,5 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-app-icons-v35.mjs
             docker compose exec -T homepage_api node server/migrate-app-icons-v36.mjs
             docker compose exec -T homepage_api node server/migrate-simrail-trail-v37.mjs
+            docker compose exec -T homepage_api node server/migrate-opentests-shots-v38.mjs
             docker image prune -f
