@@ -103,4 +103,5 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-real-shots-v39.mjs
             docker compose exec -T homepage_api node server/migrate-open3dmaze-v40.mjs
             docker compose exec -T homepage_api node server/migrate-contact-email-v41.mjs
+            docker compose exec -T homepage_api node server/migrate-gran-3d-v42.mjs
             docker image prune -f
