@@ -13,6 +13,21 @@ const FILTERS = [
   ['ios', 'iOS'],
 ]
 
+const SORTS = [
+  ['name', 'A–Z'],
+  ['released', 'Najnowsze wydanie'],
+  ['updated', 'Ostatnio edytowane'],
+  ['size', 'Rozmiar'],
+]
+const byName = (a, b) => a.name.localeCompare(b.name, 'pl', { sensitivity: 'base' })
+const stamp = value => Date.parse(value || '') || 0
+const SORTERS = {
+  name: byName,
+  released: (a, b) => stamp(b.releasedAt) - stamp(a.releasedAt) || byName(a, b),
+  updated: (a, b) => stamp(b.updatedAt) - stamp(a.updatedAt) || byName(a, b),
+  size: (a, b) => b.files.reduce((s, f) => s + (Number(f.size) || 0), 0) - a.files.reduce((s, f) => s + (Number(f.size) || 0), 0) || byName(a, b),
+}
+
 const COLUMN_MIN = 330
 
 /**
@@ -67,6 +82,13 @@ export default function DownloadsPanel() {
   const [error, setError] = useState('')
   const [platform, setPlatform] = useState('all')
   const [queue, setQueue] = useState(null)
+  const [sort, setSort] = useState(() => {
+    try { return localStorage.getItem('ap-dl-sort') || 'name' } catch { return 'name' }
+  })
+  const changeSort = value => {
+    setSort(value)
+    try { localStorage.setItem('ap-dl-sort', value) } catch { /* brak pamięci */ }
+  }
 
   const load = () => api('/api/admin/downloads')
     .then(data => setApps(data.apps))
@@ -76,7 +98,8 @@ export default function DownloadsPanel() {
 
   const visible = useMemo(() => (apps || [])
     .map(app => ({ ...app, files: app.files.filter(file => platform === 'all' || file.platform === platform) }))
-    .filter(app => app.files.length), [apps, platform])
+    .filter(app => app.files.length)
+    .sort(SORTERS[sort] || byName), [apps, platform, sort])
   const [listRef, columns] = useMasonry(visible)
   const files = visible.flatMap(app => app.files)
   const total = files.reduce((sum, file) => sum + (Number(file.size) || 0), 0)
@@ -108,6 +131,9 @@ export default function DownloadsPanel() {
           ))}
         </div>
         <div className="ap-dl-actions">
+          <select className="ap-dl-sort" value={sort} onChange={event => changeSort(event.target.value)} aria-label="Sortowanie" title="Sortowanie">
+            {SORTS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+          </select>
           <GithubRefreshButton compact onDone={load} />
           <button
             type="button"

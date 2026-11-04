@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="OpenEcho – echolokacja w smartfonie: sonar, mapa pokoju, pomiar odległości i czujnik ruchu">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#3FE0C5" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#3FE0C5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#3FE0C5" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#3FE0C5" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="scope" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3FE0C5" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#3FE0C5" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="#000000"/>
+  <g fill="#ffffff">
+    <text x="96" y="150" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-1">OpenEcho</text>
+    <text x="96" y="206" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="27" fill="#8a8a8a" letter-spacing="3">SONAR · MAPA POKOJU · POMIAR · RUCH</text>
+  </g>
+
+  <!-- mapa pokoju -->
+  <g>
+    <rect x="96" y="268" width="620" height="620" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <circle cx="406" cy="578" r="280" fill="url(#glow)"/>
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="2">
+      <circle cx="406" cy="578" r="70"/>
+      <circle cx="406" cy="578" r="140"/>
+      <circle cx="406" cy="578" r="210"/>
+      <circle cx="406" cy="578" r="280"/>
+      <path d="M406 298V858M126 578H686" stroke-opacity="0.08"/>
+    </g>
+    <!-- wiązka -->
+    <path d="M406 578 L330 316 A272 272 0 0 1 482 316 Z" fill="url(#beam)"/>
+    <path d="M406 578 L406 306" stroke="#3FE0C5" stroke-width="4" stroke-linecap="round"/>
+    <!-- echa ścian -->
+    <g fill="#3FE0C5">
+      <rect x="226" y="352" width="360" height="14" rx="7" fill-opacity="0.75"/>
+      <rect x="226" y="790" width="360" height="14" rx="7" fill-opacity="0.55"/>
+      <rect x="216" y="362" width="14" height="436" rx="7" fill-opacity="0.6"/>
+      <rect x="582" y="362" width="14" height="436" rx="7" fill-opacity="0.7"/>
+      <circle cx="526" cy="440" r="26" fill-opacity="0.55"/>
+      <circle cx="286" cy="720" r="20" fill-opacity="0.45"/>
+    </g>
+    <!-- obrys -->
+    <path d="M234 370 H586 V788 H234 Z" fill="none" stroke="#FFC45C" stroke-width="4" stroke-linejoin="round" stroke-dasharray="2 10" stroke-linecap="round"/>
+    <circle cx="406" cy="578" r="11" fill="#ffffff"/>
+    <text x="126" y="870" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#8a8a8a">≈ 4,2 × 5,4 m · 22,7 m²</text>
+  </g>
+
+  <!-- profil odległości -->
+  <g>
+    <rect x="770" y="268" width="734" height="290" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <g stroke="#ffffff" stroke-opacity="0.1" stroke-width="2">
+      <path d="M936 300V510M1072 300V510M1208 300V510M1344 300V510M1480 300V510"/>
+    </g>
+    <path d="M800 506 L820 300 L842 470 L870 496 L900 488 L930 498 L960 492 L992 497 L1010 470 L1022 352 L1036 470 L1060 494 L1100 490 L1140 496 L1180 488 L1214 492 L1236 440 L1248 396 L1262 444 L1290 494 L1330 490 L1370 496 L1410 489 L1440 494 L1474 492 L1474 510 L800 510 Z" fill="url(#scope)"/>
+    <path d="M800 506 L820 300 L842 470 L870 496 L900 488 L930 498 L960 492 L992 497 L1010 470 L1022 352 L1036 470 L1060 494 L1100 490 L1140 496 L1180 488 L1214 492 L1236 440 L1248 396 L1262 444 L1290 494 L1330 490 L1370 496 L1410 489 L1440 494 L1474 492" fill="none" stroke="#3FE0C5" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="1022" cy="352" r="9" fill="#FFC45C"/>
+    <circle cx="1248" cy="396" r="9" fill="#FFC45C"/>
+    <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#FFC45C">
+      <text x="1038" y="344">1,63 m</text>
+      <text x="1264" y="388">3,29 m</text>
+    </g>
+    <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="18" fill="#8a8a8a">
+      <text x="926" y="540">1 m</text><text x="1062" y="540">2 m</text><text x="1198" y="540">3 m</text><text x="1334" y="540">4 m</text><text x="1462" y="540">5 m</text>
+    </g>
+  </g>
+
+  <!-- pomiar -->
+  <g>
+    <rect x="770" y="598" width="350" height="290" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="804" y="652" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#8a8a8a" letter-spacing="2">POMIAR</text>
+    <text x="804" y="770" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="104" font-weight="700" fill="#ffffff" letter-spacing="-2">1,63</text>
+    <text x="1022" y="770" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="32" fill="#8a8a8a">m</text>
+    <circle cx="812" cy="836" r="7" fill="#4CD964"/>
+    <text x="830" y="844" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#8a8a8a">stabilny · ± 1 cm</text>
+  </g>
+
+  <!-- ruch (Doppler) -->
+  <g>
+    <rect x="1154" y="598" width="350" height="290" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="1188" y="652" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="22" fill="#8a8a8a" letter-spacing="2">RUCH</text>
+    <path d="M1188 760 H1470" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2" stroke-dasharray="6 6"/>
+    <path d="M1188 760 C1220 760 1230 700 1262 700 C1294 700 1300 820 1336 820 C1366 820 1376 730 1404 730 C1430 730 1440 760 1470 760" fill="none" stroke="#FF7A59" stroke-width="5" stroke-linecap="round"/>
+    <text x="1188" y="860" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="700" fill="#ffffff">zbliża się · 0,6 m/s</text>
+  </g>
+</svg>

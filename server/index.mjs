@@ -1389,6 +1389,8 @@ async function adminDownloads() {
       repo: project.repo || '',
       published: project.published !== false,
       version: release?.tag || files[0]?.version || '',
+      releasedAt: release?.publishedAt || project.release?.publishedAt || '',
+      updatedAt: project.updatedAt || '',
       error: release?.error || '',
       files,
     }
