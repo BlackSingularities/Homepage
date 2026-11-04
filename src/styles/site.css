@@ -1974,3 +1974,28 @@
   .pv-stores a { min-width: 0; grid-template-columns: 26px minmax(0, 1fr) 15px; }
 }
 
+
+/* ── zapis do testów aplikacji ──────────────────────────────────── */
+
+.pv-testing {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 56px);
+  margin-top: clamp(32px, 5vw, 56px);
+  padding: clamp(22px, 3vw, 36px);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: rgba(240, 204, 63, .04);
+}
+.pv-testing h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: clamp(22px, 2.4vw, 30px); }
+.pv-testing h2 svg { flex: none; color: var(--gold); }
+.pv-testing-copy p { color: var(--ink-2); line-height: 1.65; }
+.pv-testing-form { display: grid; gap: 16px; min-width: 0; }
+.pv-testing-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.pv-testing-done { display: flex; align-items: center; gap: 10px; align-self: center; color: var(--ink); line-height: 1.6; }
+.pv-testing-done svg { flex: none; color: var(--gold); }
+
+@media (max-width: 820px) {
+  .pv-testing { grid-template-columns: 1fr; }
+}

@@ -7,7 +7,7 @@ import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
-import { PLATFORMS, STORES, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
+import { PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { writeZip } from './zip.mjs'
 import { createAnalytics } from './analytics.mjs'
@@ -19,6 +19,7 @@ const PORT = Number(process.env.PORT || 3001)
 const DATA_DIR = process.env.DATA_DIR || '/app/data'
 const SETTINGS_FILE = path.join(DATA_DIR, 'mail-settings.json')
 const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json')
+const TESTERS_FILE = path.join(DATA_DIR, 'testers.json')
 const OUTBOX_FILE = path.join(DATA_DIR, 'outbox.json')
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json')
 const CONTENT_EN_FILE = path.join(DATA_DIR, 'content.en.json')
@@ -839,6 +840,8 @@ const CONTACT_TEXT = {
     app: 'Wybierz aplikację.',
     requestType: 'Wybierz rodzaj zgłoszenia.',
     consent: 'Zaakceptuj zgodę na kontakt.',
+    testingClosed: 'Zapisy do testów tej aplikacji są zamknięte.',
+    testingPlatform: 'Wybierz platformę.',
     subject: 'Dziękuję za wiadomość – Adam Rędzikowski',
     text: name => `Cześć ${name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
     kicker: 'Wiadomość dotarła',
@@ -854,6 +857,8 @@ const CONTACT_TEXT = {
     app: 'Please choose an app.',
     requestType: 'Please choose the type of request.',
     consent: 'Please agree to be contacted.',
+    testingClosed: 'Sign-ups for testing this app are closed.',
+    testingPlatform: 'Please choose a platform.',
     subject: 'Thank you for your message – Adam Rędzikowski',
     text: name => `Hi ${name},\n\nThank you for your message. I have received your enquiry and will get back to you as soon as possible.\n\nAdam Rędzikowski\nredzikowski.com`,
     kicker: 'Message received',
@@ -969,6 +974,75 @@ app.post('/api/contact', async (req, res) => {
   }
 
   res.status(201).json({ ok: true, id: submission.id, mailStatus })
+})
+
+/**
+ * Zapis do testów aplikacji. Ponowny zapis tego samego adresu na tę samą
+ * platformę kończy się tak samo jak pierwszy – nie zdradza, kto już jest na
+ * liście, i nie dubluje pozycji ani powiadomień.
+ */
+app.post('/api/projects/:slug/testers', async (req, res) => {
+  const copy = CONTACT_TEXT[langOf(req.body?.lang)]
+  const key = `testers:${req.ip || 'unknown'}`
+  const now = Date.now()
+  const recent = (rateLimits.get(key) || []).filter(timestamp => now - timestamp < 15 * 60 * 1000)
+  if (recent.length >= 5) return res.status(429).json({ error: copy.tooMany })
+  recent.push(now)
+  rateLimits.set(key, recent)
+
+  if (cleanText(req.body.website, 100)) return res.status(200).json({ ok: true })
+
+  const project = (await readProjects()).find(item => item.slug === req.params.slug && item.published !== false)
+  if (!project?.testing?.enabled) return res.status(404).json({ error: copy.testingClosed })
+
+  const email = cleanText(req.body.email, 200).toLowerCase()
+  const platform = cleanText(req.body.platform, 20)
+  if (!isEmail(email)) return res.status(400).json({ error: copy.email })
+  if (!TEST_PLATFORMS.includes(platform) || !project.testing.platforms.includes(platform)) {
+    return res.status(400).json({ error: copy.testingPlatform })
+  }
+  if (req.body.consent !== true) return res.status(400).json({ error: copy.consent })
+
+  const tester = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    projectId: project.id,
+    project: project.name,
+    slug: project.slug,
+    platform,
+    email,
+    lang: langOf(req.body.lang),
+    status: 'new',
+  }
+  let duplicate = false
+  await updateJson(TESTERS_FILE, [], current => {
+    duplicate = current.some(item => item.projectId === project.id && item.platform === platform && item.email === email)
+    return duplicate ? current : [tester, ...current].slice(0, 5000)
+  })
+  if (duplicate) return res.status(201).json({ ok: true })
+
+  try {
+    const settings = await getSettings({ includePassword: true })
+    const transport = getTransport(settings)
+    if (transport && settings.ownerEmail) {
+      await sendLoggedMail(transport, {
+        from: { name: settings.fromName, address: settings.smtpUsername },
+        to: settings.ownerEmail,
+        replyTo: email,
+        subject: `Nowy tester: ${project.name} (${platform})`,
+        text: `${email} zgłasza się do testów aplikacji ${project.name} na platformie ${platform}.`,
+        html: emailFrame(`
+          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowy tester</div>
+          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(project.name)}</h1>
+          <p style="line-height:1.7;color:#cfc8bb">${escapeHtml(email)}<br>Platforma: ${escapeHtml(platform)}</p>
+        `),
+      }, 'notification', tester.id)
+    }
+  } catch (error) {
+    console.error('Mail dispatch failed:', error.message)
+  }
+
+  res.status(201).json({ ok: true })
 })
 
 /* ── SEO: sitemap i strony renderowane z meta ────────────────────────── */
@@ -1139,6 +1213,94 @@ app.patch('/api/admin/submissions/:id', enforceSameOrigin, async (req, res) => {
 app.delete('/api/admin/submissions/:id', enforceSameOrigin, async (req, res) => {
   await updateJson(SUBMISSIONS_FILE, [], current => current.filter(item => item.id !== req.params.id))
   res.json({ ok: true })
+})
+
+/* ── admin: testerzy ─────────────────────────────────────────────────── */
+
+app.get('/api/admin/testers', async (_req, res) => {
+  res.json(await readJson(TESTERS_FILE, []))
+})
+
+// Zbiorczo, bo adresy dodaje się do sklepu całą listą naraz.
+app.patch('/api/admin/testers', enforceSameOrigin, async (req, res) => {
+  const status = cleanText(req.body.status, 30)
+  if (!['new', 'added'].includes(status)) return res.status(400).json({ error: 'Niepoprawny status.' })
+  const ids = new Set(Array.isArray(req.body.ids) ? req.body.ids : [])
+  res.json(await updateJson(TESTERS_FILE, [], current =>
+    current.map(item => (ids.has(item.id) ? { ...item, status } : item))))
+})
+
+app.delete('/api/admin/testers/:id', enforceSameOrigin, async (req, res) => {
+  await updateJson(TESTERS_FILE, [], current => current.filter(item => item.id !== req.params.id))
+  res.json({ ok: true })
+})
+
+/* ── admin: powiadomienia ────────────────────────────────────────────── */
+
+/**
+ * Liczba nieprzeczytanych w skrzynce. Panel odpytuje o powiadomienia co minutę,
+ * a połączenie IMAP jest drogie, więc wynik trzymamy przez pięć minut. Skrzynka
+ * bez konfiguracji albo niedostępna po prostu nie dokłada nic do licznika.
+ */
+let unseenCache = { count: 0, at: 0 }
+async function countUnseen() {
+  if (Date.now() - unseenCache.at < 5 * 60 * 1000) return unseenCache.count
+  let client
+  let count = 0
+  try {
+    const settings = await getSettings({ includePassword: true })
+    if (settings.imapHost && settings.imapUsername && settings.password) {
+      client = new ImapFlow({
+        host: settings.imapHost,
+        port: settings.imapPort,
+        secure: settings.imapSecure,
+        auth: { user: settings.imapUsername, pass: settings.password },
+        logger: false,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 20000,
+      })
+      await client.connect()
+      count = (await client.status('INBOX', { unseen: true })).unseen || 0
+    }
+  } catch (error) {
+    console.error('Unseen count failed:', error.message)
+  } finally {
+    if (client) await client.logout().catch(() => undefined)
+  }
+  unseenCache = { count, at: Date.now() }
+  return count
+}
+
+// Skrzynka sama się nie odzywa, więc licznik nie może blokować odpowiedzi.
+app.get('/api/admin/notifications', async (_req, res) => {
+  const [submissions, testers] = await Promise.all([readJson(SUBMISSIONS_FILE, []), readJson(TESTERS_FILE, [])])
+  const fresh = list => list.filter(item => item.status === 'new')
+  const newSubmissions = fresh(submissions)
+  const newTesters = fresh(testers)
+  const inbox = await Promise.race([
+    countUnseen(),
+    new Promise(resolve => setTimeout(() => resolve(unseenCache.count), 1500)),
+  ])
+  res.json({
+    counts: { submissions: newSubmissions.length, testers: newTesters.length, inbox },
+    items: [
+      ...newSubmissions.map(item => ({
+        id: item.id,
+        tab: 'submissions',
+        title: item.subject || item.app || 'Nowe zapytanie',
+        detail: item.name,
+        createdAt: item.createdAt,
+      })),
+      ...newTesters.map(item => ({
+        id: item.id,
+        tab: 'testers',
+        title: `Tester: ${item.project}`,
+        detail: `${item.email} · ${item.platform}`,
+        createdAt: item.createdAt,
+      })),
+    ].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 10),
+  })
 })
 
 /* ── admin: content ──────────────────────────────────────────────────── */

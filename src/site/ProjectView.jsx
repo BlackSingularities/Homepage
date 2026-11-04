@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, LoaderCircle, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, FlaskConical, LoaderCircle, Send, X } from 'lucide-react'
 import {
   CATALOG_PATH, PLATFORM_LABEL,
   formatBytes, formatReleaseDate, hostOf,
@@ -185,6 +185,80 @@ function Changelog({ project }) {
   )
 }
 
+/** Zapis do testów – tylko adres i platforma, tester dostaje dostęp ręcznie. */
+function TestSignup({ project }) {
+  const { t, lang } = useT()
+  const platforms = project.testing?.enabled ? project.testing.platforms || [] : []
+  const [platform, setPlatform] = useState(platforms.length === 1 ? platforms[0] : '')
+  const [email, setEmail] = useState('')
+  const [website, setWebsite] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [state, setState] = useState({ status: 'idle', message: '' })
+  if (!platforms.length) return null
+
+  const submit = async event => {
+    event.preventDefault()
+    if (!platform) return setState({ status: 'error', message: t('project.testPlatformError') })
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setState({ status: 'error', message: t('project.testEmailError') })
+    if (!consent) return setState({ status: 'error', message: t('project.testConsentError') })
+    setState({ status: 'loading', message: '' })
+    try {
+      const response = await fetch(`/api/projects/${encodeURIComponent(project.slug)}/testers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, platform, consent, website, lang }),
+      })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(result.error || t('form.failed'))
+      setState({ status: 'success', message: '' })
+    } catch (error) {
+      setState({ status: 'error', message: error.message })
+    }
+  }
+
+  return (
+    <section className="pv-testing" id="testy">
+      <div className="pv-testing-copy">
+        <h2><FlaskConical size={18} aria-hidden="true" /> {t('project.testTitle')}</h2>
+        <p>{t('project.testLead')}</p>
+      </div>
+      {state.status === 'success' ? (
+        <p className="pv-testing-done" role="status"><Check size={16} aria-hidden="true" /> {t('project.testDone')}</p>
+      ) : (
+        <form className="pv-testing-form" onSubmit={submit} noValidate>
+          {platforms.length > 1 && (
+            <div className="method-choice" role="group" aria-label={t('project.testPlatform')}>
+              {platforms.map(value => (
+                <button type="button" key={value} className={platform === value ? 'is-active' : ''} onClick={() => setPlatform(value)} aria-pressed={platform === value}>
+                  <PlatformIcon platform={value} size={15} aria-hidden="true" />{PLATFORM_LABEL[value]}
+                </button>
+              ))}
+            </div>
+          )}
+          <label className="field">
+            <span>{t(platform === 'android' ? 'project.testEmailGoogle' : platform === 'ios' ? 'project.testEmailApple' : 'project.testEmail')}</span>
+            <input type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" placeholder={t('form.emailPlaceholder')} />
+          </label>
+          <label style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+            {t('form.website')}
+            <input value={website} onChange={event => setWebsite(event.target.value)} tabIndex="-1" autoComplete="off" />
+          </label>
+          <label className="consent">
+            <input type="checkbox" checked={consent} onChange={event => setConsent(event.target.checked)} />
+            <span>{t('project.testConsent')}</span>
+          </label>
+          <div className="pv-testing-actions">
+            <button type="submit" className="btn btn-primary" disabled={state.status === 'loading'}>
+              {state.status === 'loading' ? <LoaderCircle className="spin" size={17} /> : <Send size={16} />} {t('project.testSubmit')}
+            </button>
+            {state.status === 'error' && <p className="form-error" role="alert">{state.message}</p>}
+          </div>
+        </form>
+      )}
+    </section>
+  )
+}
+
 function Gallery({ shots, name, onZoom }) {
   const { t } = useT()
   if (!shots.length) return null
@@ -365,6 +439,8 @@ export default function ProjectView({ slug, onNavigate }) {
         </div>
 
         <Downloads project={project} />
+
+        <TestSignup key={project.slug} project={project} />
 
         <Changelog project={project} />
 
