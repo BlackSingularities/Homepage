@@ -767,6 +767,13 @@ const REPO_RENAMES = {
   'blacksingularities/opencall': 'blacksingularities/opendial',
 }
 
+function checksumLines(notes) {
+  return String(notes || '')
+    .split(/\r?\n/)
+    .filter(line => /\b[0-9a-f]{64}\b/i.test(line))
+    .join('\n')
+}
+
 async function updateFeed(req) {
   const asked = `${req.params.owner}/${req.params.repo}`.toLowerCase()
   // Zainstalowane wcześniej wersje pytają o repozytorium pod dawną nazwą.
@@ -784,7 +791,9 @@ async function updateFeed(req) {
   const toGithub = item => ({
     tag_name: item.tag,
     name: item.name,
-    body: item.notes || '',
+    // Aplikacje nie mogą pokazywać listy zmian – zostawiamy wyłącznie linie z sumami
+    // SHA-256 (część aktualizatorów weryfikuje nimi pobrany plik).
+    body: checksumLines(item.notes),
     html_url: page,
     published_at: item.publishedAt,
     prerelease: item.prerelease === true,
