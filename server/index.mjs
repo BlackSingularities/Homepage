@@ -835,7 +835,9 @@ const CONTACT_TEXT = {
     name: 'Podaj imię.',
     email: 'Podaj poprawny adres e-mail.',
     phone: 'Podaj numer telefonu.',
-    message: 'Napisz kilka zdań o projekcie.',
+    message: 'Napisz kilka zdań o swojej sprawie.',
+    app: 'Wybierz aplikację.',
+    requestType: 'Wybierz rodzaj zgłoszenia.',
     consent: 'Zaakceptuj zgodę na kontakt.',
     subject: 'Dziękuję za wiadomość – Adam Rędzikowski',
     text: name => `Cześć ${name},\n\nDziękuję za wiadomość. Otrzymałem Twoje zapytanie i wrócę z odpowiedzią możliwie szybko.\n\nAdam Rędzikowski\nredzikowski.com`,
@@ -848,7 +850,9 @@ const CONTACT_TEXT = {
     name: 'Please enter your name.',
     email: 'Please enter a valid email address.',
     phone: 'Please enter your phone number.',
-    message: 'Please write a few sentences about the project.',
+    message: 'Please write a few sentences about your request.',
+    app: 'Please choose an app.',
+    requestType: 'Please choose the type of request.',
     consent: 'Please agree to be contacted.',
     subject: 'Thank you for your message – Adam Rędzikowski',
     text: name => `Hi ${name},\n\nThank you for your message. I have received your enquiry and will get back to you as soon as possible.\n\nAdam Rędzikowski\nredzikowski.com`,
@@ -857,6 +861,9 @@ const CONTACT_TEXT = {
     body: phone => `I have received your enquiry and will read it personally. I will get back to you by ${phone ? 'phone' : 'email'} as soon as possible.`,
   },
 }
+
+/** Rodzaje zgłoszeń dotyczących aplikacji – etykiety dla właściciela strony. */
+const REQUEST_TYPE_LABEL = { bug: 'Zgłoszenie błędu', feature: 'Propozycja funkcjonalności', collaboration: 'Współpraca' }
 
 app.post('/api/contact', async (req, res) => {
   const lang = langOf(req.body?.lang)
@@ -874,6 +881,7 @@ app.post('/api/contact', async (req, res) => {
     return res.status(200).json({ ok: true })
   }
 
+  const isAppRequest = req.body.topic === 'app'
   const submission = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
@@ -882,11 +890,14 @@ app.post('/api/contact', async (req, res) => {
     email: cleanText(req.body.email, 200).toLowerCase(),
     phone: cleanText(req.body.phone, 80),
     contactMethod: req.body.contactMethod === 'phone' ? 'phone' : 'email',
+    topic: isAppRequest ? 'app' : 'project',
+    app: isAppRequest ? cleanText(req.body.app, 120) : '',
+    requestType: isAppRequest && Object.hasOwn(REQUEST_TYPE_LABEL, req.body.requestType) ? req.body.requestType : '',
     subject: cleanText(req.body.subject, 200),
     message: cleanText(req.body.message, 6000),
-    budget: cleanText(req.body.budget, 60),
-    timeline: cleanText(req.body.timeline, 60),
-    scope: (Array.isArray(req.body.scope) ? req.body.scope : []).slice(0, 12).map(item => cleanText(item, 60)).filter(Boolean),
+    budget: isAppRequest ? '' : cleanText(req.body.budget, 60),
+    timeline: isAppRequest ? '' : cleanText(req.body.timeline, 60),
+    scope: isAppRequest ? [] : (Array.isArray(req.body.scope) ? req.body.scope : []).slice(0, 12).map(item => cleanText(item, 60)).filter(Boolean),
     source: cleanText(req.body.source, 60),
     consent: req.body.consent === true,
     lang,
@@ -898,6 +909,8 @@ app.post('/api/contact', async (req, res) => {
   if (!isEmail(submission.email)) errors.push(copy.email)
   if (submission.contactMethod === 'phone' && submission.phone.length < 6) errors.push(copy.phone)
   if (submission.message.length < 12) errors.push(copy.message)
+  if (isAppRequest && !submission.app) errors.push(copy.app)
+  if (isAppRequest && !submission.requestType) errors.push(copy.requestType)
   if (!submission.consent) errors.push(copy.consent)
   if (errors.length) return res.status(400).json({ error: errors[0], fields: errors })
 
@@ -911,7 +924,10 @@ app.post('/api/contact', async (req, res) => {
       const replyLabel = submission.contactMethod === 'phone'
         ? `Telefon: ${escapeHtml(submission.phone)}`
         : `E-mail: ${escapeHtml(submission.email)}`
+      const typeLabel = REQUEST_TYPE_LABEL[submission.requestType]
       const details = [
+        submission.app && `Aplikacja: ${submission.app}`,
+        typeLabel && `Rodzaj: ${typeLabel}`,
         submission.budget && `Budżet: ${submission.budget}`,
         submission.timeline && `Termin: ${submission.timeline}`,
         submission.scope.length && `Zakres: ${submission.scope.join(', ')}`,
@@ -921,11 +937,11 @@ app.post('/api/contact', async (req, res) => {
         from: { name: settings.fromName, address: settings.smtpUsername },
         to: settings.ownerEmail,
         replyTo: submission.email,
-        subject: `Nowe zapytanie${lang === 'en' ? ' (EN)' : ''}: ${submission.subject || submission.name}`,
+        subject: `${typeLabel ? `${typeLabel} – ${submission.app}` : 'Nowe zapytanie'}${lang === 'en' ? ' (EN)' : ''}: ${submission.subject || submission.name}`,
         text: `${submission.name}\n${submission.company}\n${replyLabel}\n${details.join('\n')}\n\n${submission.message}`,
         html: emailFrame(`
           <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowe zapytanie ze strony</div>
-          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(submission.subject || 'Nowy projekt')}</h1>
+          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(submission.subject || (typeLabel ? `${typeLabel} – ${submission.app}` : 'Nowy projekt'))}</h1>
           <p style="line-height:1.7;color:#cfc8bb"><b style="color:#fff">${escapeHtml(submission.name)}</b>${submission.company ? ` · ${escapeHtml(submission.company)}` : ''}<br>${replyLabel}</p>
           ${details.length ? `<p style="line-height:1.8;font-size:13px;color:#a49d91">${details.map(escapeHtml).join('<br>')}</p>` : ''}
           <div style="margin-top:28px;padding:22px;background:#17161a;border:1px solid #2c2a26;border-radius:12px;line-height:1.7;white-space:pre-wrap;color:#e7e1d6">${escapeHtml(submission.message)}</div>

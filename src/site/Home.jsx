@@ -31,7 +31,7 @@ export default function Home({ content, pages, projects, onNavigate }) {
         <PagesGrid data={content.pagesSection} pages={pages} onNavigate={onNavigate} />
         <About data={content.about} brand={content.brand} />
         <Faq data={content.faq} />
-        <Contact data={content.contact} brand={content.brand} scopeOptions={scopeOptions} />
+        <Contact data={content.contact} brand={content.brand} scopeOptions={scopeOptions} apps={projects} />
       </div>
     </main>
   )

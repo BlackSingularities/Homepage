@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole, Mail, Phone, Send } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Boxes, Briefcase, Bug, Check, Handshake, Lightbulb, LoaderCircle, LockKeyhole, Mail, Phone, Send } from 'lucide-react'
 import { ease } from '../lib/ui'
 import GlowEdge from '../lib/GlowEdge'
 import { useT } from '../lib/i18n'
 
 const EMPTY = {
+  topic: 'project', app: '', requestType: '',
   name: '', company: '', email: '', phone: '', contactMethod: 'email',
   subject: '', message: '', budget: '', timeline: '', scope: [],
   consent: false, website: '', source: 'formularz',
 }
 
+const REQUEST_TYPES = [['bug', Bug], ['feature', Lightbulb], ['collaboration', Handshake]]
+
 const isEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
-export default function ContactForm({ scopeOptions = [] }) {
+export default function ContactForm({ scopeOptions = [], apps = [] }) {
   const { t, lang } = useT()
   const BUDGETS = t('form.budgets')
   const TIMELINES = t('form.timelines')
@@ -32,7 +35,9 @@ export default function ContactForm({ scopeOptions = [] }) {
     scope: current.scope.includes(label) ? current.scope.filter(item => item !== label) : [...current.scope, label],
   }))
 
-  const stepOneValid = form.message.trim().length >= 12
+  const isApp = form.topic === 'app'
+  const messageValid = form.message.trim().length >= 12
+  const stepOneValid = messageValid && (!isApp || (form.app && form.requestType))
   const stepTwoValid = form.name.trim().length >= 2
     && isEmail(form.email)
     && (form.contactMethod !== 'phone' || form.phone.trim().length >= 6)
@@ -87,7 +92,7 @@ export default function ContactForm({ scopeOptions = [] }) {
         </div>
 
         <div className="form-step-list">
-          {[t('form.stepProject'), t('form.stepContact')].map((label, index) => (
+          {[t(isApp ? 'form.stepApp' : 'form.stepProject'), t('form.stepContact')].map((label, index) => (
             <button
               key={label}
               type="button"
@@ -95,7 +100,7 @@ export default function ContactForm({ scopeOptions = [] }) {
               onClick={() => index === 0 && setStep(0)}
             >
               <i>{step > index ? <Check size={12} /> : String(index + 1).padStart(2, '0')}</i>
-              <span>{label}<small>{index === 0 ? t('form.stepProjectHint') : t('form.stepContactHint')}</small></span>
+              <span>{label}<small>{index === 0 ? t(isApp ? 'form.stepAppHint' : 'form.stepProjectHint') : t('form.stepContactHint')}</small></span>
             </button>
           ))}
         </div>
@@ -107,18 +112,59 @@ export default function ContactForm({ scopeOptions = [] }) {
       <div className="form-content">
         <header className="form-stage-head">
           <span>{t('form.step', step + 1)}</span>
-          <h3>{step === 0 ? t('form.projectTitle') : t('form.contactTitle')}</h3>
-          <p>{step === 0 ? t('form.projectLead') : t('form.contactLead')}</p>
+          <h3>{step === 0 ? t(isApp ? 'form.appTitle' : 'form.projectTitle') : t('form.contactTitle')}</h3>
+          <p>{step === 0 ? t(isApp ? 'form.appLead' : 'form.projectLead') : t('form.contactLead')}</p>
         </header>
 
         {step === 0 ? (
           <motion.div className="form-stage" key="stage-project" initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, ease }}>
+            {apps.length > 0 && (
+              <div className="field form-section">
+                <span>{t('form.topic')}</span>
+                <div className="method-choice">
+                  {[['project', t('form.topicProject'), Briefcase], ['app', t('form.topicApp'), Boxes]].map(([value, label, Icon]) => (
+                    <button type="button" key={value} className={form.topic === value ? 'is-active' : ''} onClick={() => setForm(current => ({ ...current, topic: value }))} aria-pressed={form.topic === value}>
+                      <Icon size={15} />{label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isApp && (
+              <>
+                <div className="field form-section">
+                  <span>{t('form.app')}</span>
+                  <div className="chips scope-choices">
+                    {apps.map(app => (
+                      <GlowEdge as="button" type="button" key={app.id} className={`chip ${form.app === app.name ? 'is-active' : ''}`} onClick={() => setForm(current => ({ ...current, app: app.name }))} aria-pressed={form.app === app.name}>
+                        <i>{form.app === app.name ? <Check size={12} /> : '+'}</i><span>{app.name}</span>
+                      </GlowEdge>
+                    ))}
+                  </div>
+                  {touched && !form.app && <i className="field-error">{t('form.appError')}</i>}
+                </div>
+
+                <div className="field form-section">
+                  <span>{t('form.requestType')}</span>
+                  <div className="method-choice">
+                    {REQUEST_TYPES.map(([value, Icon]) => (
+                      <button type="button" key={value} className={form.requestType === value ? 'is-active' : ''} onClick={() => setForm(current => ({ ...current, requestType: value }))} aria-pressed={form.requestType === value}>
+                        <Icon size={15} />{t(`form.type.${value}`)}
+                      </button>
+                    ))}
+                  </div>
+                  {touched && !form.requestType && <i className="field-error">{t('form.requestTypeError')}</i>}
+                </div>
+              </>
+            )}
+
             <label className="field">
-              <span>{t('form.subject')}</span>
-              <input name="subject" value={form.subject} onChange={update} placeholder={t('form.subjectPlaceholder')} />
+              <span>{t(isApp ? 'form.appSubject' : 'form.subject')}</span>
+              <input name="subject" value={form.subject} onChange={update} placeholder={t(isApp ? 'form.appSubjectPlaceholder' : 'form.subjectPlaceholder')} />
             </label>
 
-            {scopeOptions.length > 0 && (
+            {!isApp && scopeOptions.length > 0 && (
               <div className="field form-section">
                 <span>{t('form.scope')}</span>
                 <div className="chips scope-choices">
@@ -131,7 +177,7 @@ export default function ContactForm({ scopeOptions = [] }) {
               </div>
             )}
 
-            <div className="field-row form-choice-row">
+            {!isApp && <div className="field-row form-choice-row">
               <div className="field form-section">
                 <span>{t('form.budget')}</span>
                 <div className="chips compact-choices">
@@ -148,12 +194,12 @@ export default function ContactForm({ scopeOptions = [] }) {
                   ))}
                 </div>
               </div>
-            </div>
+            </div>}
 
-            <label className={`field ${touched && !stepOneValid ? 'has-error' : ''}`}>
+            <label className={`field ${touched && !messageValid ? 'has-error' : ''}`}>
               <span>{t('form.message')}</span>
-              <textarea name="message" value={form.message} onChange={update} rows="6" placeholder={t('form.messagePlaceholder')} />
-              {touched && !stepOneValid && <i className="field-error">{t('form.messageError')}</i>}
+              <textarea name="message" value={form.message} onChange={update} rows="6" placeholder={isApp ? t(`form.placeholder.${form.requestType || 'bug'}`) : t('form.messagePlaceholder')} />
+              {touched && !messageValid && <i className="field-error">{t('form.messageError')}</i>}
             </label>
 
             <div className="form-nav">
@@ -207,7 +253,7 @@ export default function ContactForm({ scopeOptions = [] }) {
             </label>
 
             <div className="form-nav">
-              <button type="button" className="btn btn-ghost" onClick={() => setStep(0)}><ArrowLeft size={16} /> {t('form.back')}</button>
+              <button type="button" className="btn btn-ghost" onClick={() => setStep(0)}><ArrowLeft size={16} /> {t(isApp ? 'form.backApp' : 'form.back')}</button>
               <button type="submit" className="btn btn-primary" disabled={state.status === 'loading'}>
                 {state.status === 'loading' ? <><LoaderCircle className="spin" size={18} /> {t('form.sending')}</> : <>{t('form.send')} <Send size={17} /></>}
               </button>
