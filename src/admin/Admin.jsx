@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, BarChart3, Boxes, Camera, Download, FileStack, Files, Inbox, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Camera, Download, FileStack, Files, FlaskConical, Inbox, LayoutDashboard, LoaderCircle,
   LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
@@ -11,6 +11,7 @@ import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
 import DownloadsPanel from './DownloadsPanel'
+import TestersPanel from './TestersPanel'
 import '../styles/admin.css'
 
 /** Zakładka, jej adres pod /admin, nazwa i ikona. */
@@ -18,6 +19,7 @@ const TABS = [
   ['dashboard', '', 'Pulpit', LayoutDashboard],
   ['analytics', 'analityka', 'Analityka', BarChart3],
   ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText],
+  ['testers', 'testerzy', 'Testerzy', FlaskConical],
   ['projects', 'portfolio', 'Portfolio', Boxes],
   ['downloads', 'pobieranie', 'Pobieranie', Download],
   ['pages', 'podstrony', 'Podstrony', Files],
@@ -361,6 +363,64 @@ function GalleryManager() {
   )
 }
 
+/* ── powiadomienia ──────────────────────────────────────────────── */
+
+const NOTIFICATION_LABEL = { submissions: 'Zgłoszenia', testers: 'Testerzy', inbox: 'Odebrane' }
+
+function NotificationBell({ data, onOpen }) {
+  const [open, setOpen] = useState(false)
+  const root = useRef(null)
+  const total = Object.values(data.counts).reduce((sum, value) => sum + value, 0)
+
+  useEffect(() => {
+    if (!open) return undefined
+    const onClick = event => { if (!root.current?.contains(event.target)) setOpen(false) }
+    const onKey = event => { if (event.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const go = tab => { setOpen(false); onOpen(tab) }
+  const groups = Object.entries(data.counts).filter(([, count]) => count > 0)
+
+  return (
+    <div className="ap-bell" ref={root}>
+      <button
+        className="ap-btn ap-btn-ghost"
+        onClick={() => setOpen(value => !value)}
+        aria-expanded={open}
+        aria-label={total ? `Powiadomienia: ${total}` : 'Powiadomienia'}
+      >
+        <Bell size={14} />
+        {total > 0 && <b className="ap-count">{total > 99 ? '99+' : total}</b>}
+      </button>
+      {open && (
+        <div className="ap-bell-panel">
+          {!total && <p className="ap-bell-empty">Nic nowego.</p>}
+          {groups.length > 0 && (
+            <div className="ap-bell-groups">
+              {groups.map(([tab, count]) => (
+                <button key={tab} onClick={() => go(tab)}>{NOTIFICATION_LABEL[tab]} <b className="ap-count">{count}</b></button>
+              ))}
+            </div>
+          )}
+          {data.items.map(entry => (
+            <button className="ap-bell-item" key={entry.id} onClick={() => go(entry.tab)}>
+              <b>{entry.title}</b>
+              <span>{entry.detail}</span>
+              <time>{formatDate(entry.createdAt)}</time>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── shell ──────────────────────────────────────────────────────── */
 
 function AdminPanel({ admin, onLogout }) {
@@ -373,6 +433,22 @@ function AdminPanel({ admin, onLogout }) {
   const [settings, setSettings] = useState(EMPTY_SETTINGS)
   const [loading, setLoading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [notifications, setNotifications] = useState({ counts: {}, items: [] })
+
+  // Błąd odpytywania nie zasługuje na komunikat – następna próba za minutę.
+  const loadNotifications = useCallback(() => {
+    api('/api/admin/notifications').then(setNotifications).catch(() => undefined)
+  }, [])
+
+  useEffect(() => {
+    loadNotifications()
+    const timer = setInterval(() => { if (!document.hidden) loadNotifications() }, 60 * 1000)
+    document.addEventListener('visibilitychange', loadNotifications)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', loadNotifications)
+    }
+  }, [loadNotifications])
 
   const notify = useCallback(message => toast.success(message), [])
 
@@ -414,6 +490,8 @@ function AdminPanel({ admin, onLogout }) {
   }, [tab])
 
   const refresh = () => {
+    loadNotifications()
+    if (tab === 'testers') return setRefreshKey(value => value + 1)
     if (tab === 'dashboard') return loadOverview()
     if (tab === 'analytics' || tab === 'downloads') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
@@ -449,6 +527,7 @@ function AdminPanel({ admin, onLogout }) {
   const changeStatus = (id, status) => run(async () => {
     const updated = await api(`/api/admin/submissions/${id}`, json('PATCH', { status }))
     setSubmissions(current => current.map(item => (item.id === id ? updated : item)))
+    loadNotifications()
   })
 
   const deleteSubmission = item => {
@@ -456,6 +535,7 @@ function AdminPanel({ admin, onLogout }) {
     run(async () => {
       await api(`/api/admin/submissions/${item.id}`, { method: 'DELETE' })
       setSubmissions(current => current.filter(entry => entry.id !== item.id))
+      loadNotifications()
     }, 'Zgłoszenie zostało usunięte.')
   }
 
@@ -469,9 +549,11 @@ function AdminPanel({ admin, onLogout }) {
 
   const active = TABS.find(entry => entry[0] === tab)
 
+  const unread = Object.values(notifications.counts).reduce((sum, value) => sum + value, 0)
+
   useEffect(() => {
-    document.title = `${active?.[2] || 'Panel'}${item ? ` · ${item}` : ''} – Panel administracyjny`
-  }, [active, item])
+    document.title = `${unread ? `(${unread}) ` : ''}${active?.[2] || 'Panel'}${item ? ` · ${item}` : ''} – Panel administracyjny`
+  }, [active, item, unread])
 
   return (
     <div className="ap-shell">
@@ -495,6 +577,7 @@ function AdminPanel({ admin, onLogout }) {
               }}
             >
               <Icon size={17} /><span>{label}</span>
+              {notifications.counts[id] > 0 && <b className="ap-count">{notifications.counts[id]}</b>}
             </a>
           ))}
         </nav>
@@ -508,6 +591,7 @@ function AdminPanel({ admin, onLogout }) {
             <h1>{active?.[2]}</h1>
           </div>
           <div className="ap-header-actions">
+            <NotificationBell data={notifications} onOpen={chooseTab} />
             <a className="ap-btn ap-btn-ghost" href="/" target="_blank" rel="noreferrer">
               Zobacz stronę <ArrowUpRight size={14} />
             </a>
@@ -526,6 +610,8 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'submissions' && (
             <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} />
           )}
+
+          {tab === 'testers' && <TestersPanel key={refreshKey} onChange={loadNotifications} />}
 
           {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
           {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}

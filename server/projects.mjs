@@ -100,6 +100,9 @@ function sanitizeShot(input) {
   return { src: cleanMedia(input?.src), alt: cleanText(input?.alt, 200) }
 }
 
+/** Platformy, na które można zapisać się do testów. */
+export const TEST_PLATFORMS = ['android', 'ios', 'windows', 'macos', 'linux']
+
 export function sanitizeProject(input, existing = {}) {
   const name = cleanText(input?.name, 180) || existing.name || 'Nowa realizacja'
   const kind = KINDS.includes(input?.kind) ? input.kind : 'web'
@@ -128,6 +131,10 @@ export function sanitizeProject(input, existing = {}) {
     repoHidden: input?.repoHidden !== false,
     releaseSource: kind === 'app' ? releaseSource : 'none',
     stores: kind === 'app' ? sanitizeStores(input?.stores) : {},
+    testing: {
+      enabled: kind === 'app' && input?.testing?.enabled === true,
+      platforms: TEST_PLATFORMS.filter(platform => input?.testing?.platforms?.includes?.(platform)),
+    },
     downloads: (Array.isArray(input?.downloads) ? input.downloads : [])
       .slice(0, 12).map(sanitizeDownload).filter(item => item.url),
     en: sanitizeProjectTranslation(input?.en),

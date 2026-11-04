@@ -68,12 +68,15 @@ function emptyProject() {
     repoHidden: true,
     releaseSource: 'none',
     stores: {},
+    testing: { enabled: false, platforms: [] },
     downloads: [],
     published: false,
     featured: false,
     en: emptyTranslation(),
   }
 }
+
+const TEST_PLATFORMS = { android: 'Android', ios: 'iOS', windows: 'Windows', macos: 'macOS', linux: 'Linux' }
 
 function emptyTranslation() {
   return { label: '', tagline: '', summary: '', body: '', role: '', features: [], shotAlts: [] }
@@ -423,6 +426,36 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
 
             {isApp && (
               <>
+                <div className="ap-pe-group">
+                  <h3>Zapisy do testów</h3>
+                  <Toggle
+                    label="Szukam testerów"
+                    hint="Strona aplikacji pokaże formularz z adresem e-mail. Zgłoszenia trafią do zakładki Testerzy."
+                    checked={project.testing?.enabled === true}
+                    onChange={enabled => update({ testing: { platforms: [], ...project.testing, enabled } })}
+                  />
+                  {project.testing?.enabled && (
+                    <div className="ap-filters">
+                      {Object.entries(TEST_PLATFORMS).map(([id, name]) => {
+                        const platforms = project.testing.platforms || []
+                        const on = platforms.includes(id)
+                        return (
+                          <button
+                            type="button"
+                            key={id}
+                            className={on ? 'is-active' : ''}
+                            aria-pressed={on}
+                            onClick={() => update({ testing: { ...project.testing, platforms: on ? platforms.filter(item => item !== id) : [...platforms, id] } })}
+                          >{name}</button>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {project.testing?.enabled && !project.testing.platforms?.length && (
+                    <p className="ap-hint">Wybierz co najmniej jedną platformę – bez niej formularz się nie pokaże.</p>
+                  )}
+                </div>
+
                 <div className="ap-pe-group">
                   <h3>Sklepy</h3>
                   <div className="ap-grid-3">
