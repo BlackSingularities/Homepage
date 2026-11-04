@@ -65,6 +65,8 @@ function Status({ value }) {
 
 /* ── submissions ────────────────────────────────────────────────── */
 
+const REQUEST_TYPE_LABEL = { bug: 'Zgłoszenie błędu', feature: 'Propozycja funkcjonalności', collaboration: 'Współpraca' }
+
 function Submissions({ items, loading, onStatus, onDelete }) {
   const [filter, setFilter] = useState('all')
   const counts = {
@@ -102,7 +104,10 @@ function Submissions({ items, loading, onStatus, onDelete }) {
 
             <div className="ap-submission-grid">
               <div>
-                <h3>{item.subject || 'Nowy projekt'}</h3>
+                <h3>{item.subject || (item.app ? REQUEST_TYPE_LABEL[item.requestType] : 'Nowy projekt')}</h3>
+                {item.app && (
+                  <div className="ap-chips"><span>{item.app}</span><span>{REQUEST_TYPE_LABEL[item.requestType]}</span></div>
+                )}
                 <p className="ap-strong">{item.name}{item.company ? ` · ${item.company}` : ''}</p>
                 <p><a href={`mailto:${item.email}`}>{item.email}</a>{item.phone ? ` · ${item.phone}` : ''}</p>
                 {(item.budget || item.timeline) && (
@@ -161,7 +166,7 @@ function Dashboard({ submissions, pages, onTab }) {
           {submissions.slice(0, 5).map(item => (
             <button key={item.id} className="ap-row" onClick={() => onTab('submissions')}>
               <Status value={item.status} />
-              <span className="ap-row-main"><b>{item.name}</b><i>{item.subject || 'Nowy projekt'}</i></span>
+              <span className="ap-row-main"><b>{item.name}</b><i>{item.subject || (item.app ? `${item.app} – ${REQUEST_TYPE_LABEL[item.requestType]}` : 'Nowy projekt')}</i></span>
               <time>{formatDate(item.createdAt)}</time>
             </button>
           ))}
