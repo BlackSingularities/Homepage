@@ -812,12 +812,12 @@ async function updateFeed(req) {
 }
 
 // Aktualizator OpenPano pyta z webview, więc odpowiedź musi przejść przez CORS.
-app.use('/api/github', (_req, res, next) => {
+app.use(['/api/github', '/api/releases'], (_req, res, next) => {
   res.set('Access-Control-Allow-Origin', '*')
   next()
 })
 
-app.get('/api/github/repos/:owner/:repo/releases/latest', async (req, res, next) => {
+app.get(['/api/github/repos/:owner/:repo/releases/latest', '/api/releases/repos/:owner/:repo/releases/latest'], async (req, res, next) => {
   try {
     const feed = await updateFeed(req)
     if (!feed) return res.status(404).json({ message: 'Not Found' })
@@ -826,7 +826,7 @@ app.get('/api/github/repos/:owner/:repo/releases/latest', async (req, res, next)
   } catch (error) { next(error) }
 })
 
-app.get('/api/github/repos/:owner/:repo/releases', async (req, res, next) => {
+app.get(['/api/github/repos/:owner/:repo/releases', '/api/releases/repos/:owner/:repo/releases'], async (req, res, next) => {
   try {
     const feed = await updateFeed(req)
     if (!feed) return res.status(404).json({ message: 'Not Found' })
