@@ -106,5 +106,5 @@ jobs:
             docker compose exec -T homepage_api node server/migrate-gran-3d-v42.mjs
             docker compose exec -T homepage_api node server/migrate-remove-openraw-v44.mjs
             docker compose exec -T homepage_api node server/migrate-polskie-studio-map-v45.mjs
-            docker compose exec -T homepage_api node server/migrate-openecho-v46.mjs
+            docker compose exec -T homepage_api node server/migrate-remove-openecho-v47.mjs
             docker image prune -f
