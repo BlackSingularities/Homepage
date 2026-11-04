@@ -3,10 +3,9 @@ import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import nodemailer from 'nodemailer'
-import { ImapFlow } from 'imapflow'
-import { simpleParser } from 'mailparser'
 import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
+import { createMail } from './mail.mjs'
 import { PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { writeZip } from './zip.mjs'
@@ -93,10 +92,15 @@ async function resizeForUpload(buffer, extension) {
 
 const jsonSmall = express.json({ limit: '64kb' })
 const jsonLarge = express.json({ limit: '4mb' })
+// Załączniki idą w base64: 8 MB plików to około 11 MB treści.
+const jsonMail = express.json({ limit: '12mb' })
 
 app.set('trust proxy', 1)
 app.disable('x-powered-by')
-app.use((req, res, next) => (req.path.startsWith('/api/admin/') ? jsonLarge : jsonSmall)(req, res, next))
+app.use((req, res, next) => {
+  if (req.path === '/api/admin/mail/send' || req.path === '/api/admin/mail/draft') return jsonMail(req, res, next)
+  return (req.path.startsWith('/api/admin/') ? jsonLarge : jsonSmall)(req, res, next)
+})
 
 await fs.mkdir(DATA_DIR, { recursive: true })
 await fs.mkdir(UPLOAD_DIR, { recursive: true })
@@ -551,6 +555,18 @@ async function sendLoggedMail(transport, message, kind, submissionId) {
   await appendOutbox(log)
   return log
 }
+
+const mail = createMail({
+  getSettings,
+  getTransport,
+  enforceSameOrigin: (...args) => enforceSameOrigin(...args),
+  appendOutbox,
+  cleanText,
+  // Odpowiedź przenosi nowe zgłoszenie do „W toku” i zostaje w jego historii.
+  onSubmissionReply: (id, reply) => updateJson(SUBMISSIONS_FILE, [], current => current.map(item => (item.id === id
+    ? { ...item, status: item.status === 'new' ? 'in-progress' : item.status, replies: [reply, ...(item.replies || [])] }
+    : item))),
+})
 
 /* ── administrator bootstrap & session ───────────────────────────────── */
 
@@ -1237,41 +1253,6 @@ app.delete('/api/admin/testers/:id', enforceSameOrigin, async (req, res) => {
 
 /* ── admin: powiadomienia ────────────────────────────────────────────── */
 
-/**
- * Liczba nieprzeczytanych w skrzynce. Panel odpytuje o powiadomienia co minutę,
- * a połączenie IMAP jest drogie, więc wynik trzymamy przez pięć minut. Skrzynka
- * bez konfiguracji albo niedostępna po prostu nie dokłada nic do licznika.
- */
-let unseenCache = { count: 0, at: 0 }
-async function countUnseen() {
-  if (Date.now() - unseenCache.at < 5 * 60 * 1000) return unseenCache.count
-  let client
-  let count = 0
-  try {
-    const settings = await getSettings({ includePassword: true })
-    if (settings.imapHost && settings.imapUsername && settings.password) {
-      client = new ImapFlow({
-        host: settings.imapHost,
-        port: settings.imapPort,
-        secure: settings.imapSecure,
-        auth: { user: settings.imapUsername, pass: settings.password },
-        logger: false,
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 20000,
-      })
-      await client.connect()
-      count = (await client.status('INBOX', { unseen: true })).unseen || 0
-    }
-  } catch (error) {
-    console.error('Unseen count failed:', error.message)
-  } finally {
-    if (client) await client.logout().catch(() => undefined)
-  }
-  unseenCache = { count, at: Date.now() }
-  return count
-}
-
 // Skrzynka sama się nie odzywa, więc licznik nie może blokować odpowiedzi.
 app.get('/api/admin/notifications', async (_req, res) => {
   const [submissions, testers] = await Promise.all([readJson(SUBMISSIONS_FILE, []), readJson(TESTERS_FILE, [])])
@@ -1279,11 +1260,11 @@ app.get('/api/admin/notifications', async (_req, res) => {
   const newSubmissions = fresh(submissions)
   const newTesters = fresh(testers)
   const inbox = await Promise.race([
-    countUnseen(),
-    new Promise(resolve => setTimeout(() => resolve(unseenCache.count), 1500)),
+    mail.countUnseen(),
+    new Promise(resolve => setTimeout(() => resolve(0), 1500)),
   ])
   res.json({
-    counts: { submissions: newSubmissions.length, testers: newTesters.length, inbox },
+    counts: { submissions: newSubmissions.length, testers: newTesters.length, mail: inbox },
     items: [
       ...newSubmissions.map(item => ({
         id: item.id,
@@ -1676,53 +1657,8 @@ app.put('/api/admin/settings', enforceSameOrigin, async (req, res) => {
   res.json(await getSettings())
 })
 
-app.get('/api/admin/inbox', async (req, res) => {
-  let client
-  try {
-    const settings = await getSettings({ includePassword: true })
-    if (!settings.imapHost || !settings.imapUsername || !settings.password) {
-      return res.status(409).json({ error: 'Najpierw uzupełnij ustawienia IMAP.' })
-    }
-    client = new ImapFlow({
-      host: settings.imapHost,
-      port: settings.imapPort,
-      secure: settings.imapSecure,
-      auth: { user: settings.imapUsername, pass: settings.password },
-      logger: false,
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000,
-    })
-    await client.connect()
-    const lock = await client.getMailboxLock('INBOX')
-    const messages = []
-    try {
-      const count = client.mailbox.exists
-      if (count > 0) {
-        const start = Math.max(1, count - 24)
-        for await (const message of client.fetch(`${start}:*`, { envelope: true, source: true, flags: true })) {
-          const parsed = await simpleParser(message.source)
-          messages.push({
-            uid: message.uid,
-            subject: cleanText(parsed.subject || '(bez tematu)', 300),
-            from: cleanText(parsed.from?.text || '', 300),
-            to: cleanText(parsed.to?.text || '', 300),
-            date: parsed.date?.toISOString() || null,
-            text: cleanText(parsed.text || parsed.html || '', 5000),
-            seen: message.flags?.has('\\Seen') || false,
-          })
-        }
-      }
-    } finally {
-      lock.release()
-    }
-    res.json(messages.reverse())
-  } catch (error) {
-    res.status(502).json({ error: `Nie udało się połączyć ze skrzynką: ${cleanText(error.message, 250)}` })
-  } finally {
-    if (client) await client.logout().catch(() => undefined)
-  }
-})
+
+mail.mount(app)
 
 app.get('/api/admin/outbox', async (_req, res) => {
   res.json(await readJson(OUTBOX_FILE, []))
