@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Camera, Download, FileStack, Files, FlaskConical, Inbox, LayoutDashboard, LoaderCircle,
-  LockKeyhole, LogOut, MailCheck, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
+  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, LoaderCircle,
+  LockKeyhole, LogOut, Mail, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toaster, Toggle, toast } from './parts'
@@ -12,6 +12,8 @@ import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
 import DownloadsPanel from './DownloadsPanel'
 import TestersPanel from './TestersPanel'
+import MailPanel from './MailPanel'
+import MailComposer, { quoteBlock } from './MailComposer'
 import '../styles/admin.css'
 
 /** Zakładka, jej adres pod /admin, nazwa i ikona. */
@@ -25,9 +27,8 @@ const TABS = [
   ['pages', 'podstrony', 'Podstrony', Files],
   ['content', 'tresci', 'Treści strony', FileStack],
   ['gallery', 'galeria', 'Galeria', Camera],
-  ['inbox', 'odebrane', 'Odebrane', Inbox],
-  ['outbox', 'wyslane', 'Wysłane', MailCheck],
-  ['settings', 'poczta', 'Poczta', Settings],
+  ['mail', 'poczta', 'Poczta', Mail],
+  ['settings', 'ustawienia-poczty', 'Ustawienia poczty', Settings],
 ]
 
 /**
@@ -37,7 +38,9 @@ const TABS = [
  */
 function parseAdminPath(pathname = window.location.pathname) {
   const [, segment = '', ...rest] = pathname.replace(/^\/admin\/?/, '/').split('/')
-  const found = TABS.find(([, slug]) => slug === decodeURIComponent(segment))
+  // Dawne adresy skrzynek prowadzą do wspólnej Poczty.
+  const slug = ['odebrane', 'wyslane'].includes(segment) ? 'poczta' : decodeURIComponent(segment)
+  const found = TABS.find(([, entry]) => entry === slug)
   return { tab: found ? found[0] : 'dashboard', item: decodeURIComponent(rest.join('/') || '') }
 }
 
@@ -69,7 +72,7 @@ function Status({ value }) {
 
 const REQUEST_TYPE_LABEL = { bug: 'Zgłoszenie błędu', feature: 'Propozycja funkcjonalności', collaboration: 'Współpraca' }
 
-function Submissions({ items, loading, onStatus, onDelete }) {
+function Submissions({ items, loading, onStatus, onDelete, onReply }) {
   const [filter, setFilter] = useState('all')
   const counts = {
     all: items.length,
@@ -111,7 +114,7 @@ function Submissions({ items, loading, onStatus, onDelete }) {
                   <div className="ap-chips"><span>{item.app}</span><span>{REQUEST_TYPE_LABEL[item.requestType]}</span></div>
                 )}
                 <p className="ap-strong">{item.name}{item.company ? ` · ${item.company}` : ''}</p>
-                <p><a href={`mailto:${item.email}`}>{item.email}</a>{item.phone ? ` · ${item.phone}` : ''}</p>
+                <p>{item.email}{item.phone ? ` · ${item.phone}` : ''}</p>
                 {(item.budget || item.timeline) && (
                   <p className="ap-muted">{[item.budget, item.timeline].filter(Boolean).join(' · ')}</p>
                 )}
@@ -119,7 +122,12 @@ function Submissions({ items, loading, onStatus, onDelete }) {
                   <div className="ap-chips">{item.scope.map(scope => <span key={scope}>{scope}</span>)}</div>
                 )}
               </div>
-              <p className="ap-message">{item.message}</p>
+              <div className="ap-stack">
+                <p className="ap-message">{item.message}</p>
+                {item.replies?.map(reply => (
+                  <p className="ap-muted" key={reply.at}>Odpowiedź wysłana {formatDate(reply.at)} do {reply.to}</p>
+                ))}
+              </div>
             </div>
 
             <footer>
@@ -130,9 +138,9 @@ function Submissions({ items, loading, onStatus, onDelete }) {
                   onClick={() => onStatus(item.id, status)}
                 >{STATUS_LABEL[status]}</button>
               ))}
-              <a className="ap-reply" href={`mailto:${item.email}?subject=${encodeURIComponent(`Re: ${item.subject || 'Twoje zapytanie'}`)}`}>
+              <button className="ap-reply" onClick={() => onReply(item)}>
                 Odpowiedz <ArrowUpRight size={13} />
-              </a>
+              </button>
             </footer>
           </article>
         ))}
@@ -365,7 +373,7 @@ function GalleryManager() {
 
 /* ── powiadomienia ──────────────────────────────────────────────── */
 
-const NOTIFICATION_LABEL = { submissions: 'Zgłoszenia', testers: 'Testerzy', inbox: 'Odebrane' }
+const NOTIFICATION_LABEL = { submissions: 'Zgłoszenia', testers: 'Testerzy', mail: 'Poczta' }
 
 function NotificationBell({ data, onOpen }) {
   const [open, setOpen] = useState(false)
@@ -428,8 +436,9 @@ function AdminPanel({ admin, onLogout }) {
   const { tab, item } = location
   const [submissions, setSubmissions] = useState([])
   const [pages, setPages] = useState([])
-  const [inbox, setInbox] = useState([])
-  const [outbox, setOutbox] = useState([])
+  const [compose, setCompose] = useState(null)
+  const [identity, setIdentity] = useState(null)
+  const [mailChange, setMailChange] = useState(0)
   const [settings, setSettings] = useState(EMPTY_SETTINGS)
   const [loading, setLoading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -495,8 +504,7 @@ function AdminPanel({ admin, onLogout }) {
     if (tab === 'dashboard') return loadOverview()
     if (tab === 'analytics' || tab === 'downloads') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
-    if (tab === 'inbox') return run(async () => setInbox(await api('/api/admin/inbox')))
-    if (tab === 'outbox') return run(async () => setOutbox(await api('/api/admin/outbox')))
+    if (tab === 'mail') return setRefreshKey(value => value + 1)
     if (tab === 'settings') return run(async () => {
       const loaded = await api('/api/admin/settings')
       setSettings(current => ({ ...current, ...loaded, password: '' }))
@@ -505,8 +513,7 @@ function AdminPanel({ admin, onLogout }) {
   }
 
   const loadTab = next => {
-    if (next === 'inbox' && !inbox.length) run(async () => setInbox(await api('/api/admin/inbox')))
-    if (next === 'outbox' && !outbox.length) run(async () => setOutbox(await api('/api/admin/outbox')))
+    if (next === 'submissions') run(async () => setSubmissions(await api('/api/admin/submissions')))
     if (next === 'settings') run(async () => {
       const loaded = await api('/api/admin/settings')
       setSettings(current => ({ ...current, ...loaded, password: '' }))
@@ -537,6 +544,30 @@ function AdminPanel({ admin, onLogout }) {
       setSubmissions(current => current.filter(entry => entry.id !== item.id))
       loadNotifications()
     }, 'Zgłoszenie zostało usunięte.')
+  }
+
+  const startCompose = useCallback(draft => {
+    setCompose(draft)
+    if (!identity) {
+      api('/api/admin/settings')
+        .then(loaded => setIdentity({ name: loaded.fromName, address: loaded.smtpUsername }))
+        .catch(() => undefined)
+    }
+  }, [identity])
+
+  const replyToSubmission = item => startCompose({
+    title: `Odpowiedź: ${item.name}`,
+    to: item.email,
+    subject: `Re: ${item.subject || (item.app ? `${item.app} – ${REQUEST_TYPE_LABEL[item.requestType]}` : 'Twoje zapytanie')}`,
+    html: quoteBlock({ author: item.name, date: item.createdAt, text: item.message }),
+    submissionId: item.id,
+  })
+
+  const composeSent = () => {
+    setCompose(null)
+    setMailChange(value => value + 1)
+    loadNotifications()
+    if (tab === 'submissions') run(async () => setSubmissions(await api('/api/admin/submissions')))
   }
 
   const saveSettings = event => {
@@ -608,7 +639,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
 
           {tab === 'submissions' && (
-            <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} />
+            <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} onReply={replyToSubmission} />
           )}
 
           {tab === 'testers' && <TestersPanel key={refreshKey} onChange={loadNotifications} />}
@@ -623,40 +654,14 @@ function AdminPanel({ admin, onLogout }) {
 
           {tab === 'gallery' && <GalleryManager />}
 
-          {tab === 'inbox' && (
-            <div className="ap-stack">
-              {!loading && !inbox.length && <Empty>Brak wiadomości albo skrzynka IMAP nie została jeszcze skonfigurowana.</Empty>}
-              {inbox.map(message => (
-                <details className="ap-mail" key={`${message.uid}-${message.date}`}>
-                  <summary>
-                    <span className={`ap-dot ${message.seen ? '' : 'is-live'}`} />
-                    <span className="ap-row-main"><b>{message.subject}</b><i>{message.from}</i></span>
-                    <time>{formatDate(message.date)}</time>
-                  </summary>
-                  <div className="ap-mail-body">
-                    <span>Do: {message.to}</span>
-                    <p>{message.text || 'Wiadomość nie zawiera podglądu tekstowego.'}</p>
-                  </div>
-                </details>
-              ))}
-            </div>
-          )}
-
-          {tab === 'outbox' && (
-            <div className="ap-stack">
-              {!loading && !outbox.length && <Empty>Historia potwierdzeń i powiadomień pojawi się tutaj.</Empty>}
-              {outbox.map(message => (
-                <article className="ap-outbox" key={message.id}>
-                  <Status value={message.status} />
-                  <span className="ap-row-main">
-                    <b>{message.subject}</b>
-                    <i>Do: {message.to} · {message.kind === 'confirmation' ? 'potwierdzenie dla klienta' : 'powiadomienie wewnętrzne'}</i>
-                  </span>
-                  <time>{formatDate(message.createdAt)}</time>
-                  {message.error && <p className="ap-error-text">{message.error}</p>}
-                </article>
-              ))}
-            </div>
+          {tab === 'mail' && (
+            <MailPanel
+              refreshKey={refreshKey}
+              changeKey={mailChange}
+              onCompose={startCompose}
+              onChange={loadNotifications}
+              onSettings={() => chooseTab('settings')}
+            />
           )}
 
           {tab === 'settings' && (
@@ -667,6 +672,7 @@ function AdminPanel({ admin, onLogout }) {
         {loading && (
           <div className="ap-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>
         )}
+        {compose && <MailComposer draft={compose} identity={identity} onClose={() => { setCompose(null); setMailChange(value => value + 1) }} onSent={composeSent} />}
         <Toaster />
       </main>
     </div>
