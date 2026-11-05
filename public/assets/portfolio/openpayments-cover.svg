@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="OpenPayments – budżet domowy ze skanowaniem paragonów">
+  <rect width="1600" height="1000" fill="#000000"/>
+  <g fill="#ffffff">
+    <text x="96" y="150" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-1">OpenPayments</text>
+    <text x="96" y="206" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="27" fill="#8a8a8a" letter-spacing="3">BUDŻET DOMOWY · SKAN PARAGONÓW · STATYSTYKI</text>
+  </g>
+
+  <!-- paragon -->
+  <g>
+    <path d="M136 268H536V858L506 838L476 858L446 838L416 858L386 838L356 858L326 838L296 858L266 838L236 858L206 838L176 858L136 838Z" fill="#ffffff" fill-opacity="0.06"/>
+    <g font-family="Consolas, Menlo, monospace" font-size="26" fill="#ffffff">
+      <text x="176" y="330" font-weight="700">LIDL</text>
+      <text x="176" y="368" fill="#8a8a8a" font-size="22">2026-08-17  18:42</text>
+      <text x="176" y="440">Mleko 2%</text><text x="496" y="440" text-anchor="end">4,99</text>
+      <text x="176" y="486">Chleb żytni</text><text x="496" y="486" text-anchor="end">6,50</text>
+      <text x="176" y="532">Jabłka 1 kg</text><text x="496" y="532" text-anchor="end">5,99</text>
+      <text x="176" y="578">Masło 2×</text><text x="496" y="578" text-anchor="end">14,98</text>
+      <text x="176" y="624" fill="#8a8a8a">+ 9 pozycji</text>
+      <path d="M176 668H496" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="8 8"/>
+      <text x="176" y="724" font-weight="700" font-size="30">SUMA</text><text x="496" y="724" text-anchor="end" font-weight="700" font-size="30">75,65</text>
+    </g>
+    <!-- linia skanowania -->
+    <rect x="116" y="452" width="440" height="4" rx="2" fill="#ffffff" fill-opacity="0.8"/>
+  </g>
+
+  <!-- karta miesiąca -->
+  <g font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">
+    <rect x="616" y="268" width="888" height="300" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="664" y="330" font-size="24" fill="#8a8a8a" letter-spacing="2">WYDATKI · CZERWIEC</text>
+    <text x="664" y="420" font-size="84" font-weight="700" fill="#ffffff" font-family="Georgia, serif">2 840 zł</text>
+    <text x="664" y="476" font-size="24" fill="#8a8a8a">Budżet 3 500 zł · zostało 660 zł</text>
+    <rect x="664" y="508" width="792" height="14" rx="7" fill="#ffffff" fill-opacity="0.12"/>
+    <rect x="664" y="508" width="643" height="14" rx="7" fill="#ffffff"/>
+
+    <!-- kategorie -->
+    <rect x="616" y="608" width="888" height="250" rx="30" fill="#ffffff" fill-opacity="0.06"/>
+    <g transform="translate(760 733)">
+      <circle r="78" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="26"/>
+      <circle r="78" fill="none" stroke="#ffffff" stroke-width="26" stroke-dasharray="204 286" transform="rotate(-90)"/>
+      <circle r="78" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="26" stroke-dasharray="110 380" stroke-dashoffset="-208" transform="rotate(-90)"/>
+      <circle r="78" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="26" stroke-dasharray="70 420" stroke-dashoffset="-322" transform="rotate(-90)"/>
+    </g>
+    <g font-size="26" fill="#ffffff">
+      <text x="904" y="680">Rachunki</text><text x="1456" y="680" text-anchor="end" font-weight="700">1 180 zł</text>
+      <text x="904" y="732">Zakupy</text><text x="1456" y="732" text-anchor="end" font-weight="700">640 zł</text>
+      <text x="904" y="784">Transport</text><text x="1456" y="784" text-anchor="end" font-weight="700">410 zł</text>
+      <text x="904" y="836" fill="#8a8a8a">Rozrywka</text><text x="1456" y="836" text-anchor="end" fill="#8a8a8a">215 zł</text>
+    </g>
+  </g>
+</svg>
