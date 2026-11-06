@@ -19,93 +19,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Copy files to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOMEPAGE_SSH_HOST }}
-          username: ${{ secrets.HOMEPAGE_SSH_USER }}
-          key: ${{ secrets.HOMEPAGE_SSH_KEY }}
-          port: ${{ secrets.HOMEPAGE_SSH_PORT }}
-          source: "."
-          target: "/opt/apps/homepage"
-          rm: true
-          overwrite: true
-          tar_dereference: true
+      - name: Klucz SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.HOMEPAGE_SSH_KEY }}" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          ssh-keyscan -p "${{ secrets.HOMEPAGE_SSH_PORT || '22' }}" -H "${{ secrets.HOMEPAGE_SSH_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy over SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HOMEPAGE_SSH_HOST }}
-          username: ${{ secrets.HOMEPAGE_SSH_USER }}
-          key: ${{ secrets.HOMEPAGE_SSH_KEY }}
-          port: ${{ secrets.HOMEPAGE_SSH_PORT }}
-          script_stop: true
-          script: |
-            set -euo pipefail
-
-            # The copy step wipes /opt/apps/homepage on every deploy, so the
-            # encryption key and the application data live next to it instead.
-            PERSIST=/opt/apps/homepage-persist
-            mkdir -p "$PERSIST/data"
-
-            if [ ! -f "$PERSIST/env" ]; then
-              umask 077
-              {
-                printf 'SETTINGS_ENCRYPTION_KEY=%s\n' "$(openssl rand -hex 32)"
-                printf 'HOMEPAGE_DATA_DIR=%s\n' "$PERSIST/data"
-              } > "$PERSIST/env"
-            fi
-
-            mkdir -p "$PERSIST/gallery"
-            if ! grep -q '^GALLERY_JWT_SECRET=' "$PERSIST/env"; then
-              printf 'GALLERY_JWT_SECRET=%s\n' "$(openssl rand -hex 32)" >> "$PERSIST/env"
-            fi
-            if ! grep -q '^HOMEPAGE_GALLERY_DATA_DIR=' "$PERSIST/env"; then
-              printf 'HOMEPAGE_GALLERY_DATA_DIR=%s\n' "$PERSIST/gallery" >> "$PERSIST/env"
-            fi
-
-            cd /opt/apps/homepage
-            install -m 600 "$PERSIST/env" .env
-            rm -rf .git node_modules dist
-
-            docker compose up -d --build
-            docker compose exec -T homepage_gallery node -e "const D=require('better-sqlite3');const d=new D(process.env.DB_PATH,{readonly:true});console.log('Galeria:',d.prepare('SELECT COUNT(*) AS photos FROM photos').get())"
-            docker compose exec -T homepage_api node server/migrate-rebuild-v12.mjs
-            docker compose exec -T homepage_api node server/migrate-arcadia-v13.mjs
-            docker compose exec -T homepage_api node server/migrate-openpdf-v14.mjs
-            docker compose exec -T homepage_api node server/migrate-dashes-v15.mjs
-            docker compose exec -T homepage_api node server/migrate-plain-copy-v16.mjs
-            docker compose exec -T homepage_api node server/migrate-heading-split-v17.mjs
-            docker compose exec -T homepage_api node server/migrate-offer-pages-v18.mjs
-            docker compose exec -T homepage_api node server/migrate-english-v19.mjs
-            docker compose exec -T homepage_api node server/migrate-kompendium-v20.mjs
-
-            docker compose exec -T homepage_api node server/migrate-apps-refresh-v21.mjs
-            docker compose exec -T homepage_api node server/migrate-powerdesk-v22.mjs
-            docker compose exec -T homepage_api node server/migrate-powerdesk-repo-v23.mjs
-            docker compose exec -T homepage_api node server/migrate-powerdesk-shots-v24.mjs
-            docker compose exec -T homepage_api node server/migrate-travels-v25.mjs
-            docker compose exec -T homepage_api node server/migrate-icons-v26.mjs
-            docker compose exec -T homepage_api node server/migrate-opencalc-v27.mjs
-            docker compose exec -T homepage_api node server/migrate-opentimer-v28.mjs
-            docker compose exec -T homepage_api node server/migrate-shots-v29.mjs
-            docker compose exec -T homepage_api node server/migrate-app-icons-v30.mjs
-            docker compose exec -T homepage_api node server/migrate-opentests-v31.mjs
-            docker compose exec -T homepage_api node server/migrate-app-icons-v31.mjs
-            docker compose exec -T homepage_api node server/migrate-fsaddontoolkit-v32.mjs
-            docker compose exec -T homepage_api node server/migrate-openmp-v33.mjs
-            docker compose exec -T homepage_api node server/migrate-opendtp-v34.mjs
-            docker compose exec -T homepage_api node server/reset-admin-bootstrap-v1.mjs
-            docker compose exec -T homepage_api node server/migrate-app-icons-v35.mjs
-            docker compose exec -T homepage_api node server/migrate-app-icons-v36.mjs
-            docker compose exec -T homepage_api node server/migrate-simrail-trail-v37.mjs
-            docker compose exec -T homepage_api node server/migrate-opentests-shots-v38.mjs
-            docker compose exec -T homepage_api node server/migrate-real-shots-v39.mjs
-            docker compose exec -T homepage_api node server/migrate-open3dmaze-v40.mjs
-            docker compose exec -T homepage_api node server/migrate-contact-email-v41.mjs
-            docker compose exec -T homepage_api node server/migrate-gran-3d-v42.mjs
-            docker compose exec -T homepage_api node server/migrate-remove-openraw-v44.mjs
-            docker compose exec -T homepage_api node server/migrate-polskie-studio-map-v45.mjs
-            docker compose exec -T homepage_api node server/migrate-remove-openecho-v47.mjs
-            docker compose exec -T homepage_api node server/migrate-openpayments-v48.mjs
-            docker image prune -f
+      # Klucz wdrozeniowy jest na serwerze ograniczony do bramki /opt/apps/bin/ci-gate: "deploy" przyjmuje archiwum
+      # repozytorium i uruchamia staly skrypt z serwera (/opt/apps/bin/ci.d/homepage.sh): sekrety w homepage-persist,
+      # podmiana katalogu, sprawdzenie docker-compose, docker compose up --build, a potem polecenia z
+      # deploy/post-deploy.txt (migracje) - wylacznie wewnatrz kontenerow projektu.
+      - name: Deploy
+        run: |
+          tar -czf - --exclude=./.git . | ssh -i ~/.ssh/deploy -p "${{ secrets.HOMEPAGE_SSH_PORT || '22' }}" \
+            "${{ secrets.HOMEPAGE_SSH_USER }}@${{ secrets.HOMEPAGE_SSH_HOST }}" deploy "$GITHUB_SHA"

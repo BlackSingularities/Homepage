@@ -1,0 +1,40 @@
+# Polecenia po kazdym wdrozeniu, uruchamiane przez serwer WEWNATRZ kontenerow (docker compose exec -T):
+# "usluga polecenie argumenty..." - argumenty dzielone spacjami, bez powloki i cudzyslowow.
+# Kolejnosc ma znaczenie. Nowa migracje dopisz na koncu (dawniej ta lista byla w deploy-homepage.yml).
+homepage_api node server/migrate-rebuild-v12.mjs
+homepage_api node server/migrate-arcadia-v13.mjs
+homepage_api node server/migrate-openpdf-v14.mjs
+homepage_api node server/migrate-dashes-v15.mjs
+homepage_api node server/migrate-plain-copy-v16.mjs
+homepage_api node server/migrate-heading-split-v17.mjs
+homepage_api node server/migrate-offer-pages-v18.mjs
+homepage_api node server/migrate-english-v19.mjs
+homepage_api node server/migrate-kompendium-v20.mjs
+homepage_api node server/migrate-apps-refresh-v21.mjs
+homepage_api node server/migrate-powerdesk-v22.mjs
+homepage_api node server/migrate-powerdesk-repo-v23.mjs
+homepage_api node server/migrate-powerdesk-shots-v24.mjs
+homepage_api node server/migrate-travels-v25.mjs
+homepage_api node server/migrate-icons-v26.mjs
+homepage_api node server/migrate-opencalc-v27.mjs
+homepage_api node server/migrate-opentimer-v28.mjs
+homepage_api node server/migrate-shots-v29.mjs
+homepage_api node server/migrate-app-icons-v30.mjs
+homepage_api node server/migrate-opentests-v31.mjs
+homepage_api node server/migrate-app-icons-v31.mjs
+homepage_api node server/migrate-fsaddontoolkit-v32.mjs
+homepage_api node server/migrate-openmp-v33.mjs
+homepage_api node server/migrate-opendtp-v34.mjs
+homepage_api node server/reset-admin-bootstrap-v1.mjs
+homepage_api node server/migrate-app-icons-v35.mjs
+homepage_api node server/migrate-app-icons-v36.mjs
+homepage_api node server/migrate-simrail-trail-v37.mjs
+homepage_api node server/migrate-opentests-shots-v38.mjs
+homepage_api node server/migrate-real-shots-v39.mjs
+homepage_api node server/migrate-open3dmaze-v40.mjs
+homepage_api node server/migrate-contact-email-v41.mjs
+homepage_api node server/migrate-gran-3d-v42.mjs
+homepage_api node server/migrate-remove-openraw-v44.mjs
+homepage_api node server/migrate-polskie-studio-map-v45.mjs
+homepage_api node server/migrate-remove-openecho-v47.mjs
+homepage_api node server/migrate-openpayments-v48.mjs
