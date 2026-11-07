@@ -1,4 +1,5 @@
 import express from 'express'
+import { registerFeedback } from './feedback.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -98,6 +99,8 @@ const jsonMail = express.json({ limit: '12mb' })
 app.set('trust proxy', 1)
 app.disable('x-powered-by')
 app.use((req, res, next) => {
+  // Raporty z aplikacji niosą stos wywołań i log – mają własny, większy limit.
+  if (req.path === '/api/feedback' || req.path === '/api/app-feedback') return next()
   if (req.path === '/api/admin/mail/send' || req.path === '/api/admin/mail/draft') return jsonMail(req, res, next)
   return (req.path.startsWith('/api/admin/') ? jsonLarge : jsonSmall)(req, res, next)
 })
@@ -1154,6 +1157,31 @@ app.get(/^\/(?:en(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, asy
 
 /* ── protected admin API ─────────────────────────────────────────────── */
 
+/** Krótkie powiadomienie właściciela o zgłoszeniu z aplikacji – tylko gdy poczta jest skonfigurowana. */
+async function notifyOwnerAboutFeedback({ id, replyTo, subject, kicker, heading, lines, body }) {
+  const settings = await getSettings({ includePassword: true })
+  const transport = getTransport(settings)
+  if (!transport || !settings.ownerEmail) return
+  await sendLoggedMail(transport, {
+    from: { name: settings.fromName, address: settings.smtpUsername },
+    to: settings.ownerEmail,
+    ...(replyTo ? { replyTo } : {}),
+    subject,
+    text: `${lines.join('\n')}\n\n${body}`,
+    html: emailFrame(`
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">${escapeHtml(kicker)}</div>
+      <h1 style="font-size:28px;line-height:1.15;margin:15px 0 22px;color:#f7f2e8">${escapeHtml(heading)}</h1>
+      <p style="line-height:1.8;font-size:13px;color:#a49d91">${lines.map(escapeHtml).join('<br>')}</p>
+      ${body ? `<div style="margin-top:22px;padding:20px;background:#17161a;border:1px solid #2c2a26;border-radius:12px;line-height:1.6;white-space:pre-wrap;font-size:12.5px;color:#e7e1d6">${escapeHtml(body)}</div>` : ''}
+    `),
+  }, 'notification', id)
+}
+
+const appFeedback = registerFeedback(app, {
+  dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits, readProjects,
+  notifyOwner: notifyOwnerAboutFeedback,
+})
+
 app.use('/api/admin', requireAdmin)
 
 /* ── admin: submissions ──────────────────────────────────────────────── */
@@ -1264,7 +1292,11 @@ app.delete('/api/admin/testers/:id', enforceSameOrigin, async (req, res) => {
 
 // Skrzynka sama się nie odzywa, więc licznik nie może blokować odpowiedzi.
 app.get('/api/admin/notifications', async (_req, res) => {
-  const [submissions, testers] = await Promise.all([readJson(SUBMISSIONS_FILE, []), readJson(TESTERS_FILE, [])])
+  const [submissions, testers, fromApps] = await Promise.all([
+    readJson(SUBMISSIONS_FILE, []),
+    readJson(TESTERS_FILE, []),
+    appFeedback.fresh(),
+  ])
   const fresh = list => list.filter(item => item.status === 'new')
   const newSubmissions = fresh(submissions)
   const newTesters = fresh(testers)
@@ -1273,13 +1305,33 @@ app.get('/api/admin/notifications', async (_req, res) => {
     new Promise(resolve => setTimeout(() => resolve(0), 1500)),
   ])
   res.json({
-    counts: { submissions: newSubmissions.length, testers: newTesters.length, mail: inbox },
+    counts: {
+      submissions: newSubmissions.length,
+      bugReports: fromApps.reports.length,
+      appFeedback: fromApps.feedback.length,
+      testers: newTesters.length,
+      mail: inbox,
+    },
     items: [
       ...newSubmissions.map(item => ({
         id: item.id,
         tab: 'submissions',
         title: item.subject || item.app || 'Nowe zapytanie',
         detail: item.name,
+        createdAt: item.createdAt,
+      })),
+      ...fromApps.reports.map(item => ({
+        id: item.id,
+        tab: 'bugReports',
+        title: `Błąd: ${item.appName}`,
+        detail: `${item.appVersion || ''} · ${item.platform}${item.count > 1 ? ` · ×${item.count}` : ''}`,
+        createdAt: item.lastAt || item.createdAt,
+      })),
+      ...fromApps.feedback.map(item => ({
+        id: item.id,
+        tab: 'appFeedback',
+        title: `${item.kind === 'feature' ? 'Sugestia' : 'Zgłoszenie błędu'}: ${item.appName}`,
+        detail: item.message.slice(0, 80),
         createdAt: item.createdAt,
       })),
       ...newTesters.map(item => ({

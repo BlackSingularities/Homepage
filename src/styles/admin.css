@@ -2155,3 +2155,33 @@
   cursor: pointer;
 }
 .ap-dl-sort:focus { border-color: var(--ap-line-strong); }
+
+/* ── zgłoszenia z aplikacji ─────────────────────────────────────── */
+
+.ap-feedback-message { font-size: 13.5px !important; line-height: 1.7; color: var(--ink-2) !important; white-space: pre-wrap; }
+.ap-feedback-muted { font-style: italic; }
+.ap-feedback-comments { display: grid; gap: 8px; margin: 14px 0 0; }
+.ap-feedback-comments p { padding: 10px 12px; border: 1px solid var(--ap-line); border-radius: 12px; white-space: pre-wrap; }
+.ap-feedback-comments time { font-size: 11px; color: var(--ink-4); }
+.ap-feedback-diag { margin-top: 16px; display: grid; gap: 10px; }
+.ap-feedback-diag-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.ap-feedback-diag-bar svg { transition: transform .2s; }
+.ap-feedback-diag-bar svg.is-open { transform: rotate(180deg); }
+.ap-feedback-pre {
+  max-height: 360px;
+  overflow: auto;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--ap-line);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, .28);
+  font: 11.5px/1.55 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--ink-2);
+  white-space: pre;
+}
+.ap-feedback-pre.is-log { max-height: 240px; color: var(--ink-3); }
+.ap-feedback-extra { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin: 0; }
+.ap-feedback-extra div { padding: 8px 10px; border: 1px solid var(--ap-line); border-radius: 10px; }
+.ap-feedback-extra dt { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-4); }
+.ap-feedback-extra dd { margin: 3px 0 0; font: 11.5px/1.4 'JetBrains Mono', ui-monospace, monospace; color: var(--ink-2); word-break: break-word; }
+@media (max-width: 760px) { .ap-submission-grid { grid-template-columns: 1fr; gap: 16px; } }
