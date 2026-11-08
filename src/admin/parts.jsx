@@ -85,8 +85,16 @@ export function GithubRefreshButton({ onDone, compact }) {
       const result = await api('/api/admin/github/refresh-all', json('POST', {}))
       await onDone?.()
       const failed = result.results.filter(item => item.error)
-      if (failed.length) toast.error(`Nie udało się odświeżyć: ${failed.map(item => item.repo).join(', ')}.`)
-      toast.success(`Pobrano na nowo wydania ${result.refreshed} repozytoriów z GitHuba.`)
+      if (failed.length) toast.error(`Nie udało się sprawdzić: ${failed.map(item => item.name || item.repo).join(', ')}.`)
+      const fresh = result.results.filter(item => item.changed)
+      if (fresh.length) {
+        const list = fresh
+          .map(item => `${item.name} ${item.tag}${item.previous && item.previous !== item.tag ? ` (było ${item.previous})` : ''}`)
+          .join(', ')
+        toast.success(`Pobrano na nowo ${fresh.length}: ${list}. Bez zmian: ${result.checked - fresh.length}.`)
+      } else {
+        toast.success(`Pobrano na nowo 0 – wszystkie wydania (${result.checked}) są aktualne.`)
+      }
     } catch (requestError) {
       toast.error(requestError.message)
     } finally {
@@ -100,7 +108,7 @@ export function GithubRefreshButton({ onDone, compact }) {
       className={`ap-btn ap-btn-ghost ${compact ? 'ap-btn-sm' : ''}`}
       onClick={refresh}
       disabled={busy}
-      title="Pobiera od razu najnowsze wydania wszystkich repozytoriów z GitHuba."
+      title="Sprawdza wydania na GitHubie i pobiera na nowo tylko te, które się zmieniły."
     >
       <RefreshCw className={busy ? 'spin' : ''} size={14} />
       {busy ? 'Pobieram z GitHuba…' : 'Odśwież wydania z GitHuba'}

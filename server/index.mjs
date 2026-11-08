@@ -1572,18 +1572,33 @@ app.post('/api/admin/github/release', enforceSameOrigin, async (req, res) => {
   res.json(await releases.refresh(repo))
 })
 
-/** Pobiera od razu na nowo wydania wszystkich aplikacji z GitHuba, z pominięciem cache. */
+/**
+ * Sprawdza wydania wszystkich aplikacji na GitHubie i pobiera na nowo tylko te,
+ * które się zmieniły (nowa wersja, inne pliki). Pozostałe wpisy zostają bez zmian.
+ */
 app.post('/api/admin/github/refresh-all', enforceSameOrigin, async (_req, res) => {
-  const repos = [...new Set((await readProjects())
-    .filter(project => project.releaseSource === 'github' && project.repo)
-    .map(project => project.repo))]
+  const projects = (await readProjects()).filter(project => project.releaseSource === 'github' && project.repo)
+  const repos = [...new Set(projects.map(project => project.repo))]
+  const nameOf = repo => projects.find(project => project.repo === repo)?.name || repo
   const results = []
   // Po kilka naraz, żeby nie zasypać API GitHuba.
   for (let i = 0; i < repos.length; i += 6) {
-    const batch = await Promise.all(repos.slice(i, i + 6).map(repo => releases.refresh(repo)))
-    results.push(...batch.map((entry, index) => ({ repo: repos[i + index], tag: entry?.tag || '', error: entry?.error || '' })))
+    const batch = await Promise.all(repos.slice(i, i + 6).map(repo => releases.refreshIfChanged(repo)))
+    results.push(...batch.map(({ entry, changed, previous }, index) => ({
+      repo: repos[i + index],
+      name: nameOf(repos[i + index]),
+      tag: entry?.tag || '',
+      previous,
+      changed,
+      error: entry?.error || '',
+    })))
   }
-  res.json({ refreshed: results.length, failed: results.filter(item => item.error).length, results })
+  res.json({
+    checked: results.length,
+    refreshed: results.filter(item => item.changed).length,
+    failed: results.filter(item => item.error).length,
+    results,
+  })
 })
 
 app.get('/api/admin/github', async (_req, res) => {

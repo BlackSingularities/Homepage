@@ -122,6 +122,18 @@ async function fetchEntry(repo, token) {
   }
 }
 
+/**
+ * Odcisk tego, co widać na stronie: wydania i ich pliki. Liczniki pobrań celowo
+ * pomijamy – zmieniają się ciągle, a nie są nowym wydaniem.
+ */
+function releaseSignature(entry) {
+  const files = list => (list || []).map(asset => `${asset.id}:${asset.name}:${asset.size}`).join(',')
+  return JSON.stringify([
+    entry.tag, entry.publishedAt, files(entry.assets),
+    (entry.history || []).map(item => `${item.tag}|${item.publishedAt}|${files(item.assets)}`),
+  ])
+}
+
 export function createReleaseService({ cacheFile, readJson, updateJson, getToken }) {
   const inFlight = new Map()
 
@@ -154,6 +166,28 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     })()
     inFlight.set(repo, task)
     return task
+  }
+
+  /**
+   * Odświeżenie tylko wtedy, gdy na GitHubie coś się zmieniło: nowe wydanie, inne pliki
+   * albo naprawiony wcześniejszy błąd. Niezmienione wpisy w cache zostają nietknięte.
+   */
+  async function refreshIfChanged(repo) {
+    const cached = (await read())[repo]
+    if (!cached || cached.v !== CACHE_VERSION || cached.error) {
+      const entry = await refresh(repo)
+      return { entry, changed: !entry.error, previous: cached?.tag || '' }
+    }
+    let fresh
+    try {
+      fresh = await fetchEntry(repo, await getToken())
+    } catch (error) {
+      // Błąd sprawdzenia nie psuje dobrego wpisu – zostaje stary, a panel dostaje komunikat.
+      return { entry: { ...cached, error: error.message }, changed: false, previous: cached.tag }
+    }
+    const changed = releaseSignature(fresh) !== releaseSignature(cached)
+    if (changed) await store(repo, fresh)
+    return { entry: changed ? fresh : cached, changed, previous: cached.tag }
   }
 
   /** Zwraca wynik z cache, a gdy jest przedawniony – odświeża w tle i podaje stary. */
@@ -221,5 +255,5 @@ export function createReleaseService({ cacheFile, readJson, updateJson, getToken
     return { configured: true, ok: true, login: user.login || '' }
   }
 
-  return { get, getMany, refresh, asset, check }
+  return { get, getMany, refresh, refreshIfChanged, asset, check }
 }
