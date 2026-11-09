@@ -9,7 +9,7 @@ import {
   PLATFORM_LABEL, PLATFORM_ORDER, formatBytes, formatReleaseDate,
 } from '../lib/projects'
 import {
-  Area, Dropzone, Empty, Field, GithubRefreshButton, ImagePicker, LangTabs, Repeater, SaveBar, Segmented, Select,
+  Area, Dropzone, Empty, Notice, Field, GithubRefreshButton, ImagePicker, LangTabs, Repeater, SaveBar, Segmented, Select,
   Text, Toggle, toast, useMedia,
 } from './parts'
 
@@ -108,9 +108,10 @@ function Lines({ label, value = [], onChange, hint, rows = 4 }) {
 }
 
 function Shots({ value = [], onChange }) {
-  const { busy, upload } = useMedia()
+  const { busy, error, upload } = useMedia()
   return (
     <div className="ap-image-list">
+      {error && <Notice tone="error">{error}</Notice>}
       <span className="ap-field-label">Zrzuty ekranu <b className="ap-count">{value.length}</b></span>
       <div className="ap-pe-shots">
         {value.map((shot, index) => (

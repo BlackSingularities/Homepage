@@ -4,6 +4,7 @@ export async function api(path, options = {}) {
   if (response.status === 401 && path.startsWith('/api/admin/')) {
     window.dispatchEvent(new CustomEvent('admin:unauthorized'))
   }
+  if (response.status === 413 && !payload.error) throw new Error('Plik jest za duży dla serwera.')
   if (!response.ok) throw new Error(payload.error || 'Nie udało się wykonać operacji.')
   return payload
 }
