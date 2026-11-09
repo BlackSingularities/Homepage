@@ -73,6 +73,26 @@ drugiego logowania i bez osobnego hasła galerii.
 Bloki można dowolnie dodawać, przestawiać i usuwać. Opublikowana strona jest dostępna
 pod `/p/<adres>` i pojawia się w menu, w sekcji oferty na stronie głównej oraz w stopce.
 
+## Do pobrania
+
+Niezależna biblioteka materiałów pod `/do-pobrania`, ze stronami
+`/do-pobrania/<slug>`, wyszukiwaniem i filtrem kategorii. Linki są w menu i stopce.
+Panel `/admin/do-pobrania` obsługuje kategorie, materiały, kolejność, szkice,
+publikację, opisy, wymagania, instrukcje, licencje i wiele załączników na materiał.
+Po edycji wybierz **Zapisz bibliotekę**. Kategorię można usunąć dopiero po
+przeniesieniu lub usunięciu jej materiałów. Upload: maks. 100 MB na plik.
+
+Dane leżą w `resources.json`, pliki w `resource-files/` w trwałym katalogu danych.
+Odłączenie załącznika lub usunięcie wpisu odbiera publiczny dostęp; plik pozostaje
+na dysku. Pobrania są zliczane przez serwer po zakończeniu transferu (obejmują
+ponowne pobrania). Publiczne API udostępnia wyłącznie opublikowane materiały.
+Istniejące portfolio i administracyjne „Pobieranie” aplikacji są niezależne.
+
+Przy pierwszym uruchomieniu tworzona jest pozycja AR Presets: oryginalny ZIP,
+314 presetów XMP w 40 grupach wraz z PDF, instrukcją i licencją. Kolejne starty
+nie nadpisują zmian zapisanych w panelu. ZIP jest częścią obrazu API.
+Testy biblioteki: `npm run test:resources`.
+
 ## Portfolio
 
 Portfolio jest osobnym zbiorem danych (`projects.json`), a nie częścią treści strony.

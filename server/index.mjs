@@ -1,4 +1,5 @@
 import express from 'express'
+import { registerResources } from './resources.mjs'
 import { registerFeedback } from './feedback.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
@@ -99,6 +100,7 @@ const jsonMail = express.json({ limit: '12mb' })
 app.set('trust proxy', 1)
 app.disable('x-powered-by')
 app.use((req, res, next) => {
+  if (req.path === '/api/admin/resources/files') return next()
   // Raporty z aplikacji niosą stos wywołań i log – mają własny, większy limit.
   if (req.path === '/api/feedback' || req.path === '/api/app-feedback') return next()
   if (req.path === '/api/admin/mail/send' || req.path === '/api/admin/mail/draft') return jsonMail(req, res, next)
@@ -1103,6 +1105,7 @@ async function seoData(route) {
     pages: pages.map(page => localizePage(page, lang)),
     projects: entries.map(({ project, release }) => projectSummary(localizeProject(project, lang), release, counts)),
   }
+  if (route.view === 'resources') data.resources = (await readJson(path.join(DATA_DIR, 'resources.json'), { items: [] })).items.filter(item => item.published)
   if (route.view === 'home' || route.view === 'catalog') data.content = await getContent(lang)
   if (route.view === 'project') {
     const entry = entries.find(item => item.project.slug === route.slug)
@@ -1123,6 +1126,7 @@ app.get('/sitemap.xml', async (_req, res, next) => {
     res.set('Cache-Control', 'public, max-age=3600')
     res.send(renderSitemap({
       pages,
+      resources: (await readJson(path.join(DATA_DIR, 'resources.json'), { items: [] })).items.filter(item => item.published),
       projects: entries.map(entry => entry.project),
       updatedAt: stamps.at(-1) || new Date().toISOString(),
     }))
@@ -1135,7 +1139,7 @@ app.get('/sitemap.xml', async (_req, res, next) => {
  * Publiczne adresy strony (nginx kieruje je tutaj). Gdy szablonu brak –
  * lokalnie albo przy błędzie obrazu – 503 każe nginxowi podać zwykły index.html.
  */
-app.get(/^\/(?:en(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, async (req, res) => {
+app.get(/^\/(?:en(?:\/.*)?|do-pobrania(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, async (req, res) => {
   let template
   try {
     template = await readTemplate()
@@ -1156,6 +1160,8 @@ app.get(/^\/(?:en(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, asy
 })
 
 /* ── protected admin API ─────────────────────────────────────────────── */
+
+await registerResources(app, { dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin })
 
 /** Krótkie powiadomienie właściciela o zgłoszeniu z aplikacji – tylko gdy poczta jest skonfigurowana. */
 async function notifyOwnerAboutFeedback({ id, replyTo, subject, kicker, heading, lines, body }) {

@@ -69,6 +69,7 @@ export function parseRoute(pathname) {
     lang = 'en'
     clean = clean.slice(3) || '/'
   }
+  if (clean === '/do-pobrania' || clean.startsWith('/do-pobrania/')) return { lang, view: 'resources', slug: clean.slice(13), path: clean }
   if (clean === '/') return { lang, view: 'home', path: '/' }
   if (clean === '/portfolio' || clean === '/realizacje') return { lang, view: 'catalog', path: '/portfolio' }
   const project = clean.match(/^\/(?:portfolio|realizacje)\/([^/]+)$/)
@@ -485,6 +486,7 @@ export async function renderDocument(template, pathname, load) {
   let view
   if (route.view === 'home') view = homeView({ lang, ...data })
   else if (route.view === 'catalog') view = catalogView({ lang, ...data })
+  else if (route.view === 'resources') view = resourcesView(route, data.resources || [])
   else if (route.view === 'project' && data.project) view = projectView({ lang, ...data })
   else if (route.view === 'page' && data.page) view = pageView({ lang, ...data })
   else view = missingView({ lang })
@@ -532,9 +534,11 @@ export async function renderDocument(template, pathname, load) {
 
 /* ── sitemap ─────────────────────────────────────────────────────────── */
 
-export function renderSitemap({ pages, projects, updatedAt }) {
+export function renderSitemap({ pages, projects, resources = [], updatedAt }) {
   const entries = [
     { path: '/', lastmod: updatedAt, priority: '1.0', changefreq: 'weekly' },
+    { path: '/do-pobrania', lastmod: updatedAt, priority: '0.8', changefreq: 'weekly' },
+    ...resources.map(item => ({ path: `/do-pobrania/${item.slug}`, lastmod: item.updatedAt, priority: '0.7', changefreq: 'monthly' })),
     { path: '/portfolio', lastmod: updatedAt, priority: '0.9', changefreq: 'weekly' },
     ...projects.map(project => ({ path: `/portfolio/${project.slug}`, lastmod: project.updatedAt, priority: '0.8', changefreq: 'monthly', image: project.cover, images: project.shots })),
     ...pages.map(page => ({ path: `/p/${page.slug}`, lastmod: page.updatedAt, priority: '0.7', changefreq: 'monthly', image: page.cover })),
@@ -557,4 +561,15 @@ ${[...new Set(images)].slice(0, 20).map(src => `    <image:image><image:loc>${es
 ${entries.flatMap(entry => [url(entry, 'pl'), url(entry, 'en')]).join('\n')}
 </urlset>
 `
+}
+
+function resourcesView({ lang, slug }, items) {
+  const item = slug ? items.find(i => i.slug === slug) : null
+  if (slug && !item) return missingView({ lang })
+  const title = item?.title || 'Do pobrania — Adam Rędzikowski'
+  const description = item?.summary || 'Autorskie presety i materiały do pobrania.'
+  const body = item
+    ? `<h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${['description', 'instructions', 'requirements', 'license'].map(key => `<p>${escapeHtml(item[key])}</p>`).join('')}${item.files.map(f => `<p><a href="/api/resources/${escapeHtml(item.slug)}/files/${escapeHtml(f.id)}">${escapeHtml(f.name)}</a></p>`).join('')}`
+    : `<h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${items.map(i => `<article><h2><a href="${escapeHtml(localePath(`/do-pobrania/${i.slug}`, lang))}">${escapeHtml(i.title)}</a></h2><p>${escapeHtml(i.summary)}</p></article>`).join('')}`
+  return { title, description, body: `<main>${body}</main>`, jsonLd: { '@context': 'https://schema.org', '@type': item ? 'CreativeWork' : 'CollectionPage', name: title, description } }
 }

@@ -11,6 +11,7 @@ import ProjectsManager from './ProjectsManager'
 import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
 import DownloadsPanel from './DownloadsPanel'
+import ResourcesManager from './ResourcesManager'
 import TestersPanel from './TestersPanel'
 import AppFeedbackPanel from './AppFeedbackPanel'
 import MailPanel from './MailPanel'
@@ -26,6 +27,7 @@ const TABS = [
   ['appFeedback', 'sugestie', 'Sugestie i zgłoszenia', Lightbulb],
   ['testers', 'testerzy', 'Testerzy', FlaskConical],
   ['projects', 'portfolio', 'Portfolio', Boxes],
+  ['resources', 'do-pobrania', 'Do pobrania', FileStack],
   ['downloads', 'pobieranie', 'Pobieranie', Download],
   ['pages', 'podstrony', 'Podstrony', Files],
   ['content', 'tresci', 'Treści strony', FileStack],
@@ -654,6 +656,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'analytics' && <AnalyticsPanel key={refreshKey} />}
           {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}
 
+          {tab === 'resources' && <ResourcesManager />}
           {tab === 'downloads' && <DownloadsPanel key={refreshKey} />}
           {tab === 'pages' && <PagesManager notify={notify} item={item} onItem={selectItem} />}
 

@@ -8,6 +8,7 @@ const SECTIONS = [
   ['zakres', 'nav.offer'],
   ['proces', 'nav.process'],
   ['portfolio', 'nav.portfolio'],
+  ['do-pobrania', 'nav.resources'],
   ['o-mnie', 'nav.about'],
 ]
 
@@ -73,8 +74,8 @@ export default function Header({ brand, pages = [], home = true, path = '/', onN
     return () => document.body.classList.remove('no-scroll')
   }, [open])
 
-  const href = id => (id === PORTFOLIO ? lp(CATALOG_PATH) : home ? `#${id}` : lp(`/#${id}`))
-  const isActive = id => (id === PORTFOLIO ? path.startsWith(CATALOG_PATH) : home && active === id)
+  const href = id => (id === 'do-pobrania' ? lp('/do-pobrania') : id === PORTFOLIO ? lp(CATALOG_PATH) : home ? `#${id}` : lp(`/#${id}`))
+  const isActive = id => (id === 'do-pobrania' ? path.startsWith('/do-pobrania') : id === PORTFOLIO ? path.startsWith(CATALOG_PATH) : home && active === id)
 
   // Adresy wewnętrzne przechwytujemy, zakotwiczenia zostawiamy przeglądarce.
   const go = event => {

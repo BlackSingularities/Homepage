@@ -27,6 +27,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
           <a href={href('zakres')} onClick={go}>{t('nav.offer')}</a>
           <a href={href('proces')} onClick={go}>{t('nav.process')}</a>
           <a href={lp(CATALOG_PATH)} onClick={go}>{t('nav.portfolio')}</a>
+          <a href={lp('/do-pobrania')} onClick={go}>{t('nav.resources')}</a>
           <a href={href('o-mnie')} onClick={go}>{t('nav.about')}</a>
           {pages.slice(0, 6).map(page => (
             <a key={page.id} href={lp(`/p/${page.slug}`)} onClick={go}>{page.title}</a>
