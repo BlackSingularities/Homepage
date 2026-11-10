@@ -107,8 +107,8 @@ function Lines({ label, value = [], onChange, hint, rows = 4 }) {
   )
 }
 
-function Shots({ value = [], onChange }) {
-  const { busy, error, upload } = useMedia()
+function Shots({ value = [], onChange, onAdd }) {
+  const { busy, progress, error, upload } = useMedia()
   return (
     <div className="ap-image-list">
       {error && <Notice tone="error">{error}</Notice>}
@@ -129,9 +129,12 @@ function Shots({ value = [], onChange }) {
         <Dropzone
           compact
           busy={busy}
+          progress={progress}
           onFiles={async files => {
-            const uploaded = await upload(files)
-            onChange([...value, ...uploaded.map(file => ({ src: file.url, alt: '' }))])
+            const uploaded = await upload(files, file => onAdd({ src: file.url, alt: '' }))
+            if (uploaded.length) {
+              toast.success(`Dodano ${uploaded.length === 1 ? 'zdjęcie' : `zdjęcia: ${uploaded.length}`}. Kliknij „Zapisz”, żeby trafiły na stronę.`)
+            }
           }}
         />
       </div>
@@ -256,7 +259,9 @@ function GithubBar({ notify, onRefreshed }) {
 function Editor({ project, platforms, section, onSection, onChange, onSave, onDelete, saving, dirty }) {
   const [release, setRelease] = useState(project.release || null)
   const [checking, setChecking] = useState(false)
-  const update = patch => onChange({ ...project, ...patch })
+  // Funkcyjna aktualizacja – wyniki wysyłki zdjęć wracają po kilku sekundach
+  // i nie mogą nadpisać zmian zrobionych w tym czasie.
+  const update = patch => onChange(current => ({ ...current, ...(typeof patch === 'function' ? patch(current) : patch) }))
   const [lang, setLang] = useState('pl')
   const en = { ...emptyTranslation(), ...(project.en || {}) }
   // Pola tekstowe edytują wersję wybraną w zakładce języka; w angielskiej
@@ -404,7 +409,8 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
               <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
                 hint="Najlepiej poziomy zrzut ekranu – kadrowany do 16:10." />
             </div>
-            <Shots value={project.shots} onChange={shots => update({ shots })} />
+            <Shots value={project.shots} onAdd={shot => update(current => ({ shots: [...(current.shots || []), shot] }))}
+              onChange={shots => update({ shots })} />
           </>
         )}
 

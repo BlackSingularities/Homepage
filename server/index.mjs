@@ -82,7 +82,8 @@ async function resizeForUpload(buffer, extension) {
         withoutEnlargement: true,
         kernel: sharp.kernel.lanczos3,
       })
-    if (extension === 'png') return await resized.png({ quality: 85, compressionLevel: 9 }).toBuffer()
+    // Bez `quality` – kwantyzacja palety (libimagequant) trwała na VPS kilka sekund na zrzut.
+    if (extension === 'png') return await resized.png({ compressionLevel: 8 }).toBuffer()
     if (extension === 'jpg') return await resized.jpeg({ quality: 85, progressive: true }).toBuffer()
     if (extension === 'webp') return await resized.webp({ quality: 85 }).toBuffer()
     if (extension === 'avif') return await resized.avif({ quality: 60 }).toBuffer()

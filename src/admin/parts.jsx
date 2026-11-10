@@ -271,32 +271,62 @@ export function useMedia() {
 
   useEffect(() => { refresh() }, [refresh])
 
-  const upload = useCallback(async files => {
+  const [progress, setProgress] = useState(null)
+
+  /**
+   * Wysyła kilka plików naraz (po 3). `onEach` dostaje każdy plik zaraz po
+   * wysłaniu, więc zdjęcia pojawiają się od razu, a błąd jednego nie
+   * przekreśla pozostałych.
+   */
+  const upload = useCallback(async (files, onEach) => {
+    const list = Array.from(files || [])
+    if (!list.length) return []
     setBusy(true)
     setError('')
-    const uploaded = []
-    try {
-      for (const file of Array.from(files || [])) {
-        uploaded.push(await uploadImage(file))
+    setProgress({ done: 0, total: list.length })
+    const uploaded = new Array(list.length)
+    const failures = []
+    let next = 0
+    const worker = async () => {
+      while (next < list.length) {
+        const index = next++
+        try {
+          uploaded[index] = await uploadImage(list[index])
+          onEach?.(uploaded[index], index)
+        } catch (requestError) {
+          failures.push(`${list[index].name}: ${requestError.message}`)
+        }
+        setProgress(current => current && { ...current, done: current.done + 1 })
       }
+    }
+    try {
+      await Promise.all(Array.from({ length: Math.min(3, list.length) }, worker))
+      if (failures.length) setError(failures.join(' · '))
       await refresh()
-    } catch (requestError) {
-      setError(requestError.message)
     } finally {
       setBusy(false)
+      setProgress(null)
     }
-    return uploaded
+    return uploaded.filter(Boolean)
   }, [refresh])
+
+  // Zamknięcie karty przerywa wysyłkę – przeglądarka ostrzeże przed wyjściem.
+  useEffect(() => {
+    if (!busy) return undefined
+    const warn = event => { event.preventDefault(); event.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [busy])
 
   const remove = useCallback(async name => {
     await api(`/api/admin/media/${encodeURIComponent(name)}`, { method: 'DELETE' })
     await refresh()
   }, [refresh])
 
-  return { items, busy, error, refresh, upload, remove, setError }
+  return { items, busy, progress, error, refresh, upload, remove, setError }
 }
 
-export function Dropzone({ onFiles, busy, compact }) {
+export function Dropzone({ onFiles, busy, compact, progress }) {
   const inputRef = useRef(null)
   const [over, setOver] = useState(false)
 
@@ -316,7 +346,9 @@ export function Dropzone({ onFiles, busy, compact }) {
       onKeyDown={event => event.key === 'Enter' && inputRef.current?.click()}
     >
       {busy ? <LoaderCircle className="spin" size={20} /> : <Upload size={20} />}
-      <b>{busy ? 'Wysyłam pliki…' : 'Przeciągnij zdjęcia albo kliknij'}</b>
+      <b>{busy
+        ? (progress?.total > 1 ? `Wysyłam ${progress.done} z ${progress.total}…` : 'Wysyłam plik…')
+        : 'Przeciągnij zdjęcia albo kliknij'}</b>
       {!compact && <span>PNG, JPG, WEBP, AVIF lub GIF – do 10 MB każde.</span>}
       <input
         ref={inputRef}
