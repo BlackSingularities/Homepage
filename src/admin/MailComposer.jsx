@@ -18,8 +18,11 @@ export function cleanForEditor(html) {
   clean.querySelectorAll('img').forEach(image => {
     if (!/^data:image\//.test(image.getAttribute('src') || '')) image.remove()
   })
+  // Własna wiadomość z panelu: do edytora wraca sama treść, bez ramy z logo.
+  const own = clean.querySelector('[data-ar-body]')
   const box = document.createElement('div')
-  box.append(clean)
+  if (own) box.append(...own.childNodes)
+  else box.append(clean)
   return box.innerHTML
 }
 
@@ -35,7 +38,7 @@ export const formatPeople = list => (list || []).map(formatPerson).join(', ')
 /** Treść cytowana pod odpowiedzią: nagłówek i oryginał. */
 export function quoteBlock({ author, date, html, text }) {
   const body = html ? cleanForEditor(html) : escapeText(text)
-  return `<p><br></p><p>${escapeText(`${formatDate(date)}, ${author} napisał(a):`)}</p><blockquote style="margin:0 0 0 12px;padding:0 0 0 12px;color:#555">${body}</blockquote>`
+  return `<p><br></p><p>${escapeText(`${formatDate(date)}, ${author} napisał(a):`)}</p><blockquote style="margin:12px 0;padding:12px 16px;background:#f7f5f0;border:1px solid #e4ded2;border-radius:10px;color:#5f594f">${body}</blockquote>`
 }
 
 const readBase64 = file => new Promise((resolve, reject) => {

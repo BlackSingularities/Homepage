@@ -3,6 +3,7 @@ import { ImapFlow } from 'imapflow'
 import { simpleParser } from 'mailparser'
 import MailComposer from 'nodemailer/lib/mail-composer/index.js'
 import addressparser from 'nodemailer/lib/addressparser/index.js'
+import { brandAttachments, textFooter, wrapComposed } from './email.mjs'
 
 /**
  * Skrzynka firmowa w panelu: IMAP to jedyne źródło prawdy, serwer niczego nie
@@ -171,13 +172,20 @@ export function createMail({ getSettings, getTransport, enforceSameOrigin, appen
       throw new MailError('Załączniki mogą mieć razem najwyżej 8 MB.')
     }
 
+    // Szkic zostaje surowy, żeby wrócił do edytora bez ramy; wysyłka dostaje
+    // ten sam szablon z logo co wiadomości automatyczne.
+    const content = String(body.html || '').slice(0, 2_000_000)
+    const html = draft ? content : wrapComposed(content, { contact: settings.smtpUsername })
+    const text = String(body.text || '').slice(0, 1_000_000)
+    if (!draft) attachments.push(...brandAttachments(html))
+
     const domain = settings.smtpUsername.split('@')[1] || 'localhost'
     const composer = new MailComposer({
       from: { name: settings.fromName, address: settings.smtpUsername },
       to, cc,
       subject: cleanText(body.subject, 500),
-      html: String(body.html || '').slice(0, 2_000_000),
-      text: String(body.text || '').slice(0, 1_000_000),
+      html,
+      text: draft ? text : `${text.trimEnd()}${textFooter()}`,
       inReplyTo: cleanText(body.inReplyTo, 500) || undefined,
       references: cleanText(body.references, 4000) || undefined,
       messageId: `<${crypto.randomUUID()}@${domain}>`,

@@ -8,6 +8,7 @@ import nodemailer from 'nodemailer'
 import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
 import { createMail } from './mail.mjs'
+import * as tpl from './email.mjs'
 import { PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { writeZip } from './zip.mjs'
@@ -507,35 +508,6 @@ function getTransport(settings) {
   })
 }
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
-}
-
-function emailFrame(content, lang = 'pl') {
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"></head>
-  <body style="margin:0;background:#0a0a0c;color:#f5f1e8;font-family:Arial,sans-serif">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0a0a0c;padding:32px 12px">
-      <tr><td align="center">
-        <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px;background:#111114;border:1px solid #2c2a26;border-radius:16px;overflow:hidden">
-          <tr><td style="padding:24px 28px;background:linear-gradient(120deg,#171410,#0e0d0c);border-bottom:1px solid #2c2a26">
-            <div style="font-size:21px;font-weight:700;letter-spacing:-1px;color:#e8c583">AR</div>
-            <div style="margin-top:5px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8d8579">Adam Rędzikowski · Digital Studio</div>
-          </td></tr>
-          <tr><td style="padding:42px 28px">${content}</td></tr>
-          <tr><td style="padding:18px 28px;border-top:1px solid #2c2a26;font-size:11px;color:#807a70">
-            redzikowski.com · ${lang === 'en' ? 'Websites, web systems, AI and data' : 'Strony internetowe, systemy webowe, AI i dane'}
-          </td></tr>
-        </table>
-      </td></tr>
-    </table>
-  </body></html>`
-}
-
 async function appendOutbox(entry) {
   await updateJson(OUTBOX_FILE, [], current => [entry, ...current].slice(0, 500))
 }
@@ -551,7 +523,7 @@ async function sendLoggedMail(transport, message, kind, submissionId) {
     status: 'pending',
   }
   try {
-    const result = await transport.sendMail(message)
+    const result = await transport.sendMail({ ...message, attachments: [...(message.attachments || []), ...tpl.brandAttachments(message.html)] })
     log.status = 'sent'
     log.messageId = result.messageId
   } catch (error) {
@@ -957,31 +929,36 @@ app.post('/api/contact', async (req, res) => {
     const settings = await getSettings({ includePassword: true })
     const transport = getTransport(settings)
     if (transport && settings.ownerEmail) {
-      const replyLabel = submission.contactMethod === 'phone'
-        ? `Telefon: ${escapeHtml(submission.phone)}`
-        : `E-mail: ${escapeHtml(submission.email)}`
       const typeLabel = REQUEST_TYPE_LABEL[submission.requestType]
-      const details = [
-        submission.app && `Aplikacja: ${submission.app}`,
-        typeLabel && `Rodzaj: ${typeLabel}`,
-        submission.budget && `Budżet: ${submission.budget}`,
-        submission.timeline && `Termin: ${submission.timeline}`,
-        submission.scope.length && `Zakres: ${submission.scope.join(', ')}`,
-      ].filter(Boolean)
+      const title = submission.subject || (typeLabel ? `${typeLabel} – ${submission.app}` : 'Nowy projekt')
+      const rows = [
+        ['Od', submission.name],
+        ['Firma', submission.company],
+        ['E-mail', tpl.link(`mailto:${submission.email}`, submission.email)],
+        ['Telefon', submission.phone && tpl.link(`tel:${submission.phone.replace(/[^\d+]/g, '')}`, submission.phone)],
+        ['Kontakt przez', submission.contactMethod === 'phone' ? 'telefon' : 'e-mail'],
+        ['Aplikacja', submission.app],
+        ['Rodzaj', typeLabel],
+        ['Budżet', submission.budget],
+        ['Termin', submission.timeline],
+        ['Zakres', submission.scope.join(', ')],
+        ['Język', lang === 'en' ? 'angielski' : ''],
+      ]
+      const plainRows = rows.filter(([, value]) => value).map(([label, value]) => `${label}: ${value.html ? value.html.replace(/<[^>]+>/g, '') : value}`)
 
       const ownerMail = await sendLoggedMail(transport, {
         from: { name: settings.fromName, address: settings.smtpUsername },
         to: settings.ownerEmail,
         replyTo: submission.email,
         subject: `${typeLabel ? `${typeLabel} – ${submission.app}` : 'Nowe zapytanie'}${lang === 'en' ? ' (EN)' : ''}: ${submission.subject || submission.name}`,
-        text: `${submission.name}\n${submission.company}\n${replyLabel}\n${details.join('\n')}\n\n${submission.message}`,
-        html: emailFrame(`
-          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowe zapytanie ze strony</div>
-          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(submission.subject || (typeLabel ? `${typeLabel} – ${submission.app}` : 'Nowy projekt'))}</h1>
-          <p style="line-height:1.7;color:#cfc8bb"><b style="color:#fff">${escapeHtml(submission.name)}</b>${submission.company ? ` · ${escapeHtml(submission.company)}` : ''}<br>${replyLabel}</p>
-          ${details.length ? `<p style="line-height:1.8;font-size:13px;color:#a49d91">${details.map(escapeHtml).join('<br>')}</p>` : ''}
-          <div style="margin-top:28px;padding:22px;background:#17161a;border:1px solid #2c2a26;border-radius:12px;line-height:1.7;white-space:pre-wrap;color:#e7e1d6">${escapeHtml(submission.message)}</div>
-        `),
+        text: `${title}\n\n${plainRows.join('\n')}\n\n${submission.message}`,
+        html: tpl.emailFrame(`
+          ${tpl.kicker('Nowe zapytanie ze strony')}
+          ${tpl.heading(title)}
+          ${tpl.details(rows)}
+          ${tpl.messageBox(submission.message)}
+          ${tpl.button(`mailto:${submission.email}?subject=${encodeURIComponent(`Re: ${title}`)}`, `Odpowiedz: ${submission.name}`)}
+        `, { preheader: `${submission.name}: ${submission.message.slice(0, 120)}` }),
       }, 'notification', submission.id)
 
       const confirmationMail = await sendLoggedMail(transport, {
@@ -990,12 +967,14 @@ app.post('/api/contact', async (req, res) => {
         replyTo: settings.ownerEmail,
         subject: copy.subject,
         text: copy.text(submission.name),
-        html: emailFrame(`
-          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">${copy.kicker}</div>
-          <h1 style="font-size:34px;line-height:1.1;margin:15px 0 22px;color:#f7f2e8">${escapeHtml(copy.thanks(submission.name))}</h1>
-          <p style="font-size:16px;line-height:1.7;margin:0;color:#cfc8bb">${copy.body(submission.contactMethod === 'phone')}</p>
-          <p style="margin:32px 0 0;line-height:1.6;color:#e7e1d6">Adam Rędzikowski<br><span style="color:#8d8579">Digital Studio</span></p>
-        `, lang),
+        html: tpl.emailFrame(`
+          ${tpl.kicker(copy.kicker)}
+          ${tpl.heading(copy.thanks(submission.name), 30)}
+          ${tpl.paragraph(copy.body(submission.contactMethod === 'phone'))}
+          <div style="margin:26px 0 8px;font-size:12px;letter-spacing:.3px;color:#7d766b">${lang === 'en' ? 'Your message' : 'Twoja wiadomość'}</div>
+          ${tpl.messageBox(submission.message)}
+          ${tpl.signature()}
+        `, { lang, preheader: copy.body(submission.contactMethod === 'phone'), contact: settings.ownerEmail }),
       }, 'confirmation', submission.id)
       mailStatus = ownerMail.status === 'sent' && confirmationMail.status === 'sent' ? 'sent' : 'partial'
     }
@@ -1062,11 +1041,15 @@ app.post('/api/projects/:slug/testers', async (req, res) => {
         replyTo: email,
         subject: `Nowy tester: ${project.name} (${platform})`,
         text: `${email} zgłasza się do testów aplikacji ${project.name} na platformie ${platform}.`,
-        html: emailFrame(`
-          <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">Nowy tester</div>
-          <h1 style="font-size:32px;line-height:1.1;margin:15px 0 25px;color:#f7f2e8">${escapeHtml(project.name)}</h1>
-          <p style="line-height:1.7;color:#cfc8bb">${escapeHtml(email)}<br>Platforma: ${escapeHtml(platform)}</p>
-        `),
+        html: tpl.emailFrame(`
+          ${tpl.kicker('Nowy tester')}
+          ${tpl.heading(project.name)}
+          ${tpl.details([
+            ['E-mail', tpl.link(`mailto:${email}`, email)],
+            ['Platforma', platform],
+            ['Język', tester.lang === 'en' ? 'angielski' : 'polski'],
+          ])}
+        `, { preheader: `${email} – ${project.name} (${platform})` }),
       }, 'notification', tester.id)
     }
   } catch (error) {
@@ -1175,12 +1158,15 @@ async function notifyOwnerAboutFeedback({ id, replyTo, subject, kicker, heading,
     ...(replyTo ? { replyTo } : {}),
     subject,
     text: `${lines.join('\n')}\n\n${body}`,
-    html: emailFrame(`
-      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#d9b66b">${escapeHtml(kicker)}</div>
-      <h1 style="font-size:28px;line-height:1.15;margin:15px 0 22px;color:#f7f2e8">${escapeHtml(heading)}</h1>
-      <p style="line-height:1.8;font-size:13px;color:#a49d91">${lines.map(escapeHtml).join('<br>')}</p>
-      ${body ? `<div style="margin-top:22px;padding:20px;background:#17161a;border:1px solid #2c2a26;border-radius:12px;line-height:1.6;white-space:pre-wrap;font-size:12.5px;color:#e7e1d6">${escapeHtml(body)}</div>` : ''}
-    `),
+    html: tpl.emailFrame(`
+      ${tpl.kicker(kicker)}
+      ${tpl.heading(heading, 26)}
+      ${tpl.details(lines.map(line => {
+        const at = line.indexOf(': ')
+        return at > 0 ? [line.slice(0, at), line.slice(at + 2)] : ['', line]
+      }))}
+      ${body ? tpl.messageBox(body, { small: true }) : ''}
+    `, { preheader: subject }),
   }, 'notification', id)
 }
 
