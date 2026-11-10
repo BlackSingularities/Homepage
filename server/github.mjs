@@ -1,4 +1,4 @@
-import { detectPlatform } from './projects.mjs'
+import { detectPlatform, isSupportFile } from './projects.mjs'
 
 /**
  * Najnowsze wydania z GitHuba. Token jest opcjonalny: bez niego czytamy tylko
@@ -16,6 +16,8 @@ const CACHE_VERSION = 3
 // Ile wydań wstecz trzymamy – starczy na historię zmian i na aplikacje, które
 // przeglądają listę zamiast samego „latest”.
 const HISTORY = 15
+// Do sumy pobrań bierzemy wszystkie wydania, które GitHub odda jedną stroną.
+const COUNTED = 100
 const API = 'https://api.github.com'
 const USER_AGENT = 'redzikowski-homepage'
 
@@ -93,7 +95,7 @@ const mapRelease = item => ({
 async function fetchEntry(repo, token) {
   const [meta, list] = await Promise.all([
     request(`/repos/${repo}`, token).catch(() => null),
-    request(`/repos/${repo}/releases?per_page=${HISTORY}`, token).catch(error => {
+    request(`/repos/${repo}/releases?per_page=${COUNTED}`, token).catch(error => {
       error.repoPrivate = null
       throw error
     }),
@@ -118,7 +120,11 @@ async function fetchEntry(repo, token) {
     error: '',
     ...current,
     url: release.html_url || `https://github.com/${repo}/releases`,
-    history: published.map(mapRelease),
+    history: published.slice(0, HISTORY).map(mapRelease),
+    downloadTotal: published
+      .flatMap(item => item.assets || [])
+      .filter(asset => !isSupportFile(asset.name))
+      .reduce((sum, asset) => sum + (Number(asset.download_count) || 0), 0),
   }
 }
 

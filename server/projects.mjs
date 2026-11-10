@@ -176,7 +176,7 @@ export function projectSummary(project, release, counts = {}) {
       .sort((a, b) => (PLATFORM_ORDER.get(a) ?? 99) - (PLATFORM_ORDER.get(b) ?? 99)),
     shots: project.shots.length,
     stores: storesFor(project).map(store => store.id),
-    downloadCount: storesFor(project).length ? 0 : totalDownloads(downloadsFor(project, release, counts)),
+    downloadCount: storesFor(project).length ? 0 : allReleasesDownloads(project, release, counts),
   }
 }
 
@@ -185,6 +185,9 @@ export function projectSummary(project, release, counts = {}) {
  * Pliki z wydań zawsze idą przez proxy serwera: repozytoria są prywatne,
  * a pobieranie ma się odbywać wyłącznie przez portfolio.
  */
+/** Sumy kontrolne i podpisy zostają w wydaniu dla aktualizatorów, na stronie to szum. */
+export const isSupportFile = name => /(\.(sha256|sha512|sig|asc)|sha\d*sums\.txt)$/i.test(name || '')
+
 export function downloadsFor(project, release, counts = {}) {
   if (project.kind !== 'app') return []
   const local = id => Number(counts[`${project.slug}/${id}`]) || 0
@@ -193,8 +196,7 @@ export function downloadsFor(project, release, counts = {}) {
   }
   if (project.releaseSource !== 'github' || !release) return []
   return (release.assets || [])
-    // Sumy kontrolne i podpisy zostają w wydaniu dla aktualizatorów, na stronie to szum.
-    .filter(asset => !/(\.(sha256|sha512|sig|asc)|sha\d*sums\.txt)$/i.test(asset.name || ''))
+    .filter(asset => !isSupportFile(asset.name))
     .map(asset => ({
       id: asset.id,
       platform: asset.platform,
@@ -211,6 +213,26 @@ export function downloadsFor(project, release, counts = {}) {
 
 export const totalDownloads = downloads => downloads.reduce((sum, item) => sum + (Number(item.count) || 0), 0)
 
+/**
+ * Suma pobrań aplikacji ze wszystkich jej wydań na GitHubie, nie tylko
+ * z najnowszego. Liczbę z GitHuba wylicza serwis wydań (do 100 wydań wstecz);
+ * starszy wpis cache bez niej liczy się z trzymanej historii. Lokalny licznik
+ * dokłada tylko to, czego GitHub przy bieżących plikach jeszcze nie widzi.
+ */
+function allReleasesDownloads(project, release, counts) {
+  const current = downloadsFor(project, release, counts)
+  if (project.releaseSource !== 'github' || !release) return totalDownloads(current)
+  const fromGithub = Number.isFinite(release.downloadTotal)
+    ? release.downloadTotal
+    : (release.history?.length ? release.history : [release])
+      .flatMap(item => item.assets || [])
+      .filter(asset => !isSupportFile(asset.name))
+      .reduce((sum, asset) => sum + (Number(asset.downloadCount) || 0), 0)
+  const githubCurrent = new Map((release.assets || []).map(asset => [asset.id, Number(asset.downloadCount) || 0]))
+  const localExtra = current.reduce((sum, item) => sum + Math.max(0, item.count - (githubCurrent.get(item.id) || 0)), 0)
+  return fromGithub + localExtra
+}
+
 export function publicProject(project, release, counts = {}, { changelog = false } = {}) {
   // Sklep zastępuje pliki: kto wystawił aplikację w sklepie, ten nie chce,
   // żeby obok wisiał instalator z GitHuba.
@@ -225,7 +247,7 @@ export function publicProject(project, release, counts = {}, { changelog = false
     repo: project.repoHidden || release?.private !== false ? '' : project.repo,
     stores,
     downloads,
-    downloadCount: totalDownloads(downloads),
+    downloadCount: stores.length ? 0 : allReleasesDownloads(project, release, counts),
     release: !stores.length && project.releaseSource === 'github' && release
       ? {
         tag: release.tag,
