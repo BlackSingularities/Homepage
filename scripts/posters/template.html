@@ -190,7 +190,15 @@ document.getElementById('poster').innerHTML = `
     g.fillText(CH[Math.floor(rnd() * CH.length)], x, y)
   }
 })()
-document.fonts.ready.then(() => { document.body.dataset.ready = '1' })
+// Nagłówek w jednej linii: zmniejszamy czcionkę, aż przestanie się łamać (najmniej 42 px).
+function fitTitle() {
+  const t = document.querySelector('.title')
+  let size = 60
+  t.style.whiteSpace = 'nowrap'
+  while (t.scrollWidth > t.clientWidth && size > 42) { size -= 1; t.style.fontSize = size + 'px' }
+  if (t.scrollWidth > t.clientWidth) t.style.whiteSpace = 'normal'
+}
+document.fonts.ready.then(() => { fitTitle(); document.body.dataset.ready = '1' })
 </script>
 </body>
 </html>
