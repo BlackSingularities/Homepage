@@ -14,6 +14,8 @@ import sharp from 'sharp'
  */
 
 const TTL_MS = 30 * 60 * 1000
+/** Szerokość kopii plakatu do karuzeli na stronie głównej (ok. 2× szerokości karty). */
+const SMALL_WIDTH = 600
 const API = 'https://api.github.com'
 const MANIFEST = 'docs/posters/posters.json'
 const PLATFORMS = ['android', 'ios', 'windows', 'linux', 'macos', 'web']
@@ -85,18 +87,25 @@ export function createPosterService({ cacheFile, uploadDir, readJson, updateJson
         const out = await sharp(image).webp({ quality: 88, effort: 5 }).toFile(target)
         size = { width: out.width, height: out.height }
       }
+      // Mniejsza kopia do karuzeli na stronie głównej (pełny plakat zostaje w galerii pracy).
+      const small = name.replace(/\.webp$/, '-sm.webp')
+      const smallPath = path.join(folder, small)
+      if (!(await fs.stat(smallPath).then(() => true, () => false))) {
+        await sharp(target).resize({ width: SMALL_WIDTH, withoutEnlargement: true }).webp({ quality: 82, effort: 5 }).toFile(smallPath)
+      }
       items.push({
         file,
         sha: info.sha,
         platform,
         src: `/uploads/posters/${safe(slug)}/${name}`,
+        thumb: `/uploads/posters/${safe(slug)}/${small}`,
         alt: `${manifest.name || slug} – plakat: ${PLATFORM_NAMES[platform] || platform}`,
         altEn: `${manifest.name || slug} – poster: ${PLATFORM_NAMES_EN[platform] || platform}`,
         ...size,
       })
     }
     // Stare wersje plakatów tej pracy usuwamy, żeby katalog nie puchł.
-    const keep = new Set(items.map(item => path.basename(item.src)))
+    const keep = new Set(items.flatMap(item => [path.basename(item.src), path.basename(item.thumb)]))
     for (const name of await fs.readdir(folder).catch(() => [])) {
       if (!keep.has(name)) await fs.rm(path.join(folder, name), { force: true })
     }
@@ -146,7 +155,7 @@ export function createPosterService({ cacheFile, uploadDir, readJson, updateJson
 /** Plakaty jako zrzuty galerii – na początku, w kolejności z manifestu. */
 export function withPosters(project, posters) {
   if (!posters?.length) return project
-  const shots = posters.map(item => ({ src: item.src, alt: item.alt, altEn: item.altEn, poster: true, platform: item.platform }))
+  const shots = posters.map(item => ({ src: item.src, thumb: item.thumb, alt: item.alt, altEn: item.altEn, poster: true, platform: item.platform }))
   const known = new Set(shots.map(shot => shot.src))
   return { ...project, shots: [...shots, ...(project.shots || []).filter(shot => !known.has(shot.src))] }
 }

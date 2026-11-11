@@ -175,6 +175,10 @@ export function projectSummary(project, release, counts = {}) {
     platforms: [...new Set((storesFor(project).length ? storesFor(project) : downloadsFor(project, release)).map(item => item.platform))]
       .sort((a, b) => (PLATFORM_ORDER.get(a) ?? 99) - (PLATFORM_ORDER.get(b) ?? 99)),
     shots: project.shots.length,
+    // Plakaty z repozytorium (withPosters) – karuzela wybranych prac na stronie głównej.
+    posters: project.shots
+      .filter(shot => shot.poster)
+      .map(shot => ({ src: shot.thumb || shot.src, platform: shot.platform, alt: shot.alt || '' })),
     stores: storesFor(project).map(store => store.id),
     downloadCount: storesFor(project).length ? 0 : allReleasesDownloads(project, release, counts),
   }

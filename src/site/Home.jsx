@@ -6,13 +6,10 @@ import About from './About'
 import Faq from './Faq'
 import Contact from './Contact'
 
-const FEATURED_LIMIT = 5
-
 export default function Home({ content, pages, projects, onNavigate }) {
-  // Na stronie głównej stoją tylko pozycje zaznaczone w panelu jako wybrane;
-  // gdy żadnej nie zaznaczono, pokazujemy początek portfolio.
-  const marked = projects.filter(project => project.featured)
-  const featured = (marked.length ? marked : projects).slice(0, FEATURED_LIMIT)
+  // Karuzela na stronie głównej pokazuje wyłącznie pozycje zaznaczone w panelu
+  // jako wybrane (i tylko te z plakatem – filtruje Hero).
+  const featured = projects.filter(project => project.featured)
   const scopeOptions = (content.scope.items || []).map(item => item.title)
 
   return (

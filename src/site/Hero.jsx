@@ -1,22 +1,52 @@
 import Heading from './Heading'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { CATALOG_PATH } from '../lib/projects'
 import { useT } from '../lib/i18n'
-import GlowEdge from '../lib/GlowEdge'
 
 /**
  * Pierwszy ekran to od razu indeks prac. Zdanie o tym, co robię, stoi nad
- * nim krótko – dowodem są nazwy realizacji, a podgląd po prawej pokazuje
- * tę, na której właśnie jest kursor albo fokus klawiatury.
+ * nim krótko, a pod spodem jest karuzela plakatów wybranych aplikacji –
+ * tylko tych zaznaczonych w panelu i tylko tych, które mają plakat
+ * w repozytorium. Plakat prowadzi do strony pracy w portfolio.
  *
- * To jedyne miejsce na stronie, które się porusza bez udziału czytelnika:
- * jedno wejście przy załadowaniu, nic przy przewijaniu.
+ * Karuzela rusza się wyłącznie na gest czytelnika (palec, gładzik, strzałki),
+ * nic nie przewija się samo.
  */
 export default function Hero({ hero, labels, featured = [], total = 0, onNavigate }) {
   const { t, lp } = useT()
-  const [current, setCurrent] = useState(0)
   const catalog = lp(CATALOG_PATH)
-  const rest = total - featured.length
+  // Jedna karta na aplikację: pierwszy plakat z manifestu repozytorium.
+  const cards = featured
+    .filter(project => project.posters?.length)
+    .map(project => ({ project, poster: project.posters[0] }))
+  const rest = total - cards.length
+  const rail = useRef(null)
+  const [edges, setEdges] = useState({ prev: false, next: false })
+
+  const measure = useCallback(() => {
+    const el = rail.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    setEdges({ prev: el.scrollLeft > 4, next: el.scrollLeft < max - 4 })
+  }, [])
+
+  useEffect(() => {
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [measure, cards.length])
+
+  // Strzałka przesuwa o tyle kart, ile mieści się w kadrze (co najmniej jedną).
+  const step = direction => {
+    const el = rail.current
+    const card = el?.querySelector('li')
+    if (!el || !card) return
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 0
+    const size = card.offsetWidth + gap
+    const visible = Math.max(1, Math.floor((el.clientWidth + gap) / size) - 1)
+    el.scrollBy({ left: direction * size * visible, behavior: 'smooth' })
+  }
 
   // Wejście robi CSS (.rise), więc treść jest widoczna nawet bez JS-owej animacji.
   const enter = delay => ({ style: { '--rise-delay': `${delay}s` } })
@@ -40,54 +70,30 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
         </div>
       </div>
 
-      {featured.length > 0 && (
+      {cards.length > 0 && (
         <div className="works rise" id="portfolio" {...enter(0.35)}>
           <div className="works-head">
             <h2><Heading title={labels.title} accent={labels.accent} /></h2>
+            {cards.length > 1 && (
+              <div className="works-nav">
+                <button type="button" onClick={() => step(-1)} disabled={!edges.prev} aria-label={t('works.prev')}><ArrowLeft size={18} /></button>
+                <button type="button" onClick={() => step(1)} disabled={!edges.next} aria-label={t('works.next')}><ArrowRight size={18} /></button>
+              </div>
+            )}
           </div>
 
-          <div className="works-body">
-            <figure className="works-stage" aria-hidden="true">
-              <GlowEdge media className="works-frame">
-                {featured.map((project, index) => (
-                  project.thumb || project.cover
-                    ? <img key={project.id} src={project.thumb || project.cover} alt="" className={index === current ? 'is-current' : ''} loading={index === 0 ? 'eager' : 'lazy'} />
-                    : <i key={project.id} className={index === current ? 'is-current' : ''}>{project.name}</i>
-                ))}
-              </GlowEdge>
-              {/* Wszystkie podpisy leżą w jednej komórce siatki, więc jej wysokość
-                  wyznacza najdłuższy z nich i podgląd nie skacze przy przełączaniu. */}
-              {featured.map((project, index) => (
-                <figcaption key={project.id} className={index === current ? 'is-current' : ''}>{project.tagline}</figcaption>
-              ))}
-            </figure>
-
-            <ol className="works-list">
-              {featured.map((project, index) => {
-                const href = lp(`${CATALOG_PATH}/${project.slug}`)
-                return (
-                  <li key={project.id}>
-                    <a
-                      href={href}
-                      className={index === current ? 'is-current' : ''}
-                      onMouseEnter={() => setCurrent(index)}
-                      onFocus={() => setCurrent(index)}
-                      onClick={event => open(event, href)}
-                    >
-                      <strong>
-                        {project.icon && <img className="works-icon" src={project.icon} alt="" loading="lazy" />}
-                        {project.name}
-                      </strong>
-                      {/* Rok zostaje w portfolio – tu liczy się sama nazwa i rodzaj pracy. */}
-                      <span className="works-meta">
-                        <span>{project.label || t(`kind.${project.kind}`)}</span>
-                      </span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ol>
-          </div>
+          <ul className={`works-rail ${cards.length < 4 ? 'is-few' : ''}`} ref={rail} onScroll={measure}>
+            {cards.map(({ project, poster }, index) => {
+              const href = lp(`${CATALOG_PATH}/${project.slug}`)
+              return (
+                <li key={project.id}>
+                  <a href={href} onClick={event => open(event, href)} aria-label={t('works.open', project.name)}>
+                    <img src={poster.src} alt={poster.alt || project.name} width="1080" height="1920" loading={index < 4 ? 'eager' : 'lazy'} decoding="async" />
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
 
           {rest > 0 && (
             <a className="works-more" href={catalog} onClick={event => open(event, catalog)}>

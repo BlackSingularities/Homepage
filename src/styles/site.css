@@ -1091,154 +1091,90 @@
 
 .works-head span { font-size: 14px; color: var(--ink-3); }
 
-/* Ekran pracy stoi pierwszy i zostaje w kadrze; spis nazw po prawej
-   przełącza go samym najechaniem albo fokusem. */
-.works-body {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 6fr);
-  gap: clamp(28px, 4vw, 64px);
-  align-items: start;
-  padding-top: clamp(22px, 3vw, 40px);
-}
+.works-head { position: relative; }
 
-.works-stage {
-  position: sticky;
-  top: 92px;
-  display: grid;
-  margin: 0;
-}
-
-/* Ciepła poświata pod ekranem – jedyna dekoracja w tej sekcji. */
-.works-stage::before {
-  content: '';
+/* Strzałki stoją po prawej w linii tytułu; tytuł zostaje na środku. */
+.works-nav {
   position: absolute;
-  z-index: -1;
-  inset: 14% -8% -16%;
-  background: radial-gradient(58% 58% at 50% 62%, rgba(var(--accent-rgb), .14), transparent 72%);
-  filter: blur(28px);
-  pointer-events: none;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  gap: 8px;
 }
 
-.works-frame {
-  grid-area: 1 / 1;
+.works-nav button {
   display: grid;
-  border-radius: var(--radius-lg);
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(12, 11, 10, .6);
+  color: var(--ink-2);
+  transition: border-color .25s, color .25s, opacity .25s;
 }
 
-.works-frame > img,
-.works-frame > i {
-  grid-area: 1 / 1;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  object-position: top center;
+.works-nav button:hover:not(:disabled) { border-color: var(--line-gold); color: var(--accent); }
+.works-nav button:disabled { opacity: .35; cursor: default; }
+
+/*
+ * Plakaty stoją w jednym rzędzie na całą szerokość okna, jak galeria zrzutów
+ * na stronie pracy: pierwszy zaczyna się w linii tekstu, kolejne wychodzą za
+ * prawą krawędź, więc od razu widać, że jest dalej. Przewija palec, gładzik,
+ * kółko z Shiftem albo strzałki.
+ */
+.works-rail {
+  --edge: max(var(--gutter), calc((100vw - var(--maxw)) / 2 + var(--gutter)));
+  display: flex;
+  gap: clamp(14px, 1.6vw, 22px);
+  width: 100vw;
+  margin: 0 0 0 calc(50% - 50vw);
+  padding: clamp(22px, 3vw, 40px) var(--edge) 18px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--edge);
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+/* Gdy plakatów jest mało, nie ma czego przewijać – stoją na środku. */
+.works-rail.is-few { justify-content: center; }
+
+.works-rail li {
+  flex: 0 0 auto;
+  width: clamp(200px, 21vw, 290px);
+  scroll-snap-align: start;
+}
+
+.works-rail a {
+  position: relative;
+  display: block;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: #151311;
   box-shadow: var(--shadow);
-  opacity: 0;
-  transform: scale(1.02);
-  transition: opacity .4s var(--ease), transform .8s var(--ease);
+  transition: border-color .3s, transform .45s var(--ease), box-shadow .45s var(--ease);
 }
 
-.works-frame > i {
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-size: 40px;
-  font-style: normal;
-  color: var(--ink-4);
+.works-rail img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
 }
 
-.works-frame > .is-current { opacity: 1; transform: none; }
-
-.works-stage figcaption {
-  grid-area: 2 / 1;
-  max-width: 54ch;
-  margin-top: 18px;
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  visibility: hidden;
+/* Plakat unosi się pod kursorem, a złota obwódka mówi, że to odnośnik. */
+.works-rail a:hover,
+.works-rail a:focus-visible {
+  border-color: var(--line-gold);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow), 0 18px 46px rgba(var(--accent-rgb), .14);
 }
 
-.works-stage figcaption.is-current { visibility: visible; }
-
-.works-list { margin: 0; padding: 0; list-style: none; }
-
-.works-list a {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px 24px;
-  padding: clamp(13px, 1.5vw, 20px) 0;
-  border-bottom: 1px solid var(--line);
-}
-
-/* Złota linia dojeżdża pod nazwę, na której stoi kursor – ruch odpowiada
-   na gest czytelnika, nic nie rusza się samo. */
-.works-list a::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .45s var(--ease);
-}
-
-.works-list a.is-current::after { transform: scaleX(1); }
-
-.works-list strong {
-  display: flex;
-  align-items: center;
-  gap: .32em;
-  min-width: 0;
-  font-family: var(--font-display);
-  font-size: clamp(28px, 3.4vw, 48px);
-  font-weight: 300;
-  line-height: 1.02;
-  letter-spacing: -.03em;
-  color: var(--ink-2);
-  transition: color .25s;
-}
-
-.works-icon {
-  flex: none;
-  width: .74em;
-  height: .74em;
-  object-fit: contain;
-  opacity: .6;
-  transition: opacity .25s;
-}
-
-.works-list a.is-current .works-icon,
-.works-list a:hover .works-icon { opacity: 1; }
-
-.works-list a.is-current strong,
-.works-list a:hover strong { color: var(--ink); }
-
-.works-list a:focus-visible strong { color: var(--accent); }
-
-.works-meta {
-  display: grid;
-  justify-items: end;
-  gap: 4px;
-  max-width: 20ch;
-  margin-left: auto;
-  font-size: 13px;
-  line-height: 1.4;
-  text-align: right;
-  color: var(--ink-4);
-  transition: color .25s;
-}
-
-.works-list a.is-current .works-meta { color: var(--ink-2); }
+.works-rail a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 .works-more {
   display: inline-block;
@@ -1254,15 +1190,15 @@
 .works-more:hover { text-decoration-color: var(--accent); }
 
 @media (max-width: 900px) {
-  .works-body { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .works-stage { position: static; }
-  .works-stage::before { display: none; }
-  .works-list strong { color: var(--ink); font-size: clamp(26px, 7vw, 38px); }
+  .works-head { flex-direction: column; align-items: center; gap: 14px; }
+  .works-nav { position: static; }
+  .works-rail li { width: clamp(180px, 46vw, 260px); }
+  .works-rail.is-few { justify-content: flex-start; }
 }
 
-@media (max-width: 560px) {
-  .works-list a { grid-template-columns: minmax(0, 1fr); }
-  .works-meta { max-width: none; justify-items: start; text-align: left; grid-auto-flow: column; justify-content: start; gap: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .works-rail a { transition: border-color .3s; }
+  .works-rail a:hover, .works-rail a:focus-visible { transform: none; }
 }
 
 /* ── zakres ─────────────────────────────────────────────────────── */
@@ -1756,7 +1692,6 @@
 
 .site .about-strengths li,
 .site .footer-legal,
-.site .works-meta,
 /* Wąskie kolumny osi procesu i podpisy prac: justowanie rozrywałoby w nich
    odstępy, więc zostają do lewej. */
 .site .proc-step p,

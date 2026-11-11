@@ -65,6 +65,9 @@ export const STRINGS = {
     'downloads': n => `${number('pl', n)} ${polishPlural(n, 'pobranie', 'pobrania', 'pobrań')}`,
 
     'hero.more': (cta, n) => `${cta}: jeszcze ${n} ${polishPlural(n, 'pozycja', 'pozycje', 'pozycji')}`,
+    'works.prev': 'Poprzednie prace',
+    'works.next': 'Następne prace',
+    'works.open': name => `${name} – zobacz w portfolio`,
     'catalog.count': n => `${n} ${polishPlural(n, 'pozycja', 'pozycje', 'pozycji')} w portfolio`,
     'catalog.filters': 'Rodzaj pracy',
     'catalog.empty': 'Nic tu jeszcze nie ma.',
@@ -223,6 +226,9 @@ export const STRINGS = {
     'downloads': n => `${number('en', n)} ${Number(n) === 1 ? 'download' : 'downloads'}`,
 
     'hero.more': (cta, n) => `${cta}: ${n} more ${n === 1 ? 'project' : 'projects'}`,
+    'works.prev': 'Previous projects',
+    'works.next': 'Next projects',
+    'works.open': name => `${name} – see in the portfolio`,
     'catalog.count': n => `${n} ${n === 1 ? 'project' : 'projects'} in the portfolio`,
     'catalog.filters': 'Type of work',
     'catalog.empty': 'Nothing here yet.',
