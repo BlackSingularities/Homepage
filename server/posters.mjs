@@ -35,24 +35,33 @@ export function createPosterService({ cacheFile, uploadDir, readJson, updateJson
   const inFlight = new Map()
   const dir = path.join(uploadDir, 'posters')
 
-  async function contents(repo, file, token) {
+  // ref = gałąź; pusta – domyślna gałąź repozytorium.
+  const at = ref => (ref ? `?ref=${encodeURIComponent(ref)}` : '')
+
+  async function contents(repo, file, token, ref = '') {
     const encoded = file.split('/').map(encodeURIComponent).join('/')
-    const response = await fetch(`${API}/repos/${repo}/contents/${encoded}`, { headers: headers(token) })
+    const response = await fetch(`${API}/repos/${repo}/contents/${encoded}${at(ref)}`, { headers: headers(token) })
     if (response.status === 404) return null
     if (!response.ok) throw new Error(`GitHub odpowiedział kodem ${response.status}.`)
     return response.json()
   }
 
-  async function raw(repo, file, token) {
+  async function raw(repo, file, token, ref = '') {
     const encoded = file.split('/').map(encodeURIComponent).join('/')
-    const response = await fetch(`${API}/repos/${repo}/contents/${encoded}`, { headers: headers(token, 'application/vnd.github.raw') })
+    const response = await fetch(`${API}/repos/${repo}/contents/${encoded}${at(ref)}`, { headers: headers(token, 'application/vnd.github.raw') })
     if (!response.ok) throw new Error(`Nie udało się pobrać ${file} (${response.status}).`)
     return Buffer.from(await response.arrayBuffer())
   }
 
   async function fetchEntry(repo, slug, cached) {
     const token = await getToken()
-    const meta = await contents(repo, MANIFEST, token)
+    // Część repozytoriów ma domyślną gałąź roboczą (np. dev/…), a plakaty leżą na main.
+    let ref = ''
+    let meta = await contents(repo, MANIFEST, token)
+    if (!meta) {
+      meta = await contents(repo, MANIFEST, token, 'main')
+      if (meta) ref = 'main'
+    }
     if (!meta) return { repo, fetchedAt: new Date().toISOString(), sha: '', items: [], error: '' }
     const manifest = JSON.parse(Buffer.from(meta.content || '', 'base64').toString('utf8'))
     const folder = path.join(dir, safe(slug))
@@ -64,7 +73,7 @@ export function createPosterService({ cacheFile, uploadDir, readJson, updateJson
       const file = String(poster.file || '').replace(/^\/+/, '')
       if (!file || file.includes('..')) continue
       const repoPath = `docs/posters/${file}`
-      const info = await contents(repo, repoPath, token)
+      const info = await contents(repo, repoPath, token, ref)
       if (!info?.sha) continue
       const known = previous.get(file)
       const name = `${safe(platform)}-${info.sha.slice(0, 10)}.webp`
@@ -72,7 +81,7 @@ export function createPosterService({ cacheFile, uploadDir, readJson, updateJson
       let size = known?.sha === info.sha ? { width: known.width, height: known.height } : null
       const exists = await fs.stat(target).then(() => true, () => false)
       if (!size || !exists) {
-        const image = await raw(repo, repoPath, token)
+        const image = await raw(repo, repoPath, token, ref)
         const out = await sharp(image).webp({ quality: 88, effort: 5 }).toFile(target)
         size = { width: out.width, height: out.height }
       }
