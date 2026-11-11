@@ -11,6 +11,7 @@ import { createMail } from './mail.mjs'
 import * as tpl from './email.mjs'
 import { PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
+import { createPosterService, withPosters } from './posters.mjs'
 import { writeZip } from './zip.mjs'
 import { createAnalytics } from './analytics.mjs'
 import { langOf, localizePage, localizeProject } from './i18n.mjs'
@@ -29,6 +30,7 @@ const SITE_TEMPLATE_URL = process.env.SITE_TEMPLATE_URL || 'http://homepage/inde
 const PAGES_FILE = path.join(DATA_DIR, 'pages.json')
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
 const RELEASES_FILE = path.join(DATA_DIR, 'releases.json')
+const POSTERS_FILE = path.join(DATA_DIR, 'posters.json')
 const DOWNLOAD_COUNTS_FILE = path.join(DATA_DIR, 'download-counts.json')
 const ANALYTICS_DIR = path.join(DATA_DIR, 'analytics')
 const INTEGRATIONS_FILE = path.join(DATA_DIR, 'integrations.json')
@@ -332,6 +334,14 @@ const releases = createReleaseService({
   getToken: getGithubToken,
 })
 
+const posters = createPosterService({
+  cacheFile: POSTERS_FILE,
+  uploadDir: UPLOAD_DIR,
+  readJson,
+  updateJson,
+  getToken: getGithubToken,
+})
+
 const analytics = createAnalytics({
   dir: ANALYTICS_DIR,
   readJson,
@@ -354,8 +364,15 @@ function sortProjects(projects) {
 async function publishedProjects() {
   const projects = sortProjects(await readProjects()).filter(project => project.published !== false)
   // Repozytoria odpytujemy także bez wydań z GitHuba, żeby znać ich widoczność.
-  const map = await releases.getMany(projects.map(project => project.repo))
-  return projects.map(project => {
+  const [map, art] = await Promise.all([
+    releases.getMany(projects.map(project => project.repo)),
+    // Plakaty z repozytoriów aplikacji idą na początek galerii (patrz posters.mjs).
+    Promise.all(projects.map(project => (project.kind === 'app' && project.repo
+      ? posters.get(project.repo, project.slug).catch(() => [])
+      : []))),
+  ])
+  return projects.map((stored, index) => {
+    const project = withPosters(stored, art[index])
     const info = map[project.repo] || null
     if (project.releaseSource === 'github') return { project, release: info }
     return { project: info?.private === false ? project : { ...project, repoHidden: true }, release: null }

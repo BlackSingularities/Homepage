@@ -46,7 +46,13 @@ export function localizeProject(project, lang) {
   if (langOf(lang) === DEFAULT_LANG || !project.en) return project
   const result = overlay(project, project.en, PROJECT_TEXT_KEYS)
   const alts = project.en.shotAlts || []
-  result.shots = (project.shots || []).map((shot, index) => (alts[index] ? { ...shot, alt: alts[index] } : shot))
+  // Plakaty z repozytorium nie mają tłumaczeń w panelu – indeks liczymy bez nich.
+  let index = 0
+  result.shots = (project.shots || []).map(shot => {
+    if (shot.poster) return { ...shot, alt: shot.altEn || shot.alt }
+    const alt = alts[index++]
+    return alt ? { ...shot, alt } : shot
+  })
   return result
 }
 

@@ -125,6 +125,24 @@ Odpowiedzi GitHuba lądują w `releases.json` z czasem życia 30 minut, więc st
 odpytuje API przy każdym wejściu. Gdy odświeżenie się nie powiedzie, serwer podaje
 ostatni udany wynik, a panel pokazuje powód błędu przy pracy.
 
+### Plakaty z repozytoriów
+
+Jeśli repozytorium aplikacji ma `docs/posters/posters.json`, serwer co 30 minut sprawdza manifest,
+pobiera wymienione w nim plakaty (osobny na każdą platformę), zapisuje je jako WebP w
+`uploads/posters/<slug>/` i stawia na początku galerii pracy. Bez manifestu nic się nie zmienia.
+Cache: `posters.json` w katalogu danych.
+
+Plakaty składa `scripts/posters/build.mjs` z szablonu `scripts/posters/template.html`
+(styl strony, bezgłowy Chrome), a `scripts/posters/readme.mjs` wstawia je na górę README aplikacji:
+
+```bash
+node scripts/posters/build.mjs ../OpenTimer
+node scripts/posters/readme.mjs ../OpenTimer
+```
+
+Zrzuty leżą w repozytorium aplikacji w `docs/screenshots/<platforma>/`. Plakat nie podaje wersji
+ani rozmiaru pliku – tylko minimalny system – żeby po aktualizacji dalej był aktualny.
+
 ## Dane
 
 Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
