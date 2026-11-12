@@ -1061,25 +1061,12 @@
 
 .works { position: relative; margin-top: clamp(64px, 9vw, 128px); }
 
-/* Sekcja leży jeszcze na animowanym tle, więc dostaje własny, miękki cień
-   pod spodem – nazwy prac nie konkurują wtedy ze znakami. */
-.works::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -34px clamp(-20px, -2vw, -8px) -40px;
-  border-radius: var(--radius-xl);
-  background: radial-gradient(120% 92% at 50% 42%, rgba(12, 11, 10, .95) 35%, rgba(12, 11, 10, .62) 72%, transparent);
-  pointer-events: none;
-}
-
 .works-head {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--line-strong);
   text-align: center;
 }
 
@@ -1143,7 +1130,9 @@
 
 .works-rail li {
   flex: 0 0 auto;
-  width: clamp(200px, 21vw, 290px);
+  /* Plakat ma 70% wysokości ekranu (9:16, więc szerokość z niej wynika). */
+  width: min(calc(70vh * 9 / 16), 82vw);
+  width: min(calc(70svh * 9 / 16), 82vw);
   scroll-snap-align: start;
 }
 
@@ -1192,7 +1181,6 @@
 @media (max-width: 900px) {
   .works-head { flex-direction: column; align-items: center; gap: 14px; }
   .works-nav { position: static; }
-  .works-rail li { width: clamp(180px, 46vw, 260px); }
   .works-rail.is-few { justify-content: flex-start; }
 }
 
