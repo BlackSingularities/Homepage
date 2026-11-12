@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { CATALOG_PATH } from '../lib/projects'
 import { useT } from '../lib/i18n'
+import GlowEdge from '../lib/GlowEdge'
 
 /**
  * Pierwszy ekran to od razu indeks prac. Zdanie o tym, co robię, stoi nad
@@ -87,9 +88,10 @@ export default function Hero({ hero, labels, featured = [], total = 0, onNavigat
               const href = lp(`${CATALOG_PATH}/${project.slug}`)
               return (
                 <li key={project.id}>
-                  <a href={href} onClick={event => open(event, href)} aria-label={t('works.open', project.name)}>
+                  {/* Ta sama świecąca krawędź za kursorem co na kafelkach oferty. */}
+                  <GlowEdge as="a" media href={href} onClick={event => open(event, href)} aria-label={t('works.open', project.name)}>
                     <img src={poster.src} alt={poster.alt || project.name} width="1080" height="1920" loading={index < 4 ? 'eager' : 'lazy'} decoding="async" />
-                  </a>
+                  </GlowEdge>
                 </li>
               )
             })}

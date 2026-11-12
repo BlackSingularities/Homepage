@@ -1116,7 +1116,7 @@
   gap: clamp(14px, 1.6vw, 22px);
   width: 100vw;
   margin: 0 0 0 calc(50% - 50vw);
-  padding: clamp(22px, 3vw, 40px) var(--edge) 18px;
+  padding: clamp(28px, 3vw, 44px) var(--edge) 30px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
@@ -1139,7 +1139,6 @@
 .works-rail a {
   position: relative;
   display: block;
-  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: #151311;
@@ -1150,6 +1149,9 @@
 .works-rail img {
   display: block;
   width: 100%;
+  /* Zaokrąglenie trzyma obraz, nie karta – karta bez overflow: hidden,
+     żeby świecąca krawędź (GlowEdge) wychodziła poza plakat. */
+  border-radius: calc(var(--radius-lg) - 1px);
   height: auto;
   aspect-ratio: 9 / 16;
   object-fit: cover;
