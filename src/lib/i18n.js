@@ -123,6 +123,8 @@ export const STRINGS = {
     'lightbox.close': 'Zamknij',
     'lightbox.prev': 'Poprzednie zdjęcie',
     'lightbox.next': 'Następne zdjęcie',
+    'lightbox.zoom': 'Dwuklik – rozmiar 100%',
+    'lightbox.fit': 'Dwuklik – dopasuj do ekranu',
 
     'cookie.label': 'Ustawienia prywatności',
     'cookie.title': 'Statystyki odwiedzin',
@@ -284,6 +286,8 @@ export const STRINGS = {
     'lightbox.close': 'Close',
     'lightbox.prev': 'Previous image',
     'lightbox.next': 'Next image',
+    'lightbox.zoom': 'Double-click – actual size',
+    'lightbox.fit': 'Double-click – fit to screen',
 
     'cookie.label': 'Privacy settings',
     'cookie.title': 'Visit statistics',

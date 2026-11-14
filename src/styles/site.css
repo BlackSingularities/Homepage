@@ -1701,6 +1701,13 @@
 }
 
 .lightbox figure img { max-height: 80vh; animation: lightbox-in .25s var(--ease) both; }
+.lightbox figure img { cursor: zoom-in; }
+
+/* Dwuklik: obraz w skali 100% z przewijaniem (np. wysokie plakaty). */
+.lightbox.is-actual { display: block; overflow: auto; overscroll-behavior: contain; }
+.lightbox.is-actual figure { width: max-content; max-width: none; margin: 0 auto; }
+.lightbox.is-actual figure img { max-width: none; max-height: none; cursor: zoom-out; animation: none; }
+.lightbox.is-actual > button { position: fixed; }
 
 @keyframes lightbox-in { from { opacity: 0; } }
 
