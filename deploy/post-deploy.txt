@@ -42,3 +42,4 @@ homepage_api node server/migrate-openaudiopower-v49.mjs
 homepage_api node server/migrate-openfps-v50.mjs
 homepage_api node server/migrate-repo-hidden-v51.mjs
 homepage_api node server/migrate-app-icons-v52.mjs
+homepage_api node server/migrate-app-icons-v53.mjs
