@@ -39,3 +39,4 @@ homepage_api node server/migrate-polskie-studio-map-v45.mjs
 homepage_api node server/migrate-remove-openecho-v47.mjs
 homepage_api node server/migrate-openpayments-v48.mjs
 homepage_api node server/migrate-openaudiopower-v49.mjs
+homepage_api node server/migrate-openfps-v50.mjs
