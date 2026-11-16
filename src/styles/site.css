@@ -1931,3 +1931,39 @@
 @media (max-width: 820px) {
   .pv-testing { grid-template-columns: 1fr; }
 }
+
+/* ── Tło z galerii pod „O mnie” i FAQ ──
+   Chmura zdjęć leży pod treścią, przyklejona do okna na czas obu sekcji.
+   Przyciemnienie i wygaszone krawędzie trzymają tekst czytelnym. */
+.gallery-backdrop { position: relative; isolation: isolate; }
+.gallery-backdrop > .section { position: relative; z-index: 1; }
+
+.gallery-backdrop-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 220px, #000 calc(100% - 220px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 220px, #000 calc(100% - 220px), transparent);
+}
+
+.gallery-backdrop-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  opacity: .7;
+}
+
+.gallery-backdrop-sticky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1002;
+  background: rgba(12, 11, 10, .4);
+}
+
+@media (max-width: 760px) {
+  .gallery-backdrop-sticky { opacity: .6; }
+}

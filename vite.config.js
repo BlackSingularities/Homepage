@@ -14,6 +14,8 @@ export default defineConfig({
     proxy: {
       '/api': { target: apiTarget, changeOrigin: false },
       '/uploads': { target: apiTarget, changeOrigin: false },
+      // Publiczna galeria (tło sekcji na stronie głównej) – domyślnie z produkcji.
+      '/galeria': { target: process.env.GALLERY_URL || 'https://redzikowski.com', changeOrigin: true, secure: true },
     },
   },
 })

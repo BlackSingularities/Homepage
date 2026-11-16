@@ -4,6 +4,7 @@ import Process from './Process'
 import PagesGrid from './PagesGrid'
 import About from './About'
 import Faq from './Faq'
+import GalleryBackdrop from './GalleryBackdrop'
 import Contact from './Contact'
 
 export default function Home({ content, pages, projects, onNavigate }) {
@@ -26,8 +27,10 @@ export default function Home({ content, pages, projects, onNavigate }) {
         <Scope data={content.scope} />
         <Process data={content.process} />
         <PagesGrid data={content.pagesSection} pages={pages} onNavigate={onNavigate} />
-        <About data={content.about} brand={content.brand} />
-        <Faq data={content.faq} />
+        <GalleryBackdrop>
+          <About data={content.about} brand={content.brand} />
+          <Faq data={content.faq} />
+        </GalleryBackdrop>
         <Contact data={content.contact} brand={content.brand} scopeOptions={scopeOptions} apps={projects} />
       </div>
     </main>
