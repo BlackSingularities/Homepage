@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowDown, ArrowUp, ArrowUpRight, Eye, EyeOff, Globe, Link2, ListPlus, LoaderCircle, MousePointerClick, Plus, Search,
-  Sparkles, Star, Trash2, Wand2, X,
+  Camera, Sparkles, Star, Trash2, Wand2, X,
 } from 'lucide-react'
 import { api, formatDay, json, uid } from '../lib/api'
 import { Card, Empty, Field, ImagePicker, SaveBar, Toggle, toast } from './parts'
@@ -41,7 +41,7 @@ export function LinkIcon({ item, size = 30 }) {
 function newLink(url, category) {
   const now = new Date().toISOString()
   return {
-    id: uid(), url, title: domainOf(url), description: '', note: '', category, tags: [], icon: '',
+    id: uid(), url, title: domainOf(url), description: '', category, tags: [], icon: '',
     featured: false, published: true, clicks: 0, createdAt: now, updatedAt: now,
   }
 }
@@ -64,6 +64,7 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
   const [bulk, setBulk] = useState('')
   const [bulkProgress, setBulkProgress] = useState(null)
   const [fetching, setFetching] = useState(false)
+  const [shotting, setShotting] = useState(false)
   const quickRef = useRef(null)
 
   const dirty = data !== null && JSON.stringify(data) !== saved
@@ -123,7 +124,7 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
   const visible = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase('pl')
     return items.filter(entry => (!filter || entry.category === filter)
-      && (!needle || `${entry.title} ${entry.url} ${entry.description} ${entry.note} ${(entry.tags || []).join(' ')}`.toLocaleLowerCase('pl').includes(needle)))
+      && (!needle || `${entry.title} ${entry.url} ${entry.description} ${(entry.tags || []).join(' ')}`.toLocaleLowerCase('pl').includes(needle)))
   }, [items, query, filter])
 
   const stats = useMemo(() => ({
@@ -219,11 +220,32 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
     try {
       const meta = await inspect(url)
       update({ url: meta.url || url, title: meta.title || item.title, description: meta.description || item.description, icon: meta.icon || item.icon })
-      toast.success(meta.icon ? 'Pobrano tytuł, opis i ikonę strony.' : 'Pobrano tytuł i opis. Strona nie udostępnia czytelnej ikony.')
+      toast.success(meta.icon ? 'Pobrano tytuł, opis i favicon strony.' : 'Pobrano tytuł i opis. Strona nie udostępnia czytelnego faviconu.')
     } catch (requestError) {
       toast.error(requestError.message)
     } finally {
       setFetching(false)
+    }
+  }
+
+  // Zrzut zapisuje serwer od razu – aktualizujemy też kopię „zapisanego” stanu, żeby nie udawać zmian.
+  const reshoot = async () => {
+    if (!item) return
+    setShotting(true)
+    const id = item.id
+    try {
+      const { shot, shotAt } = await api(`/api/admin/links/${encodeURIComponent(id)}/shot`, json('POST', {}))
+      const patch = list => list.map(entry => (entry.id === id ? { ...entry, shot, shotAt } : entry))
+      setItems(patch)
+      setSaved(current => {
+        const parsed = JSON.parse(current)
+        return JSON.stringify({ ...parsed, items: patch(parsed.items) })
+      })
+      toast.success('Nowy zrzut strony gotowy.')
+    } catch (requestError) {
+      toast.error(requestError.message)
+    } finally {
+      setShotting(false)
     }
   }
 
@@ -264,6 +286,7 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
   }
 
   const duplicate = item && duplicateOf(item.url, item.id)
+  const savedItem = item && JSON.parse(saved || '{"items":[]}').items.find(entry => entry.id === item.id)
   const itemUrl = item && normalizeUrl(item.url)
 
   return (
@@ -300,7 +323,7 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
             Otwórz stronę <ArrowUpRight size={14} />
           </a>
         </form>
-        <p className="ap-hint">Serwer sam odczyta tytuł, opis i ikonę strony. Nowe linki trafiają na górę wybranej kategorii{filter ? ` („${categoryName(filter)}”)` : ` („${categoryName(categories[0]?.id)}”)`}.</p>
+        <p className="ap-hint">Wystarczy adres – serwer sam odczyta tytuł, opis i favicon, a po zapisie zrobi zrzut strony na miniaturę. Nowe linki trafiają na górę wybranej kategorii{filter ? ` („${categoryName(filter)}”)` : ` („${categoryName(categories[0]?.id)}”)`}.</p>
         {bulkOpen && (
           <div className="ap-links-bulk">
             <textarea
@@ -396,17 +419,13 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
                   <Field label="Adres strony" hint={duplicate ? `Uwaga: ten adres ma już link „${duplicate.title}”.` : !itemUrl && item.url ? 'Adres musi zaczynać się od http(s):// albo być domeną.' : ''}>
                     <input value={item.url} onChange={event => update({ url: event.target.value })} onBlur={() => itemUrl && itemUrl !== item.url && update({ url: itemUrl })} placeholder="https://" />
                   </Field>
-                  <button type="button" className="ap-btn ap-btn-ghost" onClick={refetch} disabled={fetching || !itemUrl} title="Nadpisuje tytuł, opis i ikonę danymi ze strony">
+                  <button type="button" className="ap-btn ap-btn-ghost" onClick={refetch} disabled={fetching || !itemUrl} title="Nadpisuje tytuł, opis i favicon danymi ze strony">
                     {fetching ? <LoaderCircle className="spin" size={15} /> : <Wand2 size={15} />} Pobierz ze strony
                   </button>
                 </div>
 
                 <Field label="Opis" hint={`${(item.description || '').length}/600 · co to za strona, w jednym–dwóch zdaniach`}>
                   <textarea rows={3} maxLength={600} value={item.description} onChange={event => update({ description: event.target.value })} placeholder="Co znajdziesz na tej stronie?" />
-                </Field>
-
-                <Field label="Dlaczego warto – mój komentarz" hint="Opcjonalnie. Na stronie pojawia się jako osobista rekomendacja.">
-                  <textarea rows={2} maxLength={600} value={item.note} onChange={event => update({ note: event.target.value })} placeholder="Np. Używam codziennie do szkiców architektury." />
                 </Field>
 
                 <div className="ap-two">
@@ -425,12 +444,32 @@ export default function LinksManager({ item: routeItem = '', onItem }) {
                   </Field>
                 </div>
 
+                <div className="ap-links-shot">
+                  <div className="ap-links-shot-frame">
+                    {item.shot
+                      ? <img src={item.shot} alt={`Zrzut strony ${domainOf(item.url)}`} />
+                      : <span>{shotting ? 'Robię zrzut strony…' : savedItem ? 'Zrzut w kolejce – pojawi się po chwili.' : 'Zrzut powstanie po zapisaniu linku.'}</span>}
+                  </div>
+                  <div className="ap-links-shot-side">
+                    <strong>Miniatura</strong>
+                    <p className="ap-hint">
+                      {data.screenshots === false
+                        ? 'Ten serwer nie ma przeglądarki do zrzutów – karta pokaże favicon.'
+                        : 'Serwer robi zrzut górnej części strony (1280×800) i pokazuje go jako miniaturę karty.'}
+                      {item.shotAt && ` Ostatni zrzut: ${formatDay(item.shotAt)}.`}
+                    </p>
+                    <button type="button" className="ap-btn ap-btn-ghost ap-btn-sm" onClick={reshoot} disabled={shotting || !savedItem || savedItem.url !== item.url || data.screenshots === false}>
+                      {shotting ? <LoaderCircle className="spin" size={14} /> : <Camera size={14} />} {item.shot ? 'Zrób nowy zrzut' : 'Zrób zrzut teraz'}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="ap-pe-group">
                   <ImagePicker
                     label="Ikona"
                     value={item.icon}
                     onChange={icon => update({ icon })}
-                    hint="Pobierana automatycznie ze strony. Możesz też wybrać własny obrazek z biblioteki; bez ikony pokaże się pierwsza litera."
+                    hint="Favicon pobierany automatycznie ze strony. Możesz też wybrać własny obrazek z biblioteki; bez ikony pokaże się pierwsza litera."
                   />
                 </div>
 

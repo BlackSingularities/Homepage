@@ -5,6 +5,7 @@ import dns from 'node:dns/promises'
 import net from 'node:net'
 import sharp from 'sharp'
 import { cleanMedia, cleanText, slugify } from './sanitize.mjs'
+import { browserPath, captureScreenshot } from './screenshot.mjs'
 
 /**
  * Przydatne linki – katalog polecanych stron z kategoriami.
@@ -19,6 +20,8 @@ const MAX_HTML = 768 * 1024
 const MAX_ICON = 1024 * 1024
 const TIMEOUT = 8000
 const ICON_SIZE = 96
+const SHOT_SIZE = [800, 500]
+const RETRY_FAILED_SHOT = 24 * 3600 * 1000
 const USER_AGENT = 'Mozilla/5.0 (compatible; redzikowski.com link preview)'
 
 export const DEFAULT_LINK_CATEGORIES = [
@@ -70,14 +73,18 @@ function privateAddress(address) {
   return v6 === '::' || v6 === '::1' || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6) || v6.startsWith('ff')
 }
 
-async function assertPublic(url) {
-  const { hostname } = new URL(url)
-  const host = hostname.replace(/^\[|\]$/g, '')
-  if (/^(localhost|.*\.local|.*\.internal|homepage[\w-]*)$/i.test(host)) throw new Error('Ten adres nie jest publiczny.')
+/** Sprawdzony publiczny adres IP hosta – albo wyjątek. */
+async function publicAddress(hostname) {
+  const host = String(hostname).replace(/^\[|\]$/g, '')
+  if (!host.includes('.') && !net.isIP(host)) throw new Error('Ten adres nie jest publiczny.')
+  if (/^(localhost|.*\.localhost|.*\.local|.*\.internal|homepage[\w-]*)$/i.test(host)) throw new Error('Ten adres nie jest publiczny.')
   const addresses = net.isIP(host) ? [{ address: host }] : await dns.lookup(host, { all: true }).catch(() => [])
   if (!addresses.length) throw new Error('Nie znaleziono tej domeny.')
   if (addresses.some(entry => privateAddress(entry.address))) throw new Error('Ten adres nie jest publiczny.')
+  return addresses[0].address
 }
+
+const assertPublic = async url => { await publicAddress(new URL(url).hostname) }
 
 /** fetch z kontrolą każdego przekierowania i limitem rozmiaru odpowiedzi. */
 async function safeFetch(url, { accept, max }) {
@@ -155,25 +162,26 @@ export function parseHtml(html, base) {
     return ''
   }
   const title = meta('og:title', 'twitter:title') || head.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || ''
-  const icons = [...head.matchAll(/<link\b[^>]*>/gi)]
+  // Favicony (`rel="icon"`) – wektorowe i większe przodem. Ikony Apple to
+  // osobna, zapasowa lista: bywają zupełnie innym obrazkiem niż favicon.
+  const links = [...head.matchAll(/<link\b[^>]*>/gi)]
     .map(match => attributes(match[0]))
-    .filter(link => /(^|\s)(icon|apple-touch-icon|apple-touch-icon-precomposed|mask-icon)(\s|$)/i.test(link.rel || '') && link.href)
+    .filter(link => link.href && link.rel)
     .map(link => {
-      const size = Math.max(0, ...String(link.sizes || '').split(/\s+/).map(entry => Number(entry.split(/x/i)[0]) || 0))
-      const rel = link.rel.toLowerCase()
+      const size = Math.max(0, ...String(link.sizes || '').split(/\s+/).map(entry => (entry === 'any' ? 512 : Number(entry.split(/x/i)[0]) || 0)))
+      const rel = link.rel.toLowerCase().split(/\s+/)
       const svg = /svg/i.test(link.type || '') || /\.svg(\?|$)/i.test(link.href)
-      // Większe i wektorowe przodem; maska Safari to jednokolorowy kształt – na końcu.
-      const score = rel.includes('mask-icon') ? -1 : svg ? 1000 : rel.includes('apple-touch') ? 600 + size : size || 32
-      try { return { href: new URL(decodeEntities(link.href), base).toString(), score } } catch { return null }
+      const kind = rel.includes('icon') ? 'icon' : rel.some(entry => entry.startsWith('apple-touch-icon')) ? 'apple' : ''
+      try { return kind && { kind, href: new URL(decodeEntities(link.href), base).toString(), score: svg ? 1000 : size || 32 } } catch { return null }
     })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score)
-    .map(icon => icon.href)
   return {
     title: tidy(title, 200),
     description: tidy(meta('og:description', 'description', 'twitter:description'), 600),
     siteName: tidy(meta('og:site_name', 'application-name'), 120),
-    icons,
+    icons: links.filter(link => link.kind === 'icon').map(link => link.href),
+    appleIcons: links.filter(link => link.kind === 'apple').map(link => link.href),
   }
 }
 
@@ -232,28 +240,104 @@ async function toIcon(buffer) {
 export async function registerLinks(app, { dataDir, uploadDir, readJson, updateJson, requireAdmin, enforceSameOrigin }) {
   const file = path.join(dataDir, 'links.json')
   const iconDir = path.join(uploadDir, 'link-icons')
+  const shotDir = path.join(uploadDir, 'link-shots')
   await fs.mkdir(iconDir, { recursive: true })
+  await fs.mkdir(shotDir, { recursive: true })
   await updateJson(file, null, current => current || { categories: DEFAULT_LINK_CATEGORIES, items: [] })
 
   const load = () => readJson(file, { categories: [], items: [] })
   const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0) || String(a.title).localeCompare(String(b.title), 'pl')
-  const publicItem = ({ clicks, ...item }) => ({ ...item, domain: domainOf(item.url) })
+  const publicItem = ({ clicks, shotAt, shotFailedAt, note, ...item }) => ({ ...item, domain: domainOf(item.url) })
+  const fileKey = url => crypto.createHash('sha1').update(url).digest('hex').slice(0, 16)
+  const stamp = () => Date.now().toString(36)
 
-  async function fetchIcon(candidates, pageUrl) {
+  /** Favicon strony jako PNG 96×96; ikony Apple dopiero, gdy faviconu brak. */
+  async function fetchIcon(meta, pageUrl) {
     const origin = new URL(pageUrl).origin
-    const list = [...new Set([...candidates, `${origin}/apple-touch-icon.png`, `${origin}/favicon.ico`])].slice(0, 6)
+    const list = [...new Set([
+      ...meta.icons,
+      `${origin}/favicon.ico`,
+      `${origin}/favicon.svg`,
+      ...(meta.appleIcons || []),
+      `${origin}/apple-touch-icon.png`,
+    ])].slice(0, 8)
     for (const candidate of list) {
       try {
         const { body } = await safeFetch(candidate, { accept: 'image/*,*/*;q=0.5', max: MAX_ICON })
         const png = await toIcon(body)
         if (!png) continue
-        const name = `${crypto.createHash('sha1').update(domainOf(pageUrl)).digest('hex').slice(0, 16)}.png`
+        const name = `${fileKey(domainOf(pageUrl))}.png`
         await fs.writeFile(path.join(iconDir, name), png)
-        return `/uploads/link-icons/${name}?v=${Date.now().toString(36)}`
+        return `/uploads/link-icons/${name}?v=${stamp()}`
       } catch { /* następny kandydat */ }
     }
     return ''
   }
+
+  /** Zrzut górnej części strony – WebP 800×500 do miniatury karty. */
+  async function makeShot(url) {
+    const png = await captureScreenshot(url, { resolve: publicAddress })
+    const webp = await sharp(png)
+      .resize(...SHOT_SIZE, { fit: 'cover', position: 'top', kernel: sharp.kernel.lanczos3 })
+      .webp({ quality: 80, effort: 5 })
+      .toBuffer()
+    const name = `${fileKey(url)}.webp`
+    await fs.writeFile(path.join(shotDir, name), webp)
+    return `/uploads/link-shots/${name}?v=${stamp()}`
+  }
+
+  async function readPage(url) {
+    const page = await safeFetch(url, { accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.5', max: MAX_HTML })
+    const html = /html|xml/i.test(page.type) || !page.type ? decodeHtml(page.body, page.type) : ''
+    return { url: page.url, meta: html ? parseHtml(html, page.url) : { title: '', description: '', siteName: '', icons: [], appleIcons: [] } }
+  }
+
+  const patchItem = (id, patch) => updateJson(file, null, current => (current?.items.some(item => item.id === id)
+    ? { ...current, items: current.items.map(item => (item.id === id ? { ...item, ...patch } : item)) }
+    : current))
+
+  /*
+   * Kolejka miniatur: po starcie i po każdym zapisie dorabia zrzuty linkom,
+   * które ich nie mają. Przy pierwszym zrzucie odświeża też automatyczną
+   * ikonę (favicon), więc starsze linki same przechodzą na nowe zasady.
+   */
+  let working = false
+  let again = false
+  async function processMissingShots() {
+    if (working) { again = true; return }
+    if (!browserPath()) return
+    working = true
+    try {
+      do {
+        again = false
+        const { items } = await load()
+        const now = Date.now()
+        const pending = items.filter(item => !item.shot && !(item.shotFailedAt && now - Date.parse(item.shotFailedAt) < RETRY_FAILED_SHOT))
+        for (const item of pending) {
+          const patch = {}
+          try {
+            patch.shot = await makeShot(item.url)
+            patch.shotAt = new Date().toISOString()
+            patch.shotFailedAt = undefined
+          } catch (error) {
+            console.warn(`[links] zrzut ${item.url}: ${error.message}`)
+            patch.shotFailedAt = new Date().toISOString()
+          }
+          if (!item.shotAt && (!item.icon || item.icon.startsWith('/uploads/link-icons/'))) {
+            const icon = await readPage(item.url).then(page => fetchIcon(page.meta, page.url)).catch(() => '')
+            if (icon) patch.icon = icon
+          }
+          // Zapis tylko, gdy w międzyczasie nikt nie zmienił adresu.
+          await updateJson(file, null, current => (current?.items.some(entry => entry.id === item.id && entry.url === item.url)
+            ? { ...current, items: current.items.map(entry => (entry.id === item.id ? { ...entry, ...patch } : entry)) }
+            : current))
+        }
+      } while (again)
+    } finally {
+      working = false
+    }
+  }
+  setTimeout(() => processMissingShots().catch(error => console.warn('[links] kolejka zrzutów:', error.message)), 15_000)
 
   app.get('/api/links', async (_req, res) => {
     const data = await load()
@@ -279,30 +363,45 @@ export async function registerLinks(app, { dataDir, uploadDir, readJson, updateJ
 
   app.get('/api/admin/links', requireAdmin, async (_req, res) => {
     const data = await load()
-    res.json({ ...data, items: [...data.items].sort(byOrder) })
+    res.json({ ...data, items: [...data.items].sort(byOrder), screenshots: Boolean(browserPath()) })
   })
+
+  const fetchError = error => (error.name === 'TimeoutError' || error.name === 'AbortError'
+    ? 'Strona nie odpowiedziała w 8 sekund.'
+    : error.message?.startsWith('fetch failed') ? 'Nie udało się połączyć ze stroną.' : error.message) || 'Nie udało się odczytać strony.'
 
   app.post('/api/admin/links/inspect', requireAdmin, enforceSameOrigin, async (req, res) => {
     const url = cleanUrl(req.body?.url)
     if (!url) return res.status(400).json({ error: 'Podaj poprawny adres strony (http lub https).' })
     try {
-      const page = await safeFetch(url, { accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.5', max: MAX_HTML })
-      const html = /html|xml/i.test(page.type) || !page.type ? decodeHtml(page.body, page.type) : ''
-      const meta = html ? parseHtml(html, page.url) : { title: '', description: '', siteName: '', icons: [] }
-      const icon = req.body?.icon === false ? '' : await fetchIcon(meta.icons, page.url)
+      const page = await readPage(url)
+      const icon = req.body?.icon === false ? '' : await fetchIcon(page.meta, page.url)
       res.json({
         url: cleanUrl(page.url) || url,
         requested: url,
-        title: meta.title || meta.siteName || domainOf(page.url),
-        description: meta.description,
-        siteName: meta.siteName,
+        title: page.meta.title || page.meta.siteName || domainOf(page.url),
+        description: page.meta.description,
+        siteName: page.meta.siteName,
         icon,
       })
     } catch (error) {
-      const message = error.name === 'TimeoutError' || error.name === 'AbortError'
-        ? 'Strona nie odpowiedziała w 8 sekund.'
-        : error.message?.startsWith('fetch failed') ? 'Nie udało się połączyć ze stroną.' : error.message
-      res.status(422).json({ error: message || 'Nie udało się odczytać strony.' })
+      res.status(422).json({ error: fetchError(error) })
+    }
+  })
+
+  // Nowy zrzut zapisanego linku – od razu trafia do links.json.
+  app.post('/api/admin/links/:id/shot', requireAdmin, enforceSameOrigin, async (req, res) => {
+    const item = (await load()).items.find(entry => entry.id === req.params.id)
+    if (!item) return res.status(404).json({ error: 'Najpierw zapisz ten link.' })
+    if (!browserPath()) return res.status(503).json({ error: 'Na serwerze nie ma przeglądarki do zrzutów (Chromium).' })
+    try {
+      await assertPublic(item.url)
+      const shot = await makeShot(item.url)
+      const shotAt = new Date().toISOString()
+      await patchItem(item.id, { shot, shotAt, shotFailedAt: undefined })
+      res.json({ shot, shotAt })
+    } catch (error) {
+      res.status(422).json({ error: `Nie udało się zrobić zrzutu: ${fetchError(error)}` })
     }
   })
 
@@ -330,7 +429,6 @@ export async function registerLinks(app, { dataDir, uploadDir, readJson, updateJ
         url,
         title,
         description: cleanText(raw.description, 600),
-        note: cleanText(raw.note, 600),
         category: raw.category,
         tags: [...new Set((Array.isArray(raw.tags) ? raw.tags : String(raw.tags || '').split(','))
           .map(tag => cleanText(tag, 40).replace(/^#/, '').toLowerCase()).filter(Boolean))].slice(0, 8),
@@ -343,17 +441,28 @@ export async function registerLinks(app, { dataDir, uploadDir, readJson, updateJ
       }
       // Sama zmiana kolejności nie odświeża daty – „ostatnio zmienione” ma znaczyć treść.
       if (before) {
-        const same = ['url', 'title', 'description', 'note', 'category', 'icon', 'featured', 'published'].every(key => before[key] === item[key])
+        const same = ['url', 'title', 'description', 'category', 'icon', 'featured', 'published'].every(key => before[key] === item[key])
           && JSON.stringify(before.tags || []) === JSON.stringify(item.tags)
         item.updatedAt = same ? before.updatedAt || now : now
       }
       items.push(item)
     }
     if (new Set(items.map(item => item.id)).size !== items.length) return res.status(400).json({ error: 'Identyfikatory linków muszą być unikalne.' })
+    // Zrzut i licznik należą do serwera; zrzut przepada, gdy zmienił się adres.
     const saved = await updateJson(file, previous, current => ({
       categories,
-      items: items.map(item => ({ ...item, clicks: current.items.find(entry => entry.id === item.id)?.clicks || 0 })),
+      items: items.map(item => {
+        const stored = current.items.find(entry => entry.id === item.id)
+        const keep = stored && stored.url === item.url
+        return {
+          ...item,
+          clicks: stored?.clicks || 0,
+          ...(keep && stored.shot ? { shot: stored.shot, shotAt: stored.shotAt } : {}),
+          ...(keep && stored.shotFailedAt ? { shotFailedAt: stored.shotFailedAt } : {}),
+        }
+      }),
     }))
-    res.json(saved)
+    res.json({ ...saved, screenshots: Boolean(browserPath()) })
+    processMissingShots().catch(error => console.warn('[links] kolejka zrzutów:', error.message))
   })
 }

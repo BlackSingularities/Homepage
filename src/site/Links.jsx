@@ -5,8 +5,6 @@ import { applySeo } from '../lib/seo'
 import SectionHead from './SectionHead'
 import '../styles/links.css'
 
-const FRESH_DAYS = 21
-
 /** Przejście liczy serwer; sendBeacon nie blokuje otwarcia karty. */
 function countVisit(id) {
   const url = `/api/links/${encodeURIComponent(id)}/visit`
@@ -26,9 +24,20 @@ function Favicon({ item, large }) {
   )
 }
 
-function LinkCard({ item, featured, category, onTag }) {
+/** Miniatura: zrzut strony zrobiony przez serwer; bez niego – favicon na tle. */
+function Shot({ item }) {
+  const [broken, setBroken] = useState(false)
+  return (
+    <div className="link-shot" aria-hidden="true">
+      {item.shot && !broken
+        ? <img src={item.shot} alt="" loading="lazy" decoding="async" onError={() => setBroken(true)} />
+        : <span className="link-shot-empty"><Favicon item={item} large /></span>}
+    </div>
+  )
+}
+
+function LinkCard({ item, featured }) {
   const { t } = useT()
-  const fresh = Date.now() - Date.parse(item.createdAt || 0) < FRESH_DAYS * 864e5
   return (
     <article className={`link-card ${featured ? 'is-featured' : ''}`}>
       <a
@@ -40,30 +49,18 @@ function LinkCard({ item, featured, category, onTag }) {
         onAuxClick={event => event.button === 1 && countVisit(item.id)}
         aria-label={`${item.title} – ${t('links.opens', item.domain)}`}
       />
-      <header className="link-card-head">
-        <Favicon item={item} large={featured} />
-        <div className="link-card-title">
-          <h3>{item.title}</h3>
-          <span className="mono">{item.domain}</span>
-        </div>
-        <ArrowUpRight className="link-card-go" size={featured ? 22 : 18} aria-hidden="true" />
-      </header>
-      {item.description && <p className="link-card-desc">{item.description}</p>}
-      {item.note && (
-        <p className="link-card-note">
-          <span>{t('links.why')}</span>
-          {item.note}
-        </p>
-      )}
-      {(item.tags?.length > 0 || fresh || category) && (
-        <footer className="link-card-tags">
-          {fresh && <span className="link-badge is-new">{t('links.new')}</span>}
-          {category && <span className="link-badge">{category}</span>}
-          {item.tags?.map(tag => (
-            <button key={tag} type="button" className="link-tag" onClick={() => onTag(tag)}>#{tag}</button>
-          ))}
-        </footer>
-      )}
+      <Shot item={item} />
+      <div className="link-card-body">
+        <header className="link-card-head">
+          <Favicon item={item} />
+          <div className="link-card-title">
+            <h3>{item.title}</h3>
+            <span className="mono">{item.domain}</span>
+          </div>
+          <ArrowUpRight className="link-card-go" size={18} aria-hidden="true" />
+        </header>
+        {item.description && <p className="link-card-desc">{item.description}</p>}
+      </div>
     </article>
   )
 }
@@ -116,7 +113,7 @@ export default function Links() {
   const matches = useMemo(() => items.filter(item => (!category || item.category === category)
     && (!needle || (tagOnly
       ? (item.tags || []).includes(needle)
-      : [item.title, item.domain, item.description, item.note, nameOf(item.category), ...(item.tags || [])]
+      : [item.title, item.domain, item.description, nameOf(item.category), ...(item.tags || [])]
         .join(' ').toLocaleLowerCase('pl').includes(needle)))), [items, category, needle, tagOnly]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const featured = filtering ? [] : items.filter(item => item.featured)
@@ -124,12 +121,6 @@ export default function Links() {
     .filter(entry => !category || entry.id === category)
     .map(entry => ({ ...entry, entries: matches.filter(item => item.category === entry.id) }))
     .filter(group => group.entries.length)
-
-  const pickTag = tag => {
-    setQuery(`#${tag}`)
-    setCategory('')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
 
   return (
     <main className="catalog links-page">
@@ -190,8 +181,8 @@ export default function Links() {
             {featured.length > 0 && (
               <section className="links-group links-featured" aria-labelledby="links-featured">
                 <h2 id="links-featured" className="links-group-title"><Star size={16} /> {t('links.featured')}</h2>
-                <div className="links-grid is-featured">
-                  {featured.map(item => <LinkCard key={item.id} item={item} featured category={nameOf(item.category)} onTag={pickTag} />)}
+                <div className="links-grid">
+                  {featured.map(item => <LinkCard key={item.id} item={item} featured />)}
                 </div>
               </section>
             )}
@@ -204,7 +195,7 @@ export default function Links() {
                   {group.description && <p>{group.description}</p>}
                 </header>
                 <div className="links-grid">
-                  {group.entries.map(item => <LinkCard key={item.id} item={item} onTag={pickTag} />)}
+                  {group.entries.map(item => <LinkCard key={item.id} item={item} />)}
                 </div>
               </section>
             ))}

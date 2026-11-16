@@ -589,7 +589,7 @@ function linksView({ lang, categories = [], items = [] }) {
   const groups = categories
     .map(category => ({ category, entries: items.filter(item => item.category === category.id) }))
     .filter(group => group.entries.length)
-  const body = `<main><h1>${escapeHtml(t.links)}</h1><p>${escapeHtml(t.linksDescription)}</p>${groups.map(({ category, entries }) => `<section><h2>${escapeHtml(category.name)}</h2><ul>${entries.map(item => `<li><a href="${escapeHtml(item.url)}" rel="noopener">${escapeHtml(item.title)}</a> (${escapeHtml(item.domain)})${item.description ? ` – ${escapeHtml(item.description)}` : ''}${item.note ? ` <em>${escapeHtml(item.note)}</em>` : ''}</li>`).join('')}</ul></section>`).join('')}</main>`
+  const body = `<main><h1>${escapeHtml(t.links)}</h1><p>${escapeHtml(t.linksDescription)}</p>${groups.map(({ category, entries }) => `<section><h2>${escapeHtml(category.name)}</h2><ul>${entries.map(item => `<li><a href="${escapeHtml(item.url)}" rel="noopener">${escapeHtml(item.title)}</a> (${escapeHtml(item.domain)})${item.description ? ` – ${escapeHtml(item.description)}` : ''}</li>`).join('')}</ul></section>`).join('')}</main>`
   return {
     title: t.linksTitle,
     description: t.linksDescription,

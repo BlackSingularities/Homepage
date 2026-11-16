@@ -1,9 +1,9 @@
 /* ══════════════════════════════════════════════════════════════════
    PRZYDATNE LINKI – /przydatne-linki
 
-   Karta to cały klikalny prostokąt (nakładka .link-card-hit); tagi
-   leżą nad nakładką i filtrują listę. Wyróżnienia robimy tłem, obwódką
-   i górną linią – bez pionowych belek z boku.
+   Karta to cały klikalny prostokąt (nakładka .link-card-hit): zrzut
+   strony, favicon, tytuł, domena i krótki opis. Wyróżnienia robimy
+   obwódką i górną linią – bez pionowych belek z boku.
    ══════════════════════════════════════════════════════════════════ */
 
 .links-page .section-head h1 {
@@ -122,24 +122,22 @@
 .links-featured .links-group-title { margin-bottom: 20px; font-size: clamp(22px, 2vw, 28px); color: var(--ink-2); }
 .links-featured .links-group-title svg { color: var(--accent); fill: currentColor; }
 
+/* ── karta ── */
+
+/* Wszystkie karty mają tę samą szerokość kolumny – także polecane. */
 .links-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 14px;
+  gap: 16px;
 }
-
-.links-grid.is-featured { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
-
-/* ── karta ── */
 
 .link-card {
   position: relative;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 12px;
   min-width: 0;
-  padding: 20px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, .022);
@@ -161,34 +159,61 @@
   border-radius: inherit;
 }
 
-.link-card-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.link-card-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-.link-card-head { display: flex; align-items: center; gap: 14px; min-width: 0; }
+/* Miniatura – zrzut górnej części strony, 16:10. */
+.link-shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(90% 120% at 50% 0%, rgba(var(--accent-rgb), .10), transparent 65%),
+    rgba(255, 255, 255, .03);
+}
+
+.link-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform .6s var(--ease), filter .4s var(--ease);
+  filter: saturate(.92) brightness(.94);
+}
+
+.link-card:hover .link-shot img { transform: scale(1.03); filter: none; }
+
+.link-shot-empty { display: grid; place-items: center; height: 100%; }
+.link-shot-empty .link-icon { width: 72px; height: 72px; border-radius: 20px; }
+.link-shot-empty .link-icon b { font-size: 36px; }
+
+.link-card-body { display: flex; flex-direction: column; gap: 10px; flex: 1; padding: 16px 18px 18px; }
+
+.link-card-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
 .link-icon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
 }
 
-.link-icon img { width: 66%; height: 66%; object-fit: contain; }
-.link-icon b { font: 400 22px/1 var(--font-display); color: var(--accent); }
-.link-icon.is-large { width: 56px; height: 56px; border-radius: 15px; }
-.link-icon.is-large b { font-size: 28px; }
+.link-icon img { width: 70%; height: 70%; object-fit: contain; }
+.link-icon b { font: 400 19px/1 var(--font-display); color: var(--accent); }
 
-.link-card-title { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.link-card-title { display: grid; gap: 2px; min-width: 0; flex: 1; }
 
 .link-card-title h3 {
   margin: 0;
   overflow: hidden;
   font-family: var(--font);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 650;
   letter-spacing: -.01em;
   line-height: 1.3;
@@ -207,91 +232,28 @@
   margin: 0;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  color: var(--ink-2);
-  font-size: 14.5px;
-  line-height: 1.6;
-}
-
-.link-card-note {
-  margin: 0;
-  padding: 11px 13px;
-  border: 1px solid rgba(var(--accent-rgb), .16);
-  border-radius: 10px;
-  background: rgba(var(--accent-rgb), .05);
-  color: var(--ink);
-  font: italic 400 15.5px/1.5 var(--font-display);
-}
-
-.link-card-note span {
-  display: block;
-  margin-bottom: 3px;
-  font: 700 10px/1.4 var(--font);
-  font-style: normal;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.link-card-tags {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: auto;
-  padding-top: 4px;
-  pointer-events: none;
-}
-
-.link-badge,
-.link-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 24px;
-  padding: 0 9px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: transparent;
-  font-size: 11.5px;
-  font-weight: 600;
+  -webkit-line-clamp: 2;
+  min-height: calc(2 * 1.55em);
   color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.55;
 }
 
-.link-badge.is-new { border-color: rgba(95, 211, 154, .35); background: rgba(95, 211, 154, .08); color: var(--good); }
-
-.link-tag {
-  pointer-events: auto;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  transition: color .2s, border-color .2s, background .2s;
-}
-
-.link-tag:hover { border-color: var(--line-gold); background: rgba(var(--accent-rgb), .08); color: var(--accent); }
-
-/* Polecane: większa karta, złota górna linia i delikatna poświata. */
-.link-card.is-featured {
-  padding: 24px;
-  border-color: rgba(var(--accent-rgb), .22);
-  background:
-    radial-gradient(120% 90% at 0% 0%, rgba(var(--accent-rgb), .09), transparent 60%),
-    rgba(255, 255, 255, .025);
-}
+/* Polecane: ta sama karta, złota obwódka i górna linia. */
+.link-card.is-featured { border-color: rgba(var(--accent-rgb), .28); }
 
 .link-card.is-featured::before {
   content: "";
   position: absolute;
-  top: -1px;
+  top: 0;
   left: 24px;
   right: 24px;
+  z-index: 2;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), .7), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), .8), transparent);
 }
 
-.link-card.is-featured:hover { border-color: rgba(var(--accent-rgb), .42); box-shadow: 0 18px 44px rgba(0, 0, 0, .4), 0 0 0 1px rgba(var(--accent-rgb), .08); }
-.link-card.is-featured .link-card-title h3 { font-size: 19px; }
+.link-card.is-featured:hover { border-color: rgba(var(--accent-rgb), .48); box-shadow: 0 18px 44px rgba(0, 0, 0, .4), 0 0 0 1px rgba(var(--accent-rgb), .08); }
 
 .links-empty {
   display: grid;
@@ -305,15 +267,16 @@
 
 @media (max-width: 640px) {
   .links-search { flex-basis: 100%; }
-  .link-card { padding: 16px; }
-  .link-card.is-featured { padding: 18px; }
+  .link-card-body { padding: 14px 16px 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .link-card,
-  .link-card-go { transition: none; }
+  .link-card-go,
+  .link-shot img { transition: none; }
   .link-card:hover,
-  .link-card:focus-within { transform: none; }
+  .link-card:focus-within,
+  .link-card:hover .link-shot img { transform: none; }
 }
 
 /* Strona justuje teksty ciągłe; w wąskich kartach dawało to rozstrzelone odstępy. */

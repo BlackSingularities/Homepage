@@ -97,16 +97,21 @@ Testy biblioteki: `npm run test:resources`.
 ## Przydatne linki
 
 Katalog polecanych stron pod `/przydatne-linki` (link „Linki” w menu i stopce). Strona
-grupuje linki według kategorii, ma wyszukiwarkę (skrót `/`), filtr kategorii, filtr po
-tagu (`#tag`), sekcję „Polecam szczególnie” i plakietkę „Nowe” przez 21 dni od dodania.
+grupuje linki według kategorii, ma wyszukiwarkę (skrót `/`, `#tag` szuka po tagu), filtr
+kategorii i sekcję „Polecam szczególnie”. Karty mają jednakową szerokość: zrzut strony,
+favicon, tytuł, domena i dwulinijkowy opis – bez plakietek.
 
-Panel `/admin/przydatne-linki`: wklej adres, a serwer sam odczyta tytuł, opis i ikonę
-strony (`POST /api/admin/links/inspect`). Kilka adresów naraz – przycisk **Wiele naraz**
-albo wklejenie listy w pole szybkiego dodawania. Każdy link ma opis, osobisty komentarz
-„Dlaczego warto”, kategorię, tagi, ikonę, widoczność i wyróżnienie; kolejność ustawia
-się strzałkami. Zmiany publikuje **Zapisz** (albo Ctrl+S).
+Panel `/admin/przydatne-linki`: wystarczy wkleić adres – serwer sam odczyta tytuł, opis
+i favicon (`POST /api/admin/links/inspect`), a po zapisie zrobi zrzut strony na miniaturę.
+Kilka adresów naraz – przycisk **Wiele naraz** albo wklejenie listy w pole szybkiego
+dodawania. Zmiany publikuje **Zapisz** (albo Ctrl+S).
 
-- Dane: `links.json`, ikony: `uploads/link-icons/` (PNG 96×96, także z plików ICO).
+- Dane: `links.json`, ikony: `uploads/link-icons/` (PNG 96×96, favicon przed ikonami Apple),
+  zrzuty: `uploads/link-shots/` (WebP 800×500 z widoku 1280×800).
+- Zrzuty robi headless Chromium (`server/screenshot.mjs`, w obrazie API z `apk add chromium`)
+  po kolei w tle: po starcie serwera i po każdym zapisie dla linków bez miniatury; nieudany
+  zrzut ponawia się po dobie, a przycisk **Zrób nowy zrzut** robi go od razu. Cały ruch
+  przeglądarki idzie przez lokalny pośrednik, który wpuszcza tylko publiczne adresy IP.
 - Serwer pobiera strony wyłącznie z publicznych adresów IP (sprawdza każde przekierowanie),
   z limitem 8 s i 768 KB, więc odwiedzający nie łączą się z obcymi serwerami przed kliknięciem.
 - Przejścia liczy `POST /api/links/:id/visit` – jedno na adres i link co 10 minut.
