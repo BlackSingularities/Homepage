@@ -1,5 +1,6 @@
 import express from 'express'
 import { registerResources } from './resources.mjs'
+import { registerLinks, domainOf } from './links.mjs'
 import { registerFeedback } from './feedback.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
@@ -1098,6 +1099,13 @@ async function publishedPages() {
   return (await readJson(PAGES_FILE, [])).filter(page => page.published !== false).sort(byOrder)
 }
 
+/** Opublikowane linki wraz z kategoriami, które coś zawierają. */
+async function publishedLinks() {
+  const data = await readJson(path.join(DATA_DIR, 'links.json'), { categories: [], items: [] })
+  const items = data.items.filter(item => item.published).map(item => ({ ...item, domain: domainOf(item.url) }))
+  return { categories: data.categories.filter(category => items.some(item => item.category === category.id)), items }
+}
+
 /** Dane dla jednego widoku – te same, które przeglądarka dostaje z API. */
 async function seoData(route) {
   const { lang } = route
@@ -1106,6 +1114,7 @@ async function seoData(route) {
     pages: pages.map(page => localizePage(page, lang)),
     projects: entries.map(({ project, release }) => projectSummary(localizeProject(project, lang), release, counts)),
   }
+  if (route.view === 'links') data.links = await publishedLinks()
   if (route.view === 'resources') data.resources = (await readJson(path.join(DATA_DIR, 'resources.json'), { items: [] })).items.filter(item => item.published)
   if (route.view === 'home' || route.view === 'catalog') data.content = await getContent(lang)
   if (route.view === 'project') {
@@ -1128,6 +1137,7 @@ app.get('/sitemap.xml', async (_req, res, next) => {
     res.send(renderSitemap({
       pages,
       resources: (await readJson(path.join(DATA_DIR, 'resources.json'), { items: [] })).items.filter(item => item.published),
+      links: (await publishedLinks()).items,
       projects: entries.map(entry => entry.project),
       updatedAt: stamps.at(-1) || new Date().toISOString(),
     }))
@@ -1140,7 +1150,7 @@ app.get('/sitemap.xml', async (_req, res, next) => {
  * Publiczne adresy strony (nginx kieruje je tutaj). Gdy szablonu brak –
  * lokalnie albo przy błędzie obrazu – 503 każe nginxowi podać zwykły index.html.
  */
-app.get(/^\/(?:en(?:\/.*)?|do-pobrania(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, async (req, res) => {
+app.get(/^\/(?:en(?:\/.*)?|do-pobrania(?:\/.*)?|przydatne-linki|portfolio(?:\/.*)?|realizacje(?:\/.*)?|p\/.+)?$/, async (req, res) => {
   let template
   try {
     template = await readTemplate()
@@ -1163,6 +1173,7 @@ app.get(/^\/(?:en(?:\/.*)?|do-pobrania(?:\/.*)?|portfolio(?:\/.*)?|realizacje(?:
 /* ── protected admin API ─────────────────────────────────────────────── */
 
 await registerResources(app, { dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin })
+await registerLinks(app, { dataDir: DATA_DIR, uploadDir: UPLOAD_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin })
 
 /** Krótkie powiadomienie właściciela o zgłoszeniu z aplikacji – tylko gdy poczta jest skonfigurowana. */
 async function notifyOwnerAboutFeedback({ id, replyTo, subject, kicker, heading, lines, body }) {

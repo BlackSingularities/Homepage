@@ -22,6 +22,9 @@ const T = {
     suffix: 'Adam Rędzikowski',
     home: 'Strona główna',
     portfolio: 'Portfolio',
+    links: 'Przydatne linki',
+    linksTitle: 'Przydatne linki – strony warte odwiedzenia | Adam Rędzikowski',
+    linksDescription: 'Wybrane narzędzia, serwisy i miejsca w sieci, które polecam – sprawdzone, ciekawe i warte odwiedzenia.',
     offer: 'Oferta',
     contact: 'Kontakt',
     download: 'Pobierz',
@@ -44,6 +47,9 @@ const T = {
     suffix: 'Adam Rędzikowski',
     home: 'Home',
     portfolio: 'Portfolio',
+    links: 'Useful links',
+    linksTitle: 'Useful links – websites worth a visit | Adam Rędzikowski',
+    linksDescription: 'Hand-picked tools, services and corners of the web I recommend – tried, interesting and worth a visit.',
     offer: 'Services',
     contact: 'Contact',
     download: 'Download',
@@ -69,6 +75,7 @@ export function parseRoute(pathname) {
     lang = 'en'
     clean = clean.slice(3) || '/'
   }
+  if (clean === '/przydatne-linki') return { lang, view: 'links', path: clean }
   if (clean === '/do-pobrania' || clean.startsWith('/do-pobrania/')) return { lang, view: 'resources', slug: clean.slice(13), path: clean }
   if (clean === '/') return { lang, view: 'home', path: '/' }
   if (clean === '/portfolio' || clean === '/realizacje') return { lang, view: 'catalog', path: '/portfolio' }
@@ -199,6 +206,7 @@ function navHtml(lang, pages) {
   return `<header><nav>${[
     link('/', t.home),
     link('/portfolio', t.portfolio),
+    link('/przydatne-linki', t.links),
     ...pages.map(page => link(`/p/${page.slug}`, page.title)),
     `<a href="${escapeHtml(localePath('/', lang))}#kontakt">${escapeHtml(t.contact)}</a>`,
     `<a href="${escapeHtml(localePath('/', other))}" hreflang="${other}" lang="${other}">${other === 'en' ? 'English' : 'Polski'}</a>`,
@@ -486,6 +494,7 @@ export async function renderDocument(template, pathname, load) {
   let view
   if (route.view === 'home') view = homeView({ lang, ...data })
   else if (route.view === 'catalog') view = catalogView({ lang, ...data })
+  else if (route.view === 'links') view = linksView({ lang, ...(data.links || { categories: [], items: [] }) })
   else if (route.view === 'resources') view = resourcesView(route, data.resources || [])
   else if (route.view === 'project' && data.project) view = projectView({ lang, ...data })
   else if (route.view === 'page' && data.page) view = pageView({ lang, ...data })
@@ -534,11 +543,12 @@ export async function renderDocument(template, pathname, load) {
 
 /* ── sitemap ─────────────────────────────────────────────────────────── */
 
-export function renderSitemap({ pages, projects, resources = [], updatedAt }) {
+export function renderSitemap({ pages, projects, resources = [], links = [], updatedAt }) {
   const entries = [
     { path: '/', lastmod: updatedAt, priority: '1.0', changefreq: 'weekly' },
     { path: '/do-pobrania', lastmod: updatedAt, priority: '0.8', changefreq: 'weekly' },
     ...resources.map(item => ({ path: `/do-pobrania/${item.slug}`, lastmod: item.updatedAt, priority: '0.7', changefreq: 'monthly' })),
+    { path: '/przydatne-linki', lastmod: links.map(item => item.updatedAt).filter(Boolean).sort().at(-1) || updatedAt, priority: '0.6', changefreq: 'weekly' },
     { path: '/portfolio', lastmod: updatedAt, priority: '0.9', changefreq: 'weekly' },
     ...projects.map(project => ({ path: `/portfolio/${project.slug}`, lastmod: project.updatedAt, priority: '0.8', changefreq: 'monthly', image: project.cover, images: project.shots })),
     ...pages.map(page => ({ path: `/p/${page.slug}`, lastmod: page.updatedAt, priority: '0.7', changefreq: 'monthly', image: page.cover })),
@@ -572,4 +582,29 @@ function resourcesView({ lang, slug }, items) {
     ? `<h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${['description', 'instructions', 'requirements', 'license'].map(key => `<p>${escapeHtml(item[key])}</p>`).join('')}${item.files.map(f => `<p><a href="/api/resources/${escapeHtml(item.slug)}/files/${escapeHtml(f.id)}">${escapeHtml(f.name)}</a></p>`).join('')}`
     : `<h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${items.map(i => `<article><h2><a href="${escapeHtml(localePath(`/do-pobrania/${i.slug}`, lang))}">${escapeHtml(i.title)}</a></h2><p>${escapeHtml(i.summary)}</p></article>`).join('')}`
   return { title, description, body: `<main>${body}</main>`, jsonLd: { '@context': 'https://schema.org', '@type': item ? 'CreativeWork' : 'CollectionPage', name: title, description } }
+}
+
+function linksView({ lang, categories = [], items = [] }) {
+  const t = T[lang]
+  const groups = categories
+    .map(category => ({ category, entries: items.filter(item => item.category === category.id) }))
+    .filter(group => group.entries.length)
+  const body = `<main><h1>${escapeHtml(t.links)}</h1><p>${escapeHtml(t.linksDescription)}</p>${groups.map(({ category, entries }) => `<section><h2>${escapeHtml(category.name)}</h2><ul>${entries.map(item => `<li><a href="${escapeHtml(item.url)}" rel="noopener">${escapeHtml(item.title)}</a> (${escapeHtml(item.domain)})${item.description ? ` – ${escapeHtml(item.description)}` : ''}${item.note ? ` <em>${escapeHtml(item.note)}</em>` : ''}</li>`).join('')}</ul></section>`).join('')}</main>`
+  return {
+    title: t.linksTitle,
+    description: t.linksDescription,
+    body,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: t.links,
+      description: t.linksDescription,
+      url: absolute(localePath('/przydatne-linki', lang)),
+      mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: items.length,
+        itemListElement: items.slice(0, 100).map((item, index) => ({ '@type': 'ListItem', position: index + 1, url: item.url, name: item.title })),
+      },
+    },
+  }
 }

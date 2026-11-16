@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, LoaderCircle,
+  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
   LockKeyhole, LogOut, Mail, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
@@ -12,6 +12,7 @@ import ContentManager from './ContentManager'
 import AnalyticsPanel from './AnalyticsPanel'
 import DownloadsPanel from './DownloadsPanel'
 import ResourcesManager from './ResourcesManager'
+import LinksManager from './LinksManager'
 import TestersPanel from './TestersPanel'
 import AppFeedbackPanel from './AppFeedbackPanel'
 import MailPanel from './MailPanel'
@@ -28,6 +29,7 @@ const TABS = [
   ['testers', 'testerzy', 'Testerzy', FlaskConical],
   ['projects', 'portfolio', 'Portfolio', Boxes],
   ['resources', 'do-pobrania', 'Do pobrania', FileStack],
+  ['links', 'przydatne-linki', 'Przydatne linki', Link2],
   ['downloads', 'pobieranie', 'Pobieranie', Download],
   ['pages', 'podstrony', 'Podstrony', Files],
   ['content', 'tresci', 'Treści strony', FileStack],
@@ -657,6 +659,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'projects' && <ProjectsManager notify={notify} item={item} onItem={selectItem} />}
 
           {tab === 'resources' && <ResourcesManager />}
+          {tab === 'links' && <LinksManager item={item} onItem={selectItem} />}
           {tab === 'downloads' && <DownloadsPanel key={refreshKey} />}
           {tab === 'pages' && <PagesManager notify={notify} item={item} onItem={selectItem} />}
 

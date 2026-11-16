@@ -9,6 +9,7 @@ const SECTIONS = [
   ['proces', 'nav.process'],
   ['portfolio', 'nav.portfolio'],
   ['do-pobrania', 'nav.resources'],
+  ['przydatne-linki', 'nav.links'],
   ['o-mnie', 'nav.about'],
 ]
 
@@ -16,7 +17,7 @@ const SECTIONS = [
 // się poza stroną główną.
 const PORTFOLIO = 'portfolio'
 
-const SECTION_IDS = SECTIONS.map(([id]) => id).filter(id => id !== PORTFOLIO)
+const SECTION_IDS = SECTIONS.map(([id]) => id).filter(id => ![PORTFOLIO, 'do-pobrania', 'przydatne-linki'].includes(id))
 
 /**
  * Przełącznik języka: prowadzi do odpowiednika bieżącej podstrony, więc nikt
@@ -74,8 +75,8 @@ export default function Header({ brand, pages = [], home = true, path = '/', onN
     return () => document.body.classList.remove('no-scroll')
   }, [open])
 
-  const href = id => (id === 'do-pobrania' ? lp('/do-pobrania') : id === PORTFOLIO ? lp(CATALOG_PATH) : home ? `#${id}` : lp(`/#${id}`))
-  const isActive = id => (id === 'do-pobrania' ? path.startsWith('/do-pobrania') : id === PORTFOLIO ? path.startsWith(CATALOG_PATH) : home && active === id)
+  const href = id => (id === 'do-pobrania' || id === 'przydatne-linki' ? lp(`/${id}`) : id === PORTFOLIO ? lp(CATALOG_PATH) : home ? `#${id}` : lp(`/#${id}`))
+  const isActive = id => (id === 'do-pobrania' || id === 'przydatne-linki' ? path.startsWith(`/${id}`) : id === PORTFOLIO ? path.startsWith(CATALOG_PATH) : home && active === id)
 
   // Adresy wewnętrzne przechwytujemy, zakotwiczenia zostawiamy przeglądarce.
   const go = event => {

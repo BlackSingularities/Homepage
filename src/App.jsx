@@ -6,6 +6,7 @@ import Footer from './site/Footer'
 import Home from './site/Home'
 import Catalog from './site/Catalog'
 import Resources from './site/Resources'
+import Links from './site/Links'
 import ProjectView from './site/ProjectView'
 import PageView from './site/PageView'
 import CookieBanner from './site/CookieBanner'
@@ -30,6 +31,7 @@ function usePath() {
 /** Rozkłada adres (już bez prefiksu języka) na widok. */
 function routeOf(path) {
   const clean = path.replace(/\/+$/, '') || '/'
+  if (clean === '/przydatne-linki') return { view: 'links' }
   if (clean === '/do-pobrania') return { view: 'resources' }
   if (clean.startsWith('/do-pobrania/')) return { view: 'resources', slug: decodeURIComponent(clean.slice(13)) }
   if (clean === CATALOG_PATH) return { view: 'catalog' }
@@ -100,6 +102,7 @@ export default function App() {
         <GlyphField />
         <Header brand={content.brand} pages={pages} home={route.view === 'home'} path={localPath} onNavigate={navigate} />
         {route.view === 'home' && <Home content={content} pages={pages} projects={projects} onNavigate={navigate} />}
+        {route.view === 'links' && <Links />}
         {route.view === 'resources' && <Resources slug={route.slug} onNavigate={navigate} />}
         {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
         {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}

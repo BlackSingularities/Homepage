@@ -59,6 +59,7 @@ drugiego logowania i bez osobnego hasła galerii.
 | Pulpit | Liczby, ostatnie zgłoszenia, skróty |
 | Analityka | Odsłony, unikalni odwiedzający, sesje, odrzucenia, czas, źródła, urządzenia, pora dnia i pobrania aplikacji |
 | Zgłoszenia | Wiadomości z formularza: statusy, filtry, szybka odpowiedź, usuwanie |
+| Przydatne linki | Polecane strony: szybkie dodawanie po adresie, import wielu naraz, kategorie, tagi, wyróżnienia, licznik przejść |
 | Portfolio | Prace: strony i aplikacje, zrzuty ekranu, pliki do pobrania, wydania z GitHuba |
 | Podstrony | Tworzenie stron oferty: adres, zajawka, zdjęcie główne, bloki treści, kolejność, publikacja |
 | Treści strony | Teksty strony głównej i katalogu – hero, nagłówki sekcji, zakres, proces, FAQ, kontakt |
@@ -92,6 +93,23 @@ Przy pierwszym uruchomieniu tworzona jest pozycja AR Presets: oryginalny ZIP,
 314 presetów XMP w 40 grupach wraz z PDF, instrukcją i licencją. Kolejne starty
 nie nadpisują zmian zapisanych w panelu. ZIP jest częścią obrazu API.
 Testy biblioteki: `npm run test:resources`.
+
+## Przydatne linki
+
+Katalog polecanych stron pod `/przydatne-linki` (link „Linki” w menu i stopce). Strona
+grupuje linki według kategorii, ma wyszukiwarkę (skrót `/`), filtr kategorii, filtr po
+tagu (`#tag`), sekcję „Polecam szczególnie” i plakietkę „Nowe” przez 21 dni od dodania.
+
+Panel `/admin/przydatne-linki`: wklej adres, a serwer sam odczyta tytuł, opis i ikonę
+strony (`POST /api/admin/links/inspect`). Kilka adresów naraz – przycisk **Wiele naraz**
+albo wklejenie listy w pole szybkiego dodawania. Każdy link ma opis, osobisty komentarz
+„Dlaczego warto”, kategorię, tagi, ikonę, widoczność i wyróżnienie; kolejność ustawia
+się strzałkami. Zmiany publikuje **Zapisz** (albo Ctrl+S).
+
+- Dane: `links.json`, ikony: `uploads/link-icons/` (PNG 96×96, także z plików ICO).
+- Serwer pobiera strony wyłącznie z publicznych adresów IP (sprawdza każde przekierowanie),
+  z limitem 8 s i 768 KB, więc odwiedzający nie łączą się z obcymi serwerami przed kliknięciem.
+- Przejścia liczy `POST /api/links/:id/visit` – jedno na adres i link co 10 minut.
 
 ## Portfolio
 
@@ -152,6 +170,7 @@ Katalog wskazany przez `HOMEPAGE_DATA_DIR` (lokalnie `./data`):
 | `content.json` | Treści strony głównej (braki uzupełnia `server/content.default.json`) |
 | `pages.json` | Podstrony CMS |
 | `projects.json` | Prace w portfolio |
+| `links.json` | Przydatne linki i ich kategorie |
 | `releases.json` | Cache wydań z GitHuba |
 | `integrations.json` | Token GitHuba (zaszyfrowany) |
 | `submissions.json` | Zgłoszenia z formularza |
