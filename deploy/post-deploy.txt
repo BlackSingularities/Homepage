@@ -45,3 +45,4 @@ homepage_api node server/migrate-app-icons-v52.mjs
 homepage_api node server/migrate-app-icons-v53.mjs
 homepage_api node server/migrate-openspacecraft-v54.mjs
 homepage_api node server/migrate-app-icons-v55.mjs
+homepage_api node server/migrate-opentakeoff-v56.mjs
