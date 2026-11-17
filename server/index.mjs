@@ -367,8 +367,8 @@ async function publishedProjects() {
   // Repozytoria odpytujemy także bez wydań z GitHuba, żeby znać ich widoczność.
   const [map, art] = await Promise.all([
     releases.getMany(projects.map(project => project.repo)),
-    // Plakaty z repozytoriów aplikacji idą na początek galerii (patrz posters.mjs).
-    Promise.all(projects.map(project => (project.kind === 'app' && project.repo
+    // Plakaty z repozytoriów (aplikacje i serwisy webowe) idą na początek galerii (patrz posters.mjs).
+    Promise.all(projects.map(project => (project.repo
       ? posters.get(project.repo, project.slug).catch(() => [])
       : []))),
   ])
