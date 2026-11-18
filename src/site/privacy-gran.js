@@ -30,7 +30,7 @@ export const PRIVACY = {
           'Konto jest potrzebne tylko do dodawania punktów, komentarzy, zdjęć i ocen. Przeglądanie mapy i punktów innych osób działa bez konta.',
           'Przy rejestracji zapisujemy: adres e-mail, nazwę widoczną przy Twoich wpisach, skrót hasła (scrypt – samego hasła nie znamy), datę rejestracji i akceptacji tej polityki, datę ostatniego logowania, system i wersję aplikacji oraz skróty tokenów sesji. Na adres e-mail wysyłamy wyłącznie wiadomości o koncie: link aktywacyjny i link do ustawienia nowego hasła – bez newslettera i reklam.',
           'Podstawa prawna: art. 6 ust. 1 lit. b RODO (świadczenie usługi, o którą prosisz, zakładając konto).',
-          'Konto, którego nie aktywujesz linkiem z wiadomości, jest usuwane po kilku dniach. Konto możesz w każdej chwili usunąć sam w aplikacji (Punkty społeczności → Konto → Usuń konto).',
+          'Konto, którego nie aktywujesz linkiem z wiadomości, jest usuwane po kilku dniach. Konto możesz w każdej chwili usunąć sam w aplikacji (narzędzie „Punkty i komentarze” → Konto → Usuń konto).',
         ],
       },
       {
@@ -105,7 +105,7 @@ export const PRIVACY = {
           'An account is only needed to add points, comments, photos and ratings. Browsing the map and other people’s points works without one.',
           'When you register we store: your e-mail address, the name shown with your posts, a password hash (scrypt – we never know the password itself), the date of registration and of accepting this policy, the last sign-in date, the system and app version, and hashes of session tokens. We only send account e-mails: the activation link and the password reset link – no newsletters or ads.',
           'Legal basis: Art. 6(1)(b) GDPR (providing the service you request by creating an account).',
-          'An account that is not activated via the e-mail link is deleted after a few days. You can delete your account at any time in the app (Community points → Account → Delete account).',
+          'An account that is not activated via the e-mail link is deleted after a few days. You can delete your account at any time in the app (the “Points and comments” tool → Account → Delete account).',
         ],
       },
       {
