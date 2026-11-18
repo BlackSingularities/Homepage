@@ -48,3 +48,4 @@ homepage_api node server/migrate-app-icons-v55.mjs
 homepage_api node server/migrate-opentakeoff-v56.mjs
 homepage_api node server/migrate-openchemistry-v57.mjs
 homepage_api node server/migrate-poster-repos-v58.mjs
+homepage_api node server/migrate-gran-3d-android-v59.mjs
