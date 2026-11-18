@@ -3,6 +3,7 @@ import { registerResources } from './resources.mjs'
 import { registerLinks, domainOf } from './links.mjs'
 import { registerFeedback } from './feedback.mjs'
 import { registerMapPoints } from './map-points.mjs'
+import { registerAppAccounts } from './app-accounts.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -1204,9 +1205,15 @@ const appFeedback = registerFeedback(app, {
   notifyOwner: notifyOwnerAboutFeedback,
 })
 
+// Konta użytkowników aplikacji (GRAŃ): rejestracja, aktywacja mailem, logowanie, własna poczta aplikacji.
+const appAccounts = registerAppAccounts(app, {
+  dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits,
+  encrypt, decrypt, getSettings, getTransport, sendLoggedMail,
+})
+
 const mapPoints = registerMapPoints(app, {
   dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits,
-  notifyOwner: notifyOwnerAboutFeedback,
+  notifyOwner: notifyOwnerAboutFeedback, accounts: appAccounts,
 })
 
 app.use('/api/admin', requireAdmin)
@@ -1338,7 +1345,7 @@ app.get('/api/admin/notifications', async (_req, res) => {
       bugReports: fromApps.reports.length,
       appFeedback: fromApps.feedback.length,
       testers: newTesters.length,
-      mapPoints: pendingPoints.length,
+      apps: pendingPoints.length,
       mail: inbox,
     },
     items: [
@@ -1363,7 +1370,7 @@ app.get('/api/admin/notifications', async (_req, res) => {
         detail: item.message.slice(0, 80),
         createdAt: item.createdAt,
       })),
-      ...pendingPoints.map(item => ({ ...item, tab: 'mapPoints' })),
+      ...pendingPoints.map(item => ({ ...item, tab: 'apps', item: 'gran/punkty' })),
       ...newTesters.map(item => ({
         id: item.id,
         tab: 'testers',
