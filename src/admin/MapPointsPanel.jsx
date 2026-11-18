@@ -164,6 +164,11 @@ export default function MapPointsPanel({ onChange }) {
             <span>{formatDate(point.createdAt)}</span>
             <span>{PLATFORM_LABEL[point.platform] || point.platform}{point.appVersion ? ` ${point.appVersion}` : ''}</span>
             {point.reports?.length > 0 && <span className="ap-tag is-warn"><Flag size={12} /> {point.reports.length}</span>}
+            {Object.keys(point.votes || {}).length > 0 && (
+              <span className="ap-tag" title="Oceny użytkowników">
+                +{Object.values(point.votes).filter(value => value > 0).length} / −{Object.values(point.votes).filter(value => value < 0).length}
+              </span>
+            )}
             <button className="ap-icon-btn is-danger" onClick={() => remove(point)} aria-label="Usuń punkt"><Trash2 size={14} /></button>
           </header>
           <div className="ap-submission-grid">
