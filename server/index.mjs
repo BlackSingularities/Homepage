@@ -2,6 +2,7 @@ import express from 'express'
 import { registerResources } from './resources.mjs'
 import { registerLinks, domainOf } from './links.mjs'
 import { registerFeedback } from './feedback.mjs'
+import { registerMapPoints } from './map-points.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -1203,6 +1204,11 @@ const appFeedback = registerFeedback(app, {
   notifyOwner: notifyOwnerAboutFeedback,
 })
 
+const mapPoints = registerMapPoints(app, {
+  dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits,
+  notifyOwner: notifyOwnerAboutFeedback,
+})
+
 app.use('/api/admin', requireAdmin)
 
 /* ── admin: submissions ──────────────────────────────────────────────── */
@@ -1313,10 +1319,11 @@ app.delete('/api/admin/testers/:id', enforceSameOrigin, async (req, res) => {
 
 // Skrzynka sama się nie odzywa, więc licznik nie może blokować odpowiedzi.
 app.get('/api/admin/notifications', async (_req, res) => {
-  const [submissions, testers, fromApps] = await Promise.all([
+  const [submissions, testers, fromApps, pendingPoints] = await Promise.all([
     readJson(SUBMISSIONS_FILE, []),
     readJson(TESTERS_FILE, []),
     appFeedback.fresh(),
+    mapPoints.fresh(),
   ])
   const fresh = list => list.filter(item => item.status === 'new')
   const newSubmissions = fresh(submissions)
@@ -1331,6 +1338,7 @@ app.get('/api/admin/notifications', async (_req, res) => {
       bugReports: fromApps.reports.length,
       appFeedback: fromApps.feedback.length,
       testers: newTesters.length,
+      mapPoints: pendingPoints.length,
       mail: inbox,
     },
     items: [
@@ -1355,6 +1363,7 @@ app.get('/api/admin/notifications', async (_req, res) => {
         detail: item.message.slice(0, 80),
         createdAt: item.createdAt,
       })),
+      ...pendingPoints.map(item => ({ ...item, tab: 'mapPoints' })),
       ...newTesters.map(item => ({
         id: item.id,
         tab: 'testers',

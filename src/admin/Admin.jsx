@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
-  LockKeyhole, LogOut, Mail, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
+  LockKeyhole, LogOut, Mail, MapPin, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toaster, Toggle, toast } from './parts'
@@ -15,6 +15,7 @@ import ResourcesManager from './ResourcesManager'
 import LinksManager from './LinksManager'
 import TestersPanel from './TestersPanel'
 import AppFeedbackPanel from './AppFeedbackPanel'
+import MapPointsPanel from './MapPointsPanel'
 import MailPanel from './MailPanel'
 import MailComposer, { quoteBlock } from './MailComposer'
 import '../styles/admin.css'
@@ -26,6 +27,7 @@ const TABS = [
   ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText],
   ['bugReports', 'raporty-bledow', 'Raporty błędów', Bug],
   ['appFeedback', 'sugestie', 'Sugestie i zgłoszenia', Lightbulb],
+  ['mapPoints', 'punkty-na-mapie', 'Punkty na mapie', MapPin],
   ['testers', 'testerzy', 'Testerzy', FlaskConical],
   ['projects', 'portfolio', 'Portfolio', Boxes],
   ['resources', 'do-pobrania', 'Do pobrania', FileStack],
@@ -381,7 +383,7 @@ function GalleryManager() {
 /* ── powiadomienia ──────────────────────────────────────────────── */
 
 const NOTIFICATION_LABEL = {
-  submissions: 'Zgłoszenia', bugReports: 'Raporty błędów', appFeedback: 'Sugestie i zgłoszenia', testers: 'Testerzy', mail: 'Poczta',
+  submissions: 'Zgłoszenia', bugReports: 'Raporty błędów', appFeedback: 'Sugestie i zgłoszenia', mapPoints: 'Punkty na mapie', testers: 'Testerzy', mail: 'Poczta',
 }
 
 function NotificationBell({ data, onOpen }) {
@@ -509,7 +511,7 @@ function AdminPanel({ admin, onLogout }) {
 
   const refresh = () => {
     loadNotifications()
-    if (tab === 'testers' || tab === 'bugReports' || tab === 'appFeedback') return setRefreshKey(value => value + 1)
+    if (tab === 'testers' || tab === 'bugReports' || tab === 'appFeedback' || tab === 'mapPoints') return setRefreshKey(value => value + 1)
     if (tab === 'dashboard') return loadOverview()
     if (tab === 'analytics' || tab === 'downloads') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
@@ -652,6 +654,7 @@ function AdminPanel({ admin, onLogout }) {
           )}
 
           {tab === 'testers' && <TestersPanel key={refreshKey} onChange={loadNotifications} />}
+          {tab === 'mapPoints' && <MapPointsPanel key={`m${refreshKey}`} onChange={loadNotifications} />}
           {tab === 'bugReports' && <AppFeedbackPanel mode="reports" key={`r${refreshKey}`} onChange={loadNotifications} />}
           {tab === 'appFeedback' && <AppFeedbackPanel mode="feedback" key={`f${refreshKey}`} onChange={loadNotifications} />}
 
