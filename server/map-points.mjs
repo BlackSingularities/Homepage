@@ -17,7 +17,8 @@ import { cleanText } from './sanitize.mjs'
  * wyłącznie jako skrót.
  */
 
-const CATEGORIES = new Set(['info', 'warning', 'water', 'view', 'shelter', 'parking', 'photo', 'other'])
+/** Rodzaje przyjmowane od aplikacji (dawne „shelter” i „parking” zostają tylko w opisach starych wpisów). */
+const CATEGORIES = new Set(['info', 'warning', 'water', 'view', 'photo', 'other'])
 const PLATFORMS = new Set(['android', 'windows', 'linux', 'macos', 'ios', 'web', 'other'])
 const STATUSES = new Set(['pending', 'approved', 'hidden'])
 const CATEGORY_LABEL = {
@@ -52,13 +53,19 @@ function number(value, min, max) {
 }
 
 /** Publiczna postać punktu: bez skrótów, zgłoszeń i notatek moderatora. */
+function tally(point) {
+  const values = Object.values(point.votes || {})
+  return { up: values.filter(value => value > 0).length, down: values.filter(value => value < 0).length }
+}
+
 function publicPoint(point) {
   return {
+    ...tally(point),
     id: point.id,
     lon: point.lon,
     lat: point.lat,
     ele: point.ele ?? null,
-    category: point.category,
+    category: CATEGORIES.has(point.category) ? point.category : 'other',
     title: point.title,
     author: point.author,
     createdAt: point.createdAt,
@@ -79,7 +86,7 @@ export function registerMapPoints(app, deps) {
     const key = `map-points:${kind}:${hash(req.ip || 'unknown')}`
     const now = Date.now()
     const recent = (rateLimits.get(key) || []).filter(timestamp => now - timestamp < LIMIT_WINDOW)
-    if (recent.length >= LIMIT_WRITES) return true
+    if (recent.length >= (kind === 'vote' ? LIMIT_WRITES * 5 : LIMIT_WRITES)) return true
     recent.push(now)
     rateLimits.set(key, recent)
     return false
@@ -96,7 +103,7 @@ export function registerMapPoints(app, deps) {
     }
   }
 
-  app.options(['/api/map-points', '/api/map-points/:id/comments', '/api/map-points/:id/report'], cors, (_req, res) => res.sendStatus(204))
+  app.options(['/api/map-points', '/api/map-points/:id/comments', '/api/map-points/:id/report', '/api/map-points/:id/vote'], cors, (_req, res) => res.sendStatus(204))
 
   /* ── publiczne ─────────────────────────────────────────────────────── */
 
@@ -216,6 +223,26 @@ export function registerMapPoints(app, deps) {
     }))
     if (!found) return res.status(404).json({ error: 'Nie ma takiego punktu.' })
     res.json({ ok: true })
+  })
+
+  /** Ocena punktu przez użytkownika: +1, −1 albo 0 (cofnięcie). Jedna ocena na instalację. */
+  app.post('/api/map-points/:id/vote', cors, jsonBody, async (req, res) => {
+    const body = req.body && typeof req.body === 'object' ? req.body : {}
+    if (limited(req, 'vote')) return res.status(429).json({ error: 'Za dużo ocen – spróbuj później.' })
+    const client = clientHash(body.client)
+    if (!client) return res.status(400).json({ error: 'Brak identyfikatora instalacji.' })
+    const value = Number(body.value) > 0 ? 1 : Number(body.value) < 0 ? -1 : 0
+    let found = null
+    await updateJson(FILE, [], current => current.map(point => {
+      if (point.id !== req.params.id || point.status !== 'approved') return point
+      const votes = { ...(point.votes || {}) }
+      if (value === 0) delete votes[client]
+      else votes[client] = value
+      found = { ...point, votes }
+      return found
+    }))
+    if (!found) return res.status(404).json({ error: 'Nie ma takiego punktu.' })
+    res.json(tally(found))
   })
 
   /* ── panel ─────────────────────────────────────────────────────────── */
