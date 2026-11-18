@@ -41,6 +41,7 @@ export default function Footer({ brand, pages = [], onNavigate, home = true }) {
         <p className="footer-legal">
           <span>© {year} {brand.name}. {brand.location}.</span>
           <button type="button" className="footer-consent" onClick={openConsent}>{t('footer.privacy')}</button>
+          <a className="footer-consent" href="/aplikacje/gran/prywatnosc" onClick={go}>{t('footer.appPrivacy')}</a>
         </p>
       </div>
     </footer>

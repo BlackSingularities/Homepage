@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
+  AppWindow, ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
   LockKeyhole, LogOut, Mail, MapPin, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
 } from 'lucide-react'
 import { api, formatDate, json } from '../lib/api'
@@ -15,30 +15,33 @@ import ResourcesManager from './ResourcesManager'
 import LinksManager from './LinksManager'
 import TestersPanel from './TestersPanel'
 import AppFeedbackPanel from './AppFeedbackPanel'
-import MapPointsPanel from './MapPointsPanel'
+import AppsPanel from './AppsPanel'
 import MailPanel from './MailPanel'
 import MailComposer, { quoteBlock } from './MailComposer'
 import '../styles/admin.css'
 
-/** Zakładka, jej adres pod /admin, nazwa i ikona. */
+/** Zakładka, jej adres pod /admin, nazwa, ikona i grupa w menu. */
 const TABS = [
-  ['dashboard', '', 'Pulpit', LayoutDashboard],
-  ['analytics', 'analityka', 'Analityka', BarChart3],
-  ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText],
-  ['bugReports', 'raporty-bledow', 'Raporty błędów', Bug],
-  ['appFeedback', 'sugestie', 'Sugestie i zgłoszenia', Lightbulb],
-  ['mapPoints', 'punkty-na-mapie', 'Punkty na mapie', MapPin],
-  ['testers', 'testerzy', 'Testerzy', FlaskConical],
-  ['projects', 'portfolio', 'Portfolio', Boxes],
-  ['resources', 'do-pobrania', 'Do pobrania', FileStack],
-  ['links', 'przydatne-linki', 'Przydatne linki', Link2],
-  ['downloads', 'pobieranie', 'Pobieranie', Download],
-  ['pages', 'podstrony', 'Podstrony', Files],
-  ['content', 'tresci', 'Treści strony', FileStack],
-  ['gallery', 'galeria', 'Galeria', Camera],
-  ['mail', 'poczta', 'Poczta', Mail],
-  ['settings', 'ustawienia-poczty', 'Ustawienia poczty', Settings],
+  ['dashboard', '', 'Pulpit', LayoutDashboard, ''],
+  ['analytics', 'analityka', 'Analityka', BarChart3, ''],
+  ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText, ''],
+  ['apps', 'aplikacje', 'Zarządzanie aplikacjami', AppWindow, 'Aplikacje'],
+  ['bugReports', 'raporty-bledow', 'Raporty błędów', Bug, 'Aplikacje'],
+  ['appFeedback', 'sugestie', 'Sugestie i zgłoszenia', Lightbulb, 'Aplikacje'],
+  ['testers', 'testerzy', 'Testerzy', FlaskConical, 'Aplikacje'],
+  ['downloads', 'pobieranie', 'Pobieranie', Download, 'Aplikacje'],
+  ['projects', 'portfolio', 'Portfolio', Boxes, 'Strona'],
+  ['resources', 'do-pobrania', 'Do pobrania', FileStack, 'Strona'],
+  ['links', 'przydatne-linki', 'Przydatne linki', Link2, 'Strona'],
+  ['pages', 'podstrony', 'Podstrony', Files, 'Strona'],
+  ['content', 'tresci', 'Treści strony', FileStack, 'Strona'],
+  ['gallery', 'galeria', 'Galeria', Camera, 'Strona'],
+  ['mail', 'poczta', 'Poczta', Mail, 'Poczta'],
+  ['settings', 'ustawienia-poczty', 'Ustawienia poczty', Settings, 'Poczta'],
 ]
+
+/** Podsekcje „Zarządzania aplikacjami” w menu (adres /admin/aplikacje/<slug>). */
+const APP_LINKS = [['gran', 'Grań', MapPin]]
 
 /**
  * Każdy widok panelu ma własny adres: /admin/<zakładka>/<pozycja>. Pozycja to
@@ -49,13 +52,15 @@ function parseAdminPath(pathname = window.location.pathname) {
   const [, segment = '', ...rest] = pathname.replace(/^\/admin\/?/, '/').split('/')
   // Dawne adresy skrzynek prowadzą do wspólnej Poczty.
   const slug = ['odebrane', 'wyslane'].includes(segment) ? 'poczta' : decodeURIComponent(segment)
+  // Dawna zakładka „Punkty na mapie” jest teraz częścią aplikacji GRAŃ.
+  if (slug === 'punkty-na-mapie') return { tab: 'apps', item: 'gran/punkty' }
   const found = TABS.find(([, entry]) => entry === slug)
   return { tab: found ? found[0] : 'dashboard', item: decodeURIComponent(rest.join('/') || '') }
 }
 
 function adminPath(tab, item = '') {
   const slug = TABS.find(([id]) => id === tab)?.[1] || ''
-  return ['/admin', slug, item && encodeURIComponent(item)].filter(Boolean).join('/')
+  return ['/admin', slug, item && item.split('/').map(encodeURIComponent).join('/')].filter(Boolean).join('/')
 }
 
 const STATUS_LABEL = {
@@ -383,7 +388,7 @@ function GalleryManager() {
 /* ── powiadomienia ──────────────────────────────────────────────── */
 
 const NOTIFICATION_LABEL = {
-  submissions: 'Zgłoszenia', bugReports: 'Raporty błędów', appFeedback: 'Sugestie i zgłoszenia', mapPoints: 'Punkty na mapie', testers: 'Testerzy', mail: 'Poczta',
+  submissions: 'Zgłoszenia', bugReports: 'Raporty błędów', appFeedback: 'Sugestie i zgłoszenia', apps: 'Punkty na mapie (GRAŃ)', testers: 'Testerzy', mail: 'Poczta',
 }
 
 function NotificationBell({ data, onOpen }) {
@@ -403,7 +408,7 @@ function NotificationBell({ data, onOpen }) {
     }
   }, [open])
 
-  const go = tab => { setOpen(false); onOpen(tab) }
+  const go = (tab, item = tab === 'apps' ? 'gran/punkty' : '') => { setOpen(false); onOpen(tab, item) }
   const groups = Object.entries(data.counts).filter(([, count]) => count > 0)
 
   return (
@@ -428,7 +433,7 @@ function NotificationBell({ data, onOpen }) {
             </div>
           )}
           {data.items.map(entry => (
-            <button className="ap-bell-item" key={entry.id} onClick={() => go(entry.tab)}>
+            <button className="ap-bell-item" key={entry.id} onClick={() => go(entry.tab, entry.item)}>
               <b>{entry.title}</b>
               <span>{entry.detail}</span>
               <time>{formatDate(entry.createdAt)}</time>
@@ -511,7 +516,7 @@ function AdminPanel({ admin, onLogout }) {
 
   const refresh = () => {
     loadNotifications()
-    if (tab === 'testers' || tab === 'bugReports' || tab === 'appFeedback' || tab === 'mapPoints') return setRefreshKey(value => value + 1)
+    if (tab === 'testers' || tab === 'bugReports' || tab === 'appFeedback' || tab === 'apps') return setRefreshKey(value => value + 1)
     if (tab === 'dashboard') return loadOverview()
     if (tab === 'analytics' || tab === 'downloads') return setRefreshKey(value => value + 1)
     if (tab === 'submissions') return run(async () => setSubmissions(await api('/api/admin/submissions')))
@@ -606,21 +611,37 @@ function AdminPanel({ admin, onLogout }) {
         </a>
 
         <nav>
-          {TABS.map(([id, , label, Icon]) => (
-            <a
-              key={id}
-              href={adminPath(id)}
-              className={tab === id ? 'is-active' : ''}
-              aria-current={tab === id ? 'page' : undefined}
-              onClick={event => {
-                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) return
-                event.preventDefault()
-                chooseTab(id)
-              }}
-            >
-              <Icon size={17} /><span>{label}</span>
-              {notifications.counts[id] > 0 && <b className="ap-count">{notifications.counts[id]}</b>}
-            </a>
+          {TABS.map(([id, , label, Icon, group], index) => (
+            <Fragment key={id}>
+              {group && group !== TABS[index - 1]?.[4] && <span className="ap-nav-group">{group}</span>}
+              <a
+                href={adminPath(id)}
+                className={tab === id && !(id === 'apps' && item) ? 'is-active' : ''}
+                aria-current={tab === id ? 'page' : undefined}
+                onClick={event => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) return
+                  event.preventDefault()
+                  chooseTab(id)
+                }}
+              >
+                <Icon size={17} /><span>{label}</span>
+                {notifications.counts[id] > 0 && <b className="ap-count">{notifications.counts[id]}</b>}
+              </a>
+              {id === 'apps' && APP_LINKS.map(([slug, name, AppIcon]) => (
+                <a
+                  key={slug}
+                  href={adminPath('apps', slug)}
+                  className={`ap-nav-sub ${tab === 'apps' && item.split('/')[0] === slug ? 'is-active' : ''}`}
+                  onClick={event => {
+                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1) return
+                    event.preventDefault()
+                    chooseTab('apps', slug)
+                  }}
+                >
+                  <AppIcon size={15} /><span>{name}</span>
+                </a>
+              ))}
+            </Fragment>
           ))}
         </nav>
 
@@ -654,7 +675,7 @@ function AdminPanel({ admin, onLogout }) {
           )}
 
           {tab === 'testers' && <TestersPanel key={refreshKey} onChange={loadNotifications} />}
-          {tab === 'mapPoints' && <MapPointsPanel key={`m${refreshKey}`} onChange={loadNotifications} />}
+          {tab === 'apps' && <AppsPanel key={`a${refreshKey}`} item={item} onItem={selectItem} onChange={loadNotifications} />}
           {tab === 'bugReports' && <AppFeedbackPanel mode="reports" key={`r${refreshKey}`} onChange={loadNotifications} />}
           {tab === 'appFeedback' && <AppFeedbackPanel mode="feedback" key={`f${refreshKey}`} onChange={loadNotifications} />}
 

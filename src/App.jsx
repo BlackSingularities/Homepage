@@ -9,6 +9,7 @@ import Resources from './site/Resources'
 import Links from './site/Links'
 import ProjectView from './site/ProjectView'
 import PageView from './site/PageView'
+import AppPages from './site/AppPages'
 import CookieBanner from './site/CookieBanner'
 import { trackPageview } from './lib/analytics'
 import { LangContext, splitLang, translate } from './lib/i18n'
@@ -40,6 +41,9 @@ function routeOf(path) {
     return { view: 'project', slug: decodeURIComponent(clean.slice(CATALOG_PATH.length + 1)) }
   }
   if (clean.startsWith('/p/')) return { view: 'page', slug: decodeURIComponent(clean.slice(3)) }
+  // Strony aplikacji: /aplikacje/<aplikacja>/prywatnosc | aktywacja | haslo
+  const appPage = clean.match(/^\/aplikacje\/([\w-]+)\/(prywatnosc|aktywacja|haslo)$/)
+  if (appPage) return { view: 'app', slug: appPage[1], page: { prywatnosc: 'privacy', aktywacja: 'activate', haslo: 'reset' }[appPage[2]] }
   return { view: 'home' }
 }
 
@@ -107,6 +111,7 @@ export default function App() {
         {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
         {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
         {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
+        {route.view === 'app' && <AppPages slug={route.slug} view={route.page} onNavigate={navigate} />}
         <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
         <CookieBanner />
       </div>

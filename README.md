@@ -68,6 +68,32 @@ drugiego logowania i bez osobnego hasła galerii.
 | Odebrane / Wysłane | Podgląd skrzynki IMAP i historia wysyłek |
 | Poczta | Dane IMAP/SMTP; hasło szyfrowane AES-256-GCM przed zapisem |
 
+Menu panelu jest pogrupowane: **Aplikacje** (Zarządzanie aplikacjami → GRAŃ, Raporty błędów,
+Sugestie i zgłoszenia, Testerzy, Pobieranie), **Strona** (portfolio, podstrony, treści, galeria)
+i **Poczta**. Zgłoszenia z formularza kontaktowego zostają na górze, poza grupami.
+
+## Aplikacje: konta użytkowników i punkty na mapie
+
+`/admin/aplikacje/<slug>/<sekcja>` (dawne `/admin/punkty-na-mapie` przekierowuje do GRANI):
+
+- **Przegląd** – liczba kont (aktywne, czekające na aktywację, nowe, korzystające w 7/30 dni,
+  platformy), wpisy do moderacji, zdjęcia i zajęte miejsce.
+- **Punkty na mapie** – moderacja punktów, komentarzy i zdjęć, odpowiedzi „GRAŃ”, zgłoszenia,
+  podpowiedzi punktów leżących blisko siebie i **scalanie** (komentarze, zdjęcia i oceny
+  przechodzą do drugiego punktu).
+- **Użytkownicy** – konta: aktywacja ręczna, ponowny link, blokada (wylogowuje), usunięcie.
+- **Ustawienia** – moderacja, limit zdjęć od jednej osoby (domyślnie 3 na punkt), promień
+  scalania, adres obsługi i **własne konto SMTP aplikacji** (puste – wiadomości idą ze skrzynki
+  strony), próbna wiadomość.
+
+Konta (`server/app-accounts.mjs`, dane `app-users.json`, ustawienia `app-settings.json`): aplikacja
+rejestruje e-mail, hasło (scrypt) i nazwę; strona wysyła link `/aplikacje/<slug>/aktywacja?token=…`
+(72 h), reset hasła `/aplikacje/<slug>/haslo?token=…` (2 h). Logowanie zwraca token sesji
+(`Authorization: Bearer`), na dysku są tylko skróty. Wpisy na mapie (`server/map-points.mjs`)
+wymagają zalogowania. Zdjęcia (`app-photos/`) serwer przelicza do 2048 px, JPEG 75 %, bez EXIF.
+Polityka prywatności GRANI: `/aplikacje/gran/prywatnosc` (`src/site/privacy-gran.js`, ta sama treść
+jest w aplikacji – zmieniaj razem).
+
 ### Bloki podstron
 
 `tekst`, `zdjęcie`, `galeria`, `lista atutów`, `liczby`, `cytat`, `wezwanie do działania`.

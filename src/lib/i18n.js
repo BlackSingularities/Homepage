@@ -56,6 +56,7 @@ export const STRINGS = {
     'nav.menu': 'Menu',
     'nav.language': 'Język strony',
     'footer.privacy': 'Ustawienia prywatności',
+    'footer.appPrivacy': 'Prywatność w aplikacji GRAŃ',
     'loading': 'Wczytuję…',
 
     'kind.web': 'Strona',
@@ -239,6 +240,7 @@ export const STRINGS = {
     'nav.menu': 'Menu',
     'nav.language': 'Site language',
     'footer.privacy': 'Privacy settings',
+    'footer.appPrivacy': 'GRAŃ app privacy',
     'loading': 'Loading…',
 
     'kind.web': 'Website',
