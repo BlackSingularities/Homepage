@@ -12,7 +12,7 @@ import { detectPlatform, isSupportFile } from './projects.mjs'
 
 const TTL_MS = 30 * 60 * 1000
 // Podbijane, gdy zmienia się kształt wpisu – stare wpisy odświeżają się od razu.
-const CACHE_VERSION = 3
+const CACHE_VERSION = 4
 // Ile wydań wstecz trzymamy – starczy na historię zmian i na aplikacje, które
 // przeglądają listę zamiast samego „latest”.
 const HISTORY = 15
@@ -101,7 +101,11 @@ async function fetchEntry(repo, token) {
     }),
   ])
   const published = (Array.isArray(list) ? list : []).filter(item => !item.draft)
-  const release = published.find(item => !item.prerelease) || published[0]
+  // Wydanie jednej platformy ma tag z jej nazwą (np. `android-v1.0.0`) i nie jest „aktualnym”
+  // wydaniem całej pracy – podmienia tylko pliki swojej platformy (niżej).
+  const platformOf = tag => (/^([a-z]+)-v\d/i.exec(tag || '') || [])[1]?.toLowerCase() || ''
+  const stable = published.filter(item => !item.prerelease)
+  const release = stable.find(item => !platformOf(item.tag_name)) || stable[0] || published[0]
   // Gdy GitHub nie pokazał repozytorium, jego widoczność jest nieznana (null)
   // i strona traktuje je jak prywatne.
   const isPrivate = meta ? meta.private === true : null
@@ -112,6 +116,15 @@ async function fetchEntry(repo, token) {
     throw empty
   }
   const current = mapRelease(release)
+  // Najnowsze wydanie każdej platformy z osobnym tagiem: jego pliki zastępują pliki tej platformy.
+  const seen = new Set()
+  for (const item of stable) {
+    const platform = platformOf(item.tag_name)
+    if (!platform || seen.has(platform) || item === release) continue
+    seen.add(platform)
+    const files = mapRelease(item).assets.filter(asset => asset.platform === platform)
+    if (files.length) current.assets = [...current.assets.filter(asset => asset.platform !== platform), ...files]
+  }
   return {
     v: CACHE_VERSION,
     repo,
