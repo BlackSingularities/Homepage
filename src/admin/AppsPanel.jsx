@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  ArrowUpRight, Ban, Check, Database, ImageIcon, Mail, MapPin, MessageSquareText, RotateCcw, Save, Send, ShieldCheck, Trash2, UserRound, Users,
+  ArrowUpRight, Ban, Check, Crown, Database, ImageIcon, Mail, MapPin, MessageSquareText, RotateCcw, Save, Send, ShieldCheck, Trash2, UserRound, Users,
 } from 'lucide-react'
 import { api, formatDate, formatDay, json } from '../lib/api'
 import { Card, Empty, Text, Toggle, Segmented, toast } from './parts'
@@ -20,7 +20,9 @@ const SECTIONS = [
 ]
 const PLATFORM_LABEL = { android: 'Android', windows: 'Windows', ios: 'iOS', linux: 'Linux', macos: 'macOS', other: 'Inna' }
 const USER_STATUS = { active: 'Aktywne', pending: 'Czeka na aktywację', blocked: 'Zablokowane' }
-const USER_FILTERS = [['all', 'Wszystkie'], ['active', 'Aktywne'], ['pending', 'Czekają'], ['blocked', 'Zablokowane']]
+const USER_FILTERS = [['all', 'Wszystkie'], ['active', 'Aktywne'], ['pending', 'Czekają'], ['blocked', 'Zablokowane'], ['premium', 'Premium']]
+/** Filtr listy kont: stan konta albo konta premium (Studio w GRANI na Windows). */
+const matches = (user, id) => id === 'all' || (id === 'premium' ? user.premium : user.status === id)
 
 const mb = bytes => `${(bytes / 1024 / 1024).toFixed(bytes > 10 * 1024 * 1024 ? 0 : 1)} MB`
 
@@ -155,6 +157,17 @@ function UsersSection({ appId, onChange }) {
     }
   }
 
+  // konto premium: dostęp do modułu Studio w GRANI na Windows (aplikacja nie mówi o kontach premium)
+  const setPremium = async (user, premium) => {
+    try {
+      const updated = await api(`/api/admin/apps/${appId}/users/${user.id}`, json('PATCH', { premium }))
+      setItems(current => current.map(item => (item.id === user.id ? { ...item, ...updated } : item)))
+      toast.success(premium ? `${user.name} ma teraz konto premium (Studio w GRANI na Windows).` : `${user.name} nie ma już konta premium.`)
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   const resend = async user => {
     try {
       const updated = await api(`/api/admin/apps/${appId}/users/${user.id}/resend`, json('POST', {}))
@@ -179,7 +192,7 @@ function UsersSection({ appId, onChange }) {
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
     return items
-      .filter(user => filter === 'all' || user.status === filter)
+      .filter(user => matches(user, filter))
       .filter(user => !q || `${user.name} ${user.email}`.toLowerCase().includes(q))
   }, [items, filter, query])
 
@@ -189,7 +202,7 @@ function UsersSection({ appId, onChange }) {
         <div className="ap-filters" role="group" aria-label="Stan konta">
           {USER_FILTERS.map(([id, label]) => (
             <button key={id} className={filter === id ? 'is-active' : ''} onClick={() => setFilter(id)}>
-              {label} <b>{items.filter(user => id === 'all' || user.status === id).length}</b>
+              {label} <b>{items.filter(user => matches(user, id)).length}</b>
             </button>
           ))}
         </div>
@@ -205,6 +218,7 @@ function UsersSection({ appId, onChange }) {
                 <b>{user.name}</b>
                 <a href={`mailto:${user.email}`}>{user.email}</a>
               </div>
+              {user.premium && <span className="ap-status is-premium" title={user.premiumSince ? `Premium od ${formatDay(user.premiumSince)}` : undefined}><Crown size={12} /> Premium</span>}
               <span className={`ap-status is-${user.status === 'active' ? 'closed' : user.status === 'pending' ? 'new' : 'in-progress'}`}>{USER_STATUS[user.status] || user.status}</span>
             </div>
             <dl className="ax-user-meta">
@@ -217,6 +231,7 @@ function UsersSection({ appId, onChange }) {
               {user.status === 'pending' && <button className="ap-btn ap-btn-sm" onClick={() => resend(user)}><Send size={13} /> Wyślij link ponownie</button>}
               {user.status !== 'active' && <button className="ap-btn ap-btn-sm" onClick={() => setStatus(user, 'active')}><Check size={13} /> {user.status === 'blocked' ? 'Odblokuj' : 'Aktywuj ręcznie'}</button>}
               {user.status !== 'blocked' && <button className="ap-btn ap-btn-sm" onClick={() => setStatus(user, 'blocked')}><Ban size={13} /> Zablokuj</button>}
+              <button className="ap-btn ap-btn-sm" onClick={() => setPremium(user, !user.premium)} title="Konto premium: moduł Studio w GRANI na Windows (wycinki 3D, przekroje, mapy wektorowe)"><Crown size={13} /> {user.premium ? 'Odbierz premium' : 'Nadaj premium'}</button>
               <a className="ap-btn ap-btn-sm" href={`mailto:${user.email}`}><Mail size={13} /> Napisz</a>
               <button className="ap-btn ap-btn-sm ap-btn-danger" onClick={() => remove(user)}><Trash2 size={13} /> Usuń konto</button>
             </div>
