@@ -141,7 +141,9 @@ export function registerFeedback(app, deps) {
       await updateJson(FILES.feedback, [], current => [entry, ...current].slice(0, 3000))
     }
 
-    if (!duplicateOf && notifyOwner) {
+    // mail tylko wtedy, gdy jest komu odpowiedzieć (podany adres e-mail); pozostałe zgłoszenia
+    // i raporty awarii czekają w panelu (Zgłoszenia, Raporty błędów)
+    if (!duplicateOf && notifyOwner && entry.email) {
       const label = KIND_LABEL[kind]
       notifyOwner({
         id: entry.id,
@@ -153,7 +155,7 @@ export function registerFeedback(app, deps) {
           entry.appVersion && `Wersja: ${entry.appVersion}`,
           `Platforma: ${entry.platform}${entry.os ? ` (${entry.os})` : ''}`,
           entry.device && `Urządzenie: ${entry.device}`,
-          entry.email ? `E-mail: ${entry.email}` : 'Bez adresu e-mail',
+          `E-mail: ${entry.email}`,
         ].filter(Boolean),
         body: [entry.message, entry.stack && entry.stack.slice(0, 4000)].filter(Boolean).join('\n\n'),
       }).catch(error => console.error('Feedback mail failed:', error.message))
