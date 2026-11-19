@@ -99,6 +99,9 @@ function publicUser(user) {
     status: user.status,
     createdAt: user.createdAt,
     activatedAt: user.activatedAt || null,
+    // dostęp do modułu Studio w GRANI na Windows (konto premium nadawane tylko w panelu; aplikacja
+    // nie pokazuje nigdzie, że takie konta istnieją)
+    studio: user.premium === true && user.status === 'active',
   }
 }
 
@@ -114,6 +117,8 @@ function adminUser(user) {
     consentAt: user.consentAt || null,
     consentVersion: user.consentVersion || '',
     activationSentAt: user.activation?.sentAt || null,
+    premium: user.premium === true,
+    premiumSince: user.premiumSince || null,
   }
 }
 
@@ -584,15 +589,25 @@ export function registerAppAccounts(app, deps) {
   app.patch('/api/admin/apps/:app/users/:id', requireAdmin, enforceSameOrigin, async (req, res) => {
     const appId = adminApp(req, res)
     if (!appId) return undefined
-    const status = cleanText(req.body?.status, 20)
-    if (!STATUSES.has(status)) return res.status(400).json({ error: 'Niepoprawny stan konta.' })
+    // stan konta i/lub premium (Studio) – każde z pól osobno
+    const status = req.body?.status === undefined ? null : cleanText(req.body.status, 20)
+    const premium = typeof req.body?.premium === 'boolean' ? req.body.premium : null
+    if (status === null && premium === null) return res.status(400).json({ error: 'Brak zmian.' })
+    if (status !== null && !STATUSES.has(status)) return res.status(400).json({ error: 'Niepoprawny stan konta.' })
     const updated = await updateJson(USERS, [], current => current.map(entry => {
       if (entry.id !== req.params.id || entry.app !== appId) return entry
-      const next = { ...entry, status }
-      if (status === 'blocked') next.sessions = []
-      if (status === 'active') {
-        delete next.activation
-        next.activatedAt = entry.activatedAt || new Date().toISOString()
+      const next = { ...entry }
+      if (status !== null) {
+        next.status = status
+        if (status === 'blocked') next.sessions = []
+        if (status === 'active') {
+          delete next.activation
+          next.activatedAt = entry.activatedAt || new Date().toISOString()
+        }
+      }
+      if (premium !== null) {
+        next.premium = premium
+        next.premiumSince = premium ? entry.premiumSince || new Date().toISOString() : null
       }
       return next
     }))

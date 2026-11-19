@@ -1028,6 +1028,7 @@
 .ap-status.is-in-progress, .ap-status.is-pending { background: rgba(231, 198, 138, .16); color: var(--gold); }
 .ap-status.is-failed { background: rgba(255, 110, 88, .14); color: #ffa896; }
 .ap-status.is-closed { background: rgba(255, 255, 255, .06); color: var(--ink-4); }
+.ap-status.is-premium { background: rgba(231, 198, 138, .2); color: var(--gold); gap: 4px; }
 
 .ap-submission-grid {
   display: grid;
