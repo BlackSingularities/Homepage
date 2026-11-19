@@ -74,6 +74,36 @@ export function regionSectors() {
   return [...set.values()]
 }
 
+/**
+ * Góry pobierane najpierw, w tej kolejności (zachód, południe, wschód, północ): Tatry, potem polskie
+ * pasma. Reszta obszaru po nich – od najbliższych Tatrom.
+ */
+const FIRST = [
+  [19.6, 49.1, 20.4, 49.35], // Tatry
+  [19.9, 49.3, 20.9, 49.65], // Podhale, Pieniny, Gorce
+  [18.7, 49.4, 19.95, 49.85], // Beskid Śląski, Żywiecki, Mały, Makowski
+  [20.4, 49.3, 21.6, 49.75], // Beskid Sądecki, Wyspowy, Niski (zachód)
+  [21.6, 49.0, 22.95, 49.6], // Beskid Niski (wschód), Bieszczady
+  [15.4, 50.65, 16.1, 50.95], // Karkonosze, Góry Izerskie
+  [15.9, 50.1, 17.4, 50.75], // Sudety Środkowe i Wschodnie
+]
+const TATRY = [19.95, 49.22]
+
+/** Sektory obszaru w kolejności pobierania: pasma z `FIRST`, potem reszta od najbliższych Tatrom. */
+export function sectorsByPriority() {
+  const center = ({ x, y }) => [xToLon((x + 0.5) / n), yToLat((y + 0.5) / n)]
+  const rank = s => {
+    const b = sectorBox(s.x, s.y)
+    const i = FIRST.findIndex(([w, so, e, nn]) => b.w < e && b.e > w && b.s < nn && b.n > so)
+    if (i >= 0) return i
+    const [lon, lat] = center(s)
+    return FIRST.length + Math.hypot((lon - TATRY[0]) * Math.cos((lat * Math.PI) / 180), lat - TATRY[1])
+  }
+  return regionSectors()
+    .map(s => ({ ...s, first: rank(s) < FIRST.length, r: rank(s) }))
+    .sort((a, b) => a.r - b.r)
+}
+
 /** Zapytania aplikacji dla sektora (te same teksty co w GRANI). */
 export function sectorQueries(x, y) {
   const b = sectorBox(x, y)
@@ -225,9 +255,11 @@ export function registerGranSectors(app, deps) {
   /** Brakujące i przeterminowane zapytania wszystkich sektorów obszaru. */
   async function plan() {
     const index = await readJson(INDEX, {})
-    // najpierw szlaki, punkty, granice i zamknięcia całego obszaru, potem cięższe pokrycie terenu
-    for (const land of [false, true]) {
-      for (const { x, y } of regionSectors()) {
+    // najpierw Tatry i polskie góry (wszystko, z pokryciem terenu), potem szlaki, punkty, granice
+    // i zamknięcia reszty obszaru od najbliższych Tatrom, na końcu jej cięższe pokrycie terenu
+    const sectors = sectorsByPriority()
+    for (const [first, land] of [[true, false], [true, true], [false, false], [false, true]]) {
+      for (const { x, y } of sectors.filter(s => s.first === first)) {
         for (const q of sectorQueries(x, y)) {
           if ((q.kind === 'land') !== land) continue
           const hash = hashOf(q.query)
