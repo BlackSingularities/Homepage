@@ -13,6 +13,7 @@ import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
 import GlowEdge from '../lib/GlowEdge'
+import GranPremium from './GranPremium'
 
 /** Tytuł karty – ta sama reguła co na serwerze (server/seo.mjs → projectTitle). */
 function projectTitle(project, kindLabel) {
@@ -307,7 +308,7 @@ function Gallery({ shots, name, onZoom }) {
   )
 }
 
-export default function ProjectView({ slug, onNavigate }) {
+export default function ProjectView({ slug, onNavigate, email }) {
   const { t, lp, lang } = useT()
   const catalog = lp(CATALOG_PATH)
   const [data, setData] = useState(null)
@@ -464,6 +465,8 @@ export default function ProjectView({ slug, onNavigate }) {
         </div>
 
         <Downloads project={project} />
+
+        {project.slug === 'gran-3d' && <GranPremium email={email} onNavigate={onNavigate} />}
 
         <TestSignup key={project.slug} project={project} />
 

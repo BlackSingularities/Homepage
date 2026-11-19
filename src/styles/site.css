@@ -2039,3 +2039,130 @@
 @media (max-width: 760px) {
   .gallery-backdrop-sticky { opacity: .6; }
 }
+
+/* ── GRAŃ Premium (strona GRANI w portfolio) ──
+   Oferta Studio: cena jednorazowa, kontakt zamiast płatności. Wyróżnienie tłem,
+   obwódką i złotą linią u góry. */
+.gp {
+  position: relative;
+  margin-top: clamp(32px, 5vw, 56px);
+  padding: clamp(22px, 3.4vw, 44px);
+  border: 1px solid var(--line-gold);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(var(--accent-rgb), .12), transparent 60%),
+    linear-gradient(180deg, rgba(var(--accent-rgb), .05), rgba(255, 255, 255, .012));
+  overflow: hidden;
+  scroll-margin-top: 90px;
+}
+.gp::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--gradient-gold);
+}
+.gp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .9fr);
+  gap: clamp(22px, 4vw, 56px);
+  align-items: start;
+}
+.gp-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 5px 12px;
+  border: 1px solid var(--line-gold);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), .08);
+}
+.gp h2 {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.2vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -.02em;
+}
+.gp-lead { max-width: 60ch; font-size: 16px; line-height: 1.72; color: var(--ink-2); }
+.gp-offer {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(12, 11, 10, .62);
+  box-shadow: var(--shadow-sm);
+}
+.gp-price { display: grid; gap: 4px; margin: 0; }
+.gp-price strong {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -.03em;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.gp-price span { font-size: 12px; color: var(--ink-3); }
+.gp-includes { margin: 4px 0 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.gp-perks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.gp-perks li { display: flex; gap: 9px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.gp-perks svg { flex: none; margin-top: 3px; color: var(--accent); }
+.gp-interest { margin: 2px 0 0; font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+.gp-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.gp-actions .btn { flex: 1 1 auto; justify-content: center; }
+.gp-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: clamp(24px, 3.4vw, 40px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.gp-group {
+  padding: 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.gp-group:hover { border-color: var(--line-gold); background: rgba(var(--accent-rgb), .045); }
+.gp-group h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.gp-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--accent-ink);
+  background: var(--gradient-gold);
+}
+.gp-group ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.gp-group li { display: flex; gap: 9px; font-size: 13.5px; line-height: 1.55; color: var(--ink-2); }
+.gp-group li::before {
+  content: '';
+  flex: none;
+  width: 5px;
+  height: 5px;
+  margin-top: .6em;
+  border-radius: 50%;
+  background: var(--accent);
+}
+@media (max-width: 1100px) {
+  .gp-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .gp-head { grid-template-columns: 1fr; }
+  .gp-groups { grid-template-columns: 1fr; }
+}
+.gp, .gp p, .gp li { text-align: left; hyphens: manual; }
+.gp-formats { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 0; padding: 0; list-style: none; }
+.gp-formats li { padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 11.5px; color: var(--ink-2); background: rgba(255, 255, 255, .02); }
