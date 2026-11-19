@@ -93,7 +93,8 @@ rejestruje e-mail, hasło (scrypt) i nazwę; strona wysyła link `/aplikacje/<sl
 wymagają zalogowania. Zdjęcia (`app-photos/`) serwer przelicza do 2048 px, JPEG 75 %, bez EXIF.
 Dane okolicy GRANI (`server/gran-sectors.mjs`): serwer trzyma odpowiedzi Overpass (szlaki, punkty, granice,
 zamknięcia, pokrycie terenu) dla sektorów z9 nad Polską, Czechami i Słowacją – `gran-overpass/<skrót>.json.gz`
-i indeks `gran-overpass.json` w katalogu danych. Kolejka pobiera je po jednym (pytania aplikacji mają
+i indeks `gran-overpass.json` w wolumenie Dockera `gran_cache` (`GRAN_CACHE_DIR`), **poza** `homepage-persist`,
+więc nie trafiają do kopii zapasowych – to pamięć podręczna, którą serwer w razie potrzeby pobierze od nowa. Kolejka pobiera je po jednym (pytania aplikacji mają
 pierwszeństwo), co godzinę dopisuje brakujące i starsze niż 30 dni. Aplikacja pyta `POST /api/gran/overpass`:
 200 – gotowe dane (gzip), 202 – w kolejce, 404 – poza obszarem. Szablony zapytań: `server/gran-queries.json`
 (te same co w `osm.rs` i `landcover.rs` GRANI). Postęp: panel → Grań → Przegląd.

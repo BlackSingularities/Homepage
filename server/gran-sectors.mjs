@@ -116,8 +116,16 @@ const hashOf = query => crypto.createHash('sha256').update(query).digest('hex').
 
 export function registerGranSectors(app, deps) {
   const { dataDir, readJson, updateJson, requireAdmin, rateLimits } = deps
-  const DIR = path.join(dataDir, 'gran-overpass')
-  const INDEX = path.join(dataDir, 'gran-overpass.json')
+  // pamięć podręczna, nie dane: osobny wolumen poza katalogiem danych strony (ten trafia do kopii
+  // zapasowych – policzonych odpowiedzi Overpass nie ma sensu kopiować, serwer pobierze je od nowa)
+  const ROOT = process.env.GRAN_CACHE_DIR || path.join(dataDir, 'cache')
+  const DIR = path.join(ROOT, 'gran-overpass')
+  const INDEX = path.join(ROOT, 'gran-overpass.json')
+  // pierwsza wersja trzymała pamięć w katalogu danych – sprzątanie
+  if (process.env.GRAN_CACHE_DIR) {
+    fs.rm(path.join(dataDir, 'gran-overpass'), { recursive: true, force: true }).catch(() => undefined)
+    fs.rm(path.join(dataDir, 'gran-overpass.json'), { force: true }).catch(() => undefined)
+  }
   // pytania z aplikacji mają pierwszeństwo przed planowym zapełnianiem obszaru
   const urgent = new Map()
   const queue = new Map()
@@ -180,6 +188,7 @@ export function registerGranSectors(app, deps) {
   /** Kolejka: po jednym zapytaniu, z przerwą. */
   async function work() {
     await fs.mkdir(DIR, { recursive: true })
+    if (!(await fs.stat(INDEX).catch(() => null))) await fs.writeFile(INDEX, '{}')
     for (;;) {
       const next = urgent.entries().next().value || queue.entries().next().value
       if (!next) {
