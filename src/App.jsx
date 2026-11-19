@@ -109,7 +109,7 @@ export default function App() {
         {route.view === 'links' && <Links />}
         {route.view === 'resources' && <Resources slug={route.slug} onNavigate={navigate} />}
         {route.view === 'catalog' && <Catalog data={content.catalog} projects={projects} onNavigate={navigate} />}
-        {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} />}
+        {route.view === 'project' && <ProjectView slug={route.slug} onNavigate={navigate} email={content.brand?.email} />}
         {route.view === 'page' && <PageView slug={route.slug} onNavigate={navigate} />}
         {route.view === 'app' && <AppPages slug={route.slug} view={route.page} onNavigate={navigate} />}
         <Footer brand={content.brand} pages={pages} home={route.view === 'home'} onNavigate={navigate} />
