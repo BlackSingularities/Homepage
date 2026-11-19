@@ -52,3 +52,4 @@ homepage_api node server/migrate-gran-3d-android-v59.mjs
 homepage_api node server/migrate-gran-3d-android-shots-v60.mjs
 homepage_api node server/migrate-gran-3d-ios-v61.mjs
 homepage_api node server/migrate-seo-v62.mjs
+homepage_api node server/migrate-fsopendatascenery-v63.mjs
