@@ -4,6 +4,7 @@ import { registerLinks, domainOf } from './links.mjs'
 import { registerFeedback } from './feedback.mjs'
 import { registerMapPoints } from './map-points.mjs'
 import { registerAppAccounts } from './app-accounts.mjs'
+import { registerGranSectors } from './gran-sectors.mjs'
 import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -1210,6 +1211,9 @@ const appAccounts = registerAppAccounts(app, {
   dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits,
   encrypt, decrypt, getSettings, getTransport, sendLoggedMail,
 })
+
+// Dane okolicy GRANI (Polska, Czechy, Słowacja) trzymane na serwerze zamiast publicznego Overpass.
+registerGranSectors(app, { dataDir: DATA_DIR, readJson, updateJson, requireAdmin, rateLimits })
 
 const mapPoints = registerMapPoints(app, {
   dataDir: DATA_DIR, readJson, updateJson, requireAdmin, enforceSameOrigin, rateLimits,
