@@ -23,13 +23,15 @@ import { cors } from './app-accounts.mjs'
  * Adres IP nie jest zapisywany, tylko jego skrót z solą (do limitów i blokowania nadużyć).
  */
 
-/** Rodzaje przyjmowane od aplikacji (dawne „shelter” i „parking” zostają tylko w opisach starych wpisów). */
-const CATEGORIES = new Set(['info', 'warning', 'water', 'view', 'photo', 'other'])
+/** Rodzaje przyjmowane od aplikacji (dawny „parking” zostaje tylko w opisach starych wpisów). */
+const CATEGORIES = new Set(['info', 'warning', 'closed', 'avalanche', 'exposed', 'water', 'entrance', 'transport', 'signal', 'shelter', 'view', 'photo', 'ban', 'other'])
 const PLATFORMS = new Set(['android', 'windows', 'linux', 'macos', 'ios', 'web', 'other'])
 const STATUSES = new Set(['pending', 'approved', 'hidden'])
 const CATEGORY_LABEL = {
-  info: 'Informacja', warning: 'Utrudnienie', water: 'Woda', view: 'Punkt widokowy', shelter: 'Nocleg i schronienie',
-  parking: 'Parking', photo: 'Miejsce na zdjęcie', other: 'Inne',
+  info: 'Informacja', warning: 'Utrudnienie', closed: 'Szlak zamknięty', avalanche: 'Zagrożenie lawinowe',
+  exposed: 'Łańcuchy i ekspozycja', water: 'Woda', entrance: 'Wejście i opłaty', transport: 'Dojazd i parking',
+  signal: 'Zasięg i ratunek', shelter: 'Schron', view: 'Punkt widokowy', photo: 'Miejsce na zdjęcie', ban: 'Zakaz',
+  parking: 'Parking', other: 'Inne',
 }
 const APPS = new Set(['gran-3d'])
 /** Po tylu zgłoszeniach zatwierdzony punkt wraca do moderacji (znika z mapy do decyzji). */

@@ -4,8 +4,10 @@ import { api, formatDate, json } from '../lib/api'
 import { Empty, Toggle, toast } from './parts'
 
 const CATEGORY_LABEL = {
-  info: 'Informacja', warning: 'Utrudnienie', water: 'Woda', view: 'Punkt widokowy', shelter: 'Nocleg i schronienie',
-  parking: 'Parking', photo: 'Miejsce na zdjęcie', other: 'Inne',
+  info: 'Informacja', warning: 'Utrudnienie', closed: 'Szlak zamknięty', avalanche: 'Zagrożenie lawinowe',
+  exposed: 'Łańcuchy i ekspozycja', water: 'Woda', entrance: 'Wejście i opłaty', transport: 'Dojazd i parking',
+  signal: 'Zasięg i ratunek', shelter: 'Schron', view: 'Punkt widokowy', photo: 'Miejsce na zdjęcie', ban: 'Zakaz',
+  parking: 'Parking', other: 'Inne',
 }
 const STATUS_LABEL = { pending: 'Czeka', approved: 'Opublikowany', hidden: 'Ukryty' }
 const PLATFORM_LABEL = { android: 'Android', windows: 'Windows', ios: 'iOS', linux: 'Linux', other: 'Inna' }
