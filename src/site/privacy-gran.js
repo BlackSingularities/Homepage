@@ -22,6 +22,7 @@ export const PRIVACY = {
         h: '2. Co zostaje na urządzeniu',
         p: [
           'Ustawienia, biblioteka tras, miejsc i widoków, pobrane mapy i obszary offline, dziennik programu oraz dane konta (adres e-mail, nazwa i token sesji – bez hasła) są zapisywane tylko na Twoim urządzeniu. Aplikacja nie używa GPS ani lokalizacji urządzenia, nie ma reklam, analityki ani śledzenia.',
+          'Położenie GPS (Android, iOS) jest używane tylko po Twojej zgodzie w systemie i tylko wtedy, gdy sam je włączysz – żeby pokazać Cię na mapie i nagrać przejście. Odczyty i nagrane przejścia są zapisywane wyłącznie na urządzeniu; aplikacja nie wysyła położenia na serwer i nikomu go nie udostępnia. Podczas nagrywania na Androidzie widać powiadomienie, a na iOS – wskaźnik lokalizacji na pasku stanu. Plik przejścia trafia do innej aplikacji (np. Garmin Connect, Strava) tylko wtedy, gdy sam go wyeksportujesz albo udostępnisz.',
         ],
       },
       {
@@ -97,6 +98,7 @@ export const PRIVACY = {
         h: '2. What stays on your device',
         p: [
           'Settings, your library of routes, places and views, downloaded maps and offline areas, the app log and your account details (e-mail, name and session token – never the password) are stored only on your device. The app does not use GPS or device location and has no ads, analytics or tracking.',
+          'GPS location (Android, iOS) is used only with your system permission and only when you turn it on yourself – to show you on the map and to record a hike. Readings and recorded hikes are stored only on your device; the app does not send your location to the server or share it with anyone. While recording, Android shows a notification and iOS shows the location indicator in the status bar. A hike file reaches another app (e.g. Garmin Connect, Strava) only when you export or share it yourself.',
         ],
       },
       {
