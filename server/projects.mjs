@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { cleanLink, cleanMedia, cleanRepo, cleanText, slugify } from './sanitize.mjs'
+import { cleanFaq, cleanKeywords, cleanLink, cleanMedia, cleanRepo, cleanText, slugify } from './sanitize.mjs'
 import { sanitizeProjectTranslation } from './i18n.mjs'
 
 /**
@@ -103,6 +103,29 @@ function sanitizeShot(input) {
 /** Platformy, na które można zapisać się do testów. */
 export const TEST_PLATFORMS = ['android', 'ios', 'windows', 'macos', 'linux']
 
+/**
+ * Kategorie aplikacji ze słownika schema.org (`applicationCategory`). Google
+ * pokazuje je w wynikach przy oprogramowaniu, więc każda praca ma własną.
+ */
+export const APP_CATEGORIES = [
+  ['UtilitiesApplication', 'Narzędzia'],
+  ['MultimediaApplication', 'Multimedia, zdjęcia i dźwięk'],
+  ['GameApplication', 'Gry'],
+  ['EducationalApplication', 'Edukacja'],
+  ['ReferenceApplication', 'Wiedza i atlasy'],
+  ['TravelApplication', 'Podróże i mapy'],
+  ['DesignApplication', 'Projektowanie i grafika'],
+  ['BusinessApplication', 'Biznes i biuro'],
+  ['FinanceApplication', 'Finanse'],
+  ['CommunicationApplication', 'Komunikacja'],
+  ['DeveloperApplication', 'Dla programistów'],
+  ['SecurityApplication', 'Bezpieczeństwo'],
+  ['LifestyleApplication', 'Styl życia'],
+  ['NewsApplication', 'Artykuły i wiadomości'],
+]
+const APP_CATEGORY_IDS = APP_CATEGORIES.map(([id]) => id)
+
+
 export function sanitizeProject(input, existing = {}) {
   const name = cleanText(input?.name, 180) || existing.name || 'Nowa realizacja'
   const kind = KINDS.includes(input?.kind) ? input.kind : 'web'
@@ -137,6 +160,11 @@ export function sanitizeProject(input, existing = {}) {
     },
     downloads: (Array.isArray(input?.downloads) ? input.downloads : [])
       .slice(0, 12).map(sanitizeDownload).filter(item => item.url),
+    seoTitle: cleanText(input?.seoTitle, 90),
+    seoDescription: cleanText(input?.seoDescription, 200),
+    keywords: cleanKeywords(input?.keywords),
+    category: APP_CATEGORY_IDS.includes(input?.category) ? input.category : '',
+    faq: cleanFaq(input?.faq),
     en: sanitizeProjectTranslation(input?.en),
     published: input?.published !== false,
     featured: input?.featured === true,
@@ -167,6 +195,7 @@ export function projectSummary(project, release, counts = {}) {
     kind: project.kind,
     label: project.label,
     tagline: project.tagline,
+    category: project.category || '',
     icon: project.icon || '',
     cover,
     thumb: thumbFor(cover),
@@ -189,8 +218,11 @@ export function projectSummary(project, release, counts = {}) {
  * Pliki z wydań zawsze idą przez proxy serwera: repozytoria są prywatne,
  * a pobieranie ma się odbywać wyłącznie przez portfolio.
  */
-/** Sumy kontrolne i podpisy zostają w wydaniu dla aktualizatorów, na stronie to szum. */
-export const isSupportFile = name => /(\.(sha256|sha512|sig|asc)|sha\d*sums\.txt)$/i.test(name || '')
+/**
+ * Sumy kontrolne, podpisy i pliki opisu aktualizacji (latest.yml, .blockmap) zostają
+ * w wydaniu dla aktualizatorów – kanał aktualizacji czyta je osobno – na stronie to szum.
+ */
+export const isSupportFile = name => /(\.(sha256|sha512|sig|asc|blockmap)|sha\d*sums\.txt|^latest[\w-]*\.ya?ml)$/i.test(name || '')
 
 export function downloadsFor(project, release, counts = {}) {
   if (project.kind !== 'app') return []

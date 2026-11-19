@@ -35,6 +35,9 @@ const T = {
     web: 'Strona',
     jobTitle: 'Projektant i programista stron oraz aplikacji',
     serviceName: 'Adam Rędzikowski – strony i aplikacje na zamówienie',
+    faq: 'Najczęstsze pytania',
+    related: 'Podobne prace',
+    screenshot: 'zrzut ekranu',
     notFound: 'Nie znaleziono strony',
     notFoundText: 'Ta strona nie istnieje albo została ukryta.',
   },
@@ -60,6 +63,9 @@ const T = {
     web: 'Website',
     jobTitle: 'Web & software designer and developer',
     serviceName: 'Adam Rędzikowski – custom websites and applications',
+    faq: 'Frequently asked questions',
+    related: 'Related projects',
+    screenshot: 'screenshot',
     notFound: 'Page not found',
     notFoundText: 'This page does not exist or has been hidden.',
   },
@@ -309,14 +315,41 @@ function catalogView({ lang, content, projects }) {
   }
 }
 
-function projectView({ lang, project }) {
+/**
+ * Tytuł karty pracy. Własny tytuł SEO z panelu wygrywa; podpis autora
+ * doklejamy tylko wtedy, gdy całość zmieści się w wyniku wyszukiwania.
+ */
+export function projectTitle(project, lang) {
+  const t = T[lang]
+  const base = project.seoTitle || `${project.name} – ${project.label || (project.kind === 'app' ? t.app : t.web)}`
+  const full = `${base} | ${t.suffix}`
+  return full.length <= 70 ? full : base
+}
+
+export const projectDescription = project => describe(project.seoDescription || project.tagline || project.summary || project.body)
+
+/** Kilka innych prac do przeglądania dalej – najpierw z tej samej kategorii. */
+export function relatedProjects(project, projects = [], limit = 4) {
+  const others = projects.filter(item => item.slug !== project.slug)
+  const score = item => (project.category && item.category === project.category ? 2 : 0) + (item.kind === project.kind ? 1 : 0)
+  return [...others].sort((a, b) => score(b) - score(a)).slice(0, limit)
+}
+
+function projectView({ lang, project, projects }) {
   const t = T[lang]
   const path = localePath(`/portfolio/${project.slug}`, lang)
   const url = absolute(path)
-  const description = describe(project.tagline || project.summary || project.body)
+  const title = projectTitle(project, lang)
+  const description = projectDescription(project)
   const isApp = project.kind === 'app'
-  const systems = [...new Set((project.downloads || []).map(file => OS_NAMES[file.platform]).filter(Boolean))]
-  const shots = (project.shots || []).map(shot => asset(shot.src))
+  const systems = [...new Set([
+    ...(project.downloads || []).map(file => OS_NAMES[file.platform]),
+    ...(project.stores || []).map(store => OS_NAMES[store.platform]),
+  ].filter(Boolean))]
+  const altOf = (shot, index) => shot.alt || `${project.name} – ${t.screenshot} ${index + 1}`
+  const shots = (project.shots || []).map((shot, index) => ({ '@type': 'ImageObject', contentUrl: asset(shot.src), caption: altOf(shot, index) }))
+  const faq = project.faq || []
+  const related = relatedProjects(project, projects)
   const body = `
     <main>
       <p><a href="${escapeHtml(localePath('/portfolio', lang))}">${escapeHtml(t.portfolio)}</a></p>
@@ -325,65 +358,96 @@ function projectView({ lang, project }) {
       ${project.tagline ? `<p><strong>${escapeHtml(project.tagline)}</strong></p>` : ''}
       ${project.summary ? `<p>${escapeHtml(project.summary)}</p>` : ''}
       ${paragraphs(project.body)}
-      ${(project.shots || []).map((shot, index) => `<img src="${escapeHtml(shot.src)}" alt="${escapeHtml(shot.alt || `${project.name} – ${index + 1}`)}" loading="lazy">`).join('')}
+      ${(project.shots || []).map((shot, index) => `<img src="${escapeHtml(shot.src)}" alt="${escapeHtml(altOf(shot, index))}" loading="lazy">`).join('')}
       ${project.features?.length ? `<h2>${t.features}</h2><ul>${project.features.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
       ${project.stack?.length ? `<h2>${t.stack}</h2><ul>${project.stack.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
       ${project.role ? `<h2>${t.role}</h2><p>${escapeHtml(project.role)}</p>` : ''}
       ${project.downloads?.length ? `<h2>${t.download}</h2><ul>${project.downloads.map(file => `<li><a href="${escapeHtml(file.url)}" rel="nofollow">${escapeHtml(OS_NAMES[file.platform] || file.label || file.platform)} ${escapeHtml(file.version || '')}</a></li>`).join('')}</ul>` : ''}
+      ${project.stores?.length ? `<ul>${project.stores.map(store => `<li><a href="${escapeHtml(store.url)}" rel="noopener">${escapeHtml(store.name)}</a></li>`).join('')}</ul>` : ''}
+      ${faq.length ? `<section><h2>${t.faq}</h2>${faq.map(item => `<h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p>`).join('')}</section>` : ''}
       ${project.siteUrl ? `<p><a href="${escapeHtml(project.siteUrl)}">${escapeHtml(project.siteUrl)}</a></p>` : ''}
       ${project.repo ? `<p><a href="https://github.com/${escapeHtml(project.repo)}">github.com/${escapeHtml(project.repo)}</a></p>` : ''}
+      ${related.length ? `<nav><h2>${t.related}</h2><ul>${related.map(item => `<li><a href="${escapeHtml(localePath(`/portfolio/${item.slug}`, lang))}">${escapeHtml(item.name)}</a>${item.tagline ? ` – ${escapeHtml(item.tagline)}` : ''}</li>`).join('')}</ul></nav>` : ''}
     </main>`
 
   const software = {
     '@type': isApp ? 'SoftwareApplication' : 'WebApplication',
     '@id': `${url}#software`,
     name: project.name,
+    ...(project.label ? { alternateName: `${project.name} – ${project.label.split('/')[0].trim()}` } : {}),
     url,
     description: project.summary || project.tagline || describe(project.body, 300),
+    ...(project.tagline ? { abstract: project.tagline } : {}),
     inLanguage: lang === 'en' ? 'en' : 'pl-PL',
-    applicationCategory: isApp ? 'UtilitiesApplication' : 'WebApplication',
+    applicationCategory: project.category || (isApp ? 'UtilitiesApplication' : 'WebApplication'),
+    ...(project.label ? { applicationSubCategory: project.label.split('/')[0].trim() } : {}),
     operatingSystem: isApp ? (systems.join(', ') || 'Android') : 'Web browser',
+    ...(isApp ? {} : { browserRequirements: 'Requires JavaScript. Works in current Chrome, Edge, Firefox and Safari.' }),
     author: { '@id': `${SITE}/#person` },
     creator: { '@id': `${SITE}/#person` },
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'PLN', availability: 'https://schema.org/InStock' },
-    ...(project.cover ? { image: asset(project.cover) } : {}),
+    publisher: { '@id': `${SITE}/#person` },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'PLN', availability: 'https://schema.org/InStock', url },
+    ...(project.cover || project.icon ? { image: asset(project.cover || project.icon) } : {}),
     ...(shots.length ? { screenshot: shots } : {}),
-    ...(project.features?.length ? { featureList: project.features.join(', ') } : {}),
-    ...(project.release?.tag ? { softwareVersion: project.release.tag.replace(/^v/i, '') } : {}),
+    ...(project.features?.length ? { featureList: project.features } : {}),
+    ...(project.release?.tag ? { softwareVersion: project.release.tag.replace(/^[a-z-]*v/i, '') } : {}),
     ...(project.release?.publishedAt ? { datePublished: project.release.publishedAt.slice(0, 10) } : {}),
-    ...(project.downloads?.length && project.downloads[0].url.startsWith('http') ? { downloadUrl: project.downloads[0].url } : {}),
-    ...(project.repo ? { sameAs: [`https://github.com/${project.repo}`] } : {}),
-    ...(project.siteUrl ? { installUrl: asset(project.siteUrl) } : {}),
-    keywords: (project.stack || []).join(', '),
+    ...(project.createdAt ? { dateCreated: project.createdAt.slice(0, 10) } : {}),
+    ...(project.updatedAt ? { dateModified: project.updatedAt.slice(0, 10) } : {}),
+    ...(project.downloads?.length ? { downloadUrl: asset(project.downloads[0].url) } : {}),
+    ...(project.stores?.length ? { installUrl: project.stores[0].url } : project.siteUrl ? { installUrl: asset(project.siteUrl) } : {}),
+    sameAs: [
+      ...(project.repo ? [`https://github.com/${project.repo}`] : []),
+      ...(project.siteUrl?.startsWith('http') ? [project.siteUrl] : []),
+      ...(project.stores || []).map(store => store.url),
+    ],
+    keywords: [...(project.keywords || []), ...(project.stack || [])].join(', '),
+  }
+  const graph = [
+    software,
+    {
+      '@type': 'WebPage',
+      '@id': `${url}#webpage`,
+      url,
+      name: title,
+      description,
+      inLanguage: lang === 'en' ? 'en' : 'pl-PL',
+      isPartOf: { '@id': `${SITE}/#website` },
+      mainEntity: { '@id': `${url}#software` },
+      author: { '@id': `${SITE}/#person` },
+      ...(project.cover ? { primaryImageOfPage: asset(project.cover) } : {}),
+      datePublished: project.createdAt,
+      dateModified: project.updatedAt,
+      breadcrumb: { '@id': `${url}#breadcrumb` },
+    },
+    {
+      ...breadcrumbs([
+        [t.home, localePath('/', lang)],
+        [t.portfolio, localePath('/portfolio', lang)],
+        [project.name, path],
+      ]),
+      '@id': `${url}#breadcrumb`,
+    },
+  ]
+  if (faq.length) {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${url}#faq`,
+      inLanguage: lang === 'en' ? 'en' : 'pl-PL',
+      isPartOf: { '@id': `${url}#webpage` },
+      mainEntity: faq.map(item => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })),
+    })
   }
   return {
-    title: `${project.name} – ${project.label || (isApp ? t.app : t.web)} | ${t.suffix}`,
+    title,
     description,
-    image: asset(project.cover) || OG_IMAGE,
+    keywords: [...(project.keywords || []), project.name].join(', '),
+    image: asset(project.cover || project.shots?.[0]?.src) || OG_IMAGE,
+    imageAlt: [project.name, project.tagline].filter(Boolean).join(' – '),
     type: 'article',
+    modified: project.updatedAt,
     body,
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@graph': [
-        software,
-        {
-          '@type': 'WebPage',
-          '@id': `${url}#webpage`,
-          url,
-          name: project.name,
-          description,
-          inLanguage: lang === 'en' ? 'en' : 'pl-PL',
-          isPartOf: { '@id': `${SITE}/#website` },
-          mainEntity: { '@id': `${url}#software` },
-          dateModified: project.updatedAt,
-        },
-        breadcrumbs([
-          [t.home, localePath('/', lang)],
-          [t.portfolio, localePath('/portfolio', lang)],
-          [project.name, path],
-        ]),
-      ],
-    },
+    jsonLd: { '@context': 'https://schema.org', '@graph': graph },
   }
 }
 
@@ -512,6 +576,7 @@ export async function renderDocument(template, pathname, load) {
     `<title>${escapeHtml(view.title)}</title>`,
     `<meta name="description" content="${escapeHtml(view.description)}" />`,
     `<meta name="author" content="${AUTHOR}" />`,
+    view.keywords ? `<meta name="keywords" content="${escapeHtml(view.keywords)}" />` : '',
     `<meta name="robots" content="${view.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}" />`,
     view.status === 404 ? '' : `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
     ...alternates.map(([code, href]) => `<link rel="alternate" hreflang="${code}" href="${escapeHtml(href)}" />`),
@@ -523,7 +588,8 @@ export async function renderDocument(template, pathname, load) {
     `<meta property="og:title" content="${escapeHtml(view.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(view.description)}" />`,
     `<meta property="og:image" content="${escapeHtml(image)}" />`,
-    `<meta property="og:image:alt" content="${escapeHtml(view.title)}" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(view.imageAlt || view.title)}" />`,
+    view.modified ? `<meta property="article:modified_time" content="${escapeHtml(view.modified)}" />` : '',
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(view.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(view.description)}" />`,

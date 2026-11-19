@@ -1,4 +1,4 @@
-import { cleanText } from './sanitize.mjs'
+import { cleanFaq, cleanKeywords, cleanText } from './sanitize.mjs'
 
 /**
  * Wersje językowe treści. Polski jest językiem bazowym: realizacje i podstrony
@@ -25,11 +25,15 @@ function overlay(base, translation, keys) {
 
 /* ── realizacje ──────────────────────────────────────────────────────── */
 
-export const PROJECT_TEXT_KEYS = ['label', 'tagline', 'summary', 'body', 'role', 'features']
+export const PROJECT_TEXT_KEYS = ['label', 'tagline', 'summary', 'body', 'role', 'features', 'seoTitle', 'seoDescription', 'keywords', 'faq']
 
 export function sanitizeProjectTranslation(input) {
   const source = input && typeof input === 'object' ? input : {}
   return {
+    seoTitle: cleanText(source.seoTitle, 90),
+    seoDescription: cleanText(source.seoDescription, 200),
+    keywords: cleanKeywords(source.keywords),
+    faq: cleanFaq(source.faq),
     label: cleanText(source.label, 120),
     tagline: cleanText(source.tagline, 300),
     summary: cleanText(source.summary, 1200),

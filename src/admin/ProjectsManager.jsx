@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  AppWindow, ArrowUpRight, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, CircleAlert, Download, Eye, EyeOff,
-  GitBranch, GripVertical, Images, KeyRound, LayoutGrid, Link2, LoaderCircle, Package, Plus, RefreshCw, Save,
-  Search, Star, Trash2, Type, X,
+  AppWindow, ArrowDown, ArrowUp, ArrowUpRight, Check, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp, CircleAlert, CircleCheck, CircleDashed,
+  Copy, Download, Eye, EyeOff, GitBranch, Globe, GripVertical, Images, KeyRound, LayoutGrid, Link2, LoaderCircle, Package, Plus,
+  RefreshCw, Save, Search, Star, Trash2, Type, X,
 } from 'lucide-react'
+import { SEO_DESCRIPTION, SEO_TITLE, meterTone, readiness, seoDescriptionOf, seoTitleOf } from './readiness'
 import { api, json, uid } from '../lib/api'
 import {
   PLATFORM_LABEL, PLATFORM_ORDER, formatBytes, formatReleaseDate,
@@ -42,8 +43,9 @@ const RELEASE_OPTIONS = [
 const SECTIONS = [
   ['basics', 'Podstawy', LayoutGrid],
   ['content', 'Treść', Type],
-  ['media', 'Media', Images],
+  ['media', 'Zdjęcia', Images],
   ['links', 'Linki i pliki', Link2],
+  ['seo', 'SEO i Google', Globe],
 ]
 
 function emptyProject() {
@@ -70,16 +72,40 @@ function emptyProject() {
     stores: {},
     testing: { enabled: false, platforms: [] },
     downloads: [],
+    seoTitle: '',
+    seoDescription: '',
+    keywords: [],
+    category: '',
+    faq: [],
     published: false,
     featured: false,
     en: emptyTranslation(),
   }
 }
 
+/**
+ * Nowa praca na wzór istniejącej: rodzaj, technologie, mój udział, źródło
+ * plików i kategoria przechodzą, treść i zdjęcia zaczynają się od zera.
+ */
+function projectFromTemplate(source) {
+  return {
+    ...emptyProject(),
+    name: `${source.name} – kopia`,
+    kind: source.kind,
+    label: source.label,
+    role: source.role,
+    stack: [...(source.stack || [])],
+    releaseSource: source.releaseSource,
+    category: source.category || '',
+    testing: { enabled: false, platforms: [...(source.testing?.platforms || [])] },
+    en: { ...emptyTranslation(), label: source.en?.label || '', role: source.en?.role || '' },
+  }
+}
+
 const TEST_PLATFORMS = { android: 'Android', ios: 'iOS', windows: 'Windows', macos: 'macOS', linux: 'Linux' }
 
 function emptyTranslation() {
-  return { label: '', tagline: '', summary: '', body: '', role: '', features: [], shotAlts: [] }
+  return { label: '', tagline: '', summary: '', body: '', role: '', features: [], shotAlts: [], seoTitle: '', seoDescription: '', keywords: [], faq: [] }
 }
 
 /** Edytor listy prostych łańcuchów – jedna linia to jedna pozycja. */
@@ -107,25 +133,66 @@ function Lines({ label, value = [], onChange, hint, rows = 4 }) {
   )
 }
 
-function Shots({ value = [], onChange, onAdd }) {
+/**
+ * Zrzuty ekranu z opisami. Opis (alt) czytają wyszukiwarki grafiki i czytniki
+ * ekranu, więc każdy zrzut ma pole po polsku i po angielsku. Angielskie opisy
+ * leżą w `en.shotAlts` pod tym samym indeksem – przesuwanie zdjęć przesuwa oba.
+ */
+function Shots({ value = [], alts = [], name, onChange, onAdd }) {
   const { busy, progress, error, upload } = useMedia()
+  const move = (index, step) => {
+    const target = index + step
+    if (target < 0 || target >= value.length) return
+    const shots = [...value]
+    const english = [...alts]
+    ;[shots[index], shots[target]] = [shots[target], shots[index]]
+    ;[english[index], english[target]] = [english[target] || '', english[index] || '']
+    onChange(shots, english)
+  }
+  const remove = index => onChange(value.filter((_, at) => at !== index), alts.filter((_, at) => at !== index))
+  const missing = value.filter(shot => !String(shot.alt || '').trim()).length
   return (
     <div className="ap-image-list">
       {error && <Notice tone="error">{error}</Notice>}
-      <span className="ap-field-label">Zrzuty ekranu <b className="ap-count">{value.length}</b></span>
-      <div className="ap-pe-shots">
+      <span className="ap-field-label">
+        Zrzuty ekranu <b className="ap-count">{value.length}</b>
+        {missing > 0 && <em className="ap-shots-missing">{missing === 1 ? '1 bez opisu' : `${missing} bez opisu`}</em>}
+      </span>
+      <ul className="ap-shot-list">
         {value.map((shot, index) => (
-          <figure key={`${shot.src}-${index}`}>
+          <li key={`${shot.src}-${index}`}>
             <img src={shot.src} alt="" />
-            <button
-              type="button"
-              onClick={() => onChange(value.filter((_, position) => position !== index))}
-              aria-label="Usuń"
-            >
-              <Trash2 size={12} />
-            </button>
-          </figure>
+            <div className="ap-shot-fields">
+              <label>
+                <span>Opis zdjęcia</span>
+                <input
+                  value={shot.alt || ''}
+                  placeholder={`${name} – co widać na ekranie`}
+                  onChange={event => onChange(value.map((item, at) => (at === index ? { ...item, alt: event.target.value } : item)), alts)}
+                />
+              </label>
+              <label>
+                <span>Po angielsku</span>
+                <input
+                  value={alts[index] || ''}
+                  placeholder={shot.alt || 'Screenshot description'}
+                  onChange={event => {
+                    const english = value.map((_, at) => alts[at] || '')
+                    english[index] = event.target.value
+                    onChange(value, english)
+                  }}
+                />
+              </label>
+            </div>
+            <div className="ap-shot-tools">
+              <button type="button" onClick={() => move(index, -1)} disabled={index === 0} aria-label="Przesuń wyżej" title="Wyżej"><ArrowUp size={13} /></button>
+              <button type="button" onClick={() => move(index, 1)} disabled={index === value.length - 1} aria-label="Przesuń niżej" title="Niżej"><ArrowDown size={13} /></button>
+              <button type="button" className="is-danger" onClick={() => remove(index)} aria-label="Usuń zdjęcie" title="Usuń"><Trash2 size={13} /></button>
+            </div>
+          </li>
         ))}
+      </ul>
+      <div className="ap-pe-shots">
         <Dropzone
           compact
           busy={busy}
@@ -133,7 +200,7 @@ function Shots({ value = [], onChange, onAdd }) {
           onFiles={async files => {
             const uploaded = await upload(files, file => onAdd({ src: file.url, alt: '' }))
             if (uploaded.length) {
-              toast.success(`Dodano ${uploaded.length === 1 ? 'zdjęcie' : `zdjęcia: ${uploaded.length}`}. Kliknij „Zapisz”, żeby trafiły na stronę.`)
+              toast.success(`Dodano ${uploaded.length === 1 ? 'zdjęcie' : `zdjęcia: ${uploaded.length}`}. Dopisz opisy i zapisz pracę.`)
             }
           }}
         />
@@ -256,7 +323,119 @@ function GithubBar({ notify, onRefreshed }) {
   )
 }
 
-function Editor({ project, platforms, section, onSection, onChange, onSave, onDelete, saving, dirty }) {
+/** Licznik znaków z zakresem, który Google pokazuje bez ucinania. */
+function Counter({ value, min, max }) {
+  const length = String(value || '').length
+  const tone = !length ? '' : length < min ? 'is-short' : length > max ? 'is-long' : 'is-ok'
+  const note = !length ? `${min}–${max} znaków` : length < min ? `za krótki o ${min - length}` : length > max ? `za długi o ${length - max}` : 'dobra długość'
+  return <span className={`ap-counter ${tone}`}>{length} · {note}</span>
+}
+
+/** Tak mniej więcej wygląda wynik w Google – tytuł, adres, opis. */
+function SerpPreview({ title, description, url }) {
+  return (
+    <figure className="ap-serp" aria-label="Podgląd wyniku w Google">
+      <figcaption>Podgląd w wynikach wyszukiwania</figcaption>
+      <div className="ap-serp-site">
+        <img src="/assets/brand/favicon-r-32.png" alt="" />
+        <span><b>Adam Rędzikowski</b><i>{url}</i></span>
+      </div>
+      <p className="ap-serp-title">{title.length > 62 ? `${title.slice(0, 60)}…` : title}</p>
+      <p className="ap-serp-text">{description || 'Brak opisu – Google weźmie dowolny fragment strony.'}</p>
+    </figure>
+  )
+}
+
+/** Lista kontrolna wpisu: co jest gotowe i gdzie poprawić resztę. */
+function Readiness({ report, onSection }) {
+  return (
+    <section className="ap-ready" aria-labelledby="ap-ready-title">
+      <header>
+        <h3 id="ap-ready-title">Gotowość wpisu</h3>
+        <span className={`ap-meter ${meterTone(report.score)}`}><i style={{ '--value': `${report.score}%` }} />{report.done} z {report.total}</span>
+      </header>
+      <ul>
+        {report.checks.map(check => (
+          <li key={check.id} className={check.ok ? 'is-ok' : ''}>
+            {check.ok ? <CircleCheck size={15} aria-label="Gotowe" /> : <CircleDashed size={15} aria-label="Do zrobienia" />}
+            <span><b>{check.label}</b>{!check.ok && <small>{check.hint}</small>}</span>
+            {!check.ok && (
+              <button type="button" className="ap-btn ap-btn-sm" onClick={() => onSection(check.tab)}>Popraw</button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function SeoSection({ project, lang, setLang, value, set, original, categories, onSection }) {
+  const title = seoTitleOf(project, lang)
+  const description = seoDescriptionOf(project, lang)
+  const url = `redzikowski.com › ${lang === 'en' ? 'en › ' : ''}portfolio › ${project.slug || '…'}`
+  const faq = value('faq') || []
+  return (
+    <div className="ap-seo">
+      <div className="ap-seo-main">
+        <LangTabs
+          value={lang}
+          onChange={setLang}
+          hint={lang === 'en' ? 'Wynik dla /en/portfolio/… – puste pola biorą polski tekst.' : 'Tak praca wygląda w Google i w podglądzie linku.'}
+        />
+        <SerpPreview title={title} description={description} url={url} />
+
+        <div className="ap-field is-wide">
+          <span className="ap-field-row">Tytuł w wynikach <Counter value={value('seoTitle')} {...SEO_TITLE} /></span>
+          <input value={value('seoTitle') || ''} onChange={event => set('seoTitle', event.target.value)}
+            placeholder={original('seoTitle') || `${project.name} – czym jest, w kilku słowach`} />
+          <i>Nazwa na początku, potem to, co ktoś wpisze w wyszukiwarkę: „edytor PDF”, „mapa szlaków 3D”. Podpis autora doklei się sam, gdy zmieści.</i>
+        </div>
+        <div className="ap-field is-wide">
+          <span className="ap-field-row">Opis w wynikach <Counter value={value('seoDescription')} {...SEO_DESCRIPTION} /></span>
+          <textarea rows={3} value={value('seoDescription') || ''} onChange={event => set('seoDescription', event.target.value)}
+            placeholder={original('seoDescription') || 'Co to jest, dla kogo i czym się wyróżnia – jedno, dwa zdania.'} />
+          <i>Bez tego pola Google bierze zdanie z listy.</i>
+        </div>
+
+        <div className="ap-grid-2">
+          <Lines key={`keywords-${lang}`} label="Słowa kluczowe" value={value('keywords') || []} onChange={next => set('keywords', next)} rows={5}
+            hint="Jedna fraza w linii, tak jak ktoś by jej szukał. Trafiają do meta i danych strukturalnych." />
+          <Select
+            label="Kategoria programu"
+            value={project.category || ''}
+            onChange={category => set('category', category, true)}
+            options={[['', 'Wybierz kategorię'], ...categories]}
+            hint="Wspólna dla obu języków. Google używa jej przy wynikach z aplikacjami."
+          />
+        </div>
+
+        <div className="ap-pe-group">
+          <h3>Najczęstsze pytania</h3>
+          <p className="ap-hint">Widać je pod opisem pracy i trafiają do danych FAQPage. Pisz tak, jak pytają ludzie: „Czy działa bez internetu?”.</p>
+          <Repeater
+            items={faq}
+            onChange={next => set('faq', next)}
+            create={() => ({ q: '', a: '' })}
+            addLabel="Dodaj pytanie"
+            itemLabel={(item, index) => item.q || `Pytanie ${index + 1}`}
+            render={(item, patch) => (
+              <>
+                <Text label="Pytanie" value={item.q} onChange={q => patch({ q })} placeholder="Czy aplikacja jest darmowa?" />
+                <Area label="Odpowiedź" value={item.a} onChange={a => patch({ a })} rows={2} placeholder="Konkretnie, w jednym lub dwóch zdaniach." />
+              </>
+            )}
+          />
+          {lang === 'en' && !faq.length && (original('faq') || []).length > 0 && (
+            <p className="ap-hint">Bez angielskich pytań strona /en pokaże polskie.</p>
+          )}
+        </div>
+      </div>
+      <Readiness report={readiness(project)} onSection={onSection} />
+    </div>
+  )
+}
+
+function Editor({ project, platforms, categories, section, onSection, onChange, onSave, onDelete, onDuplicate, saving, dirty, saveExtra }) {
   const [release, setRelease] = useState(project.release || null)
   const [checking, setChecking] = useState(false)
   // Funkcyjna aktualizacja – wyniki wysyłki zdjęć wracają po kilku sekundach
@@ -267,7 +446,8 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
   // Pola tekstowe edytują wersję wybraną w zakładce języka; w angielskiej
   // podpowiedzią jest polski oryginał, a puste pole spada na niego na stronie.
   const value = key => (lang === 'en' ? en[key] : project[key])
-  const set = (key, next) => (lang === 'en' ? update({ en: { ...en, [key]: next } }) : update({ [key]: next }))
+  // `shared` – pole wspólne dla obu języków (np. kategoria).
+  const set = (key, next, shared = false) => (lang === 'en' && !shared ? update({ en: { ...en, [key]: next } }) : update({ [key]: next }))
   const original = key => (lang === 'en' ? project[key] : undefined)
 
   useEffect(() => { setRelease(project.release || null) }, [project.id, project.release])
@@ -287,6 +467,7 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
   const published = project.published !== false
   const thumb = project.icon || project.cover
   const releaseProblem = isApp && project.releaseSource === 'github' && release?.error
+  const report = readiness(project)
 
   return (
     <div className="ap-pe">
@@ -300,7 +481,12 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
             placeholder="Nazwa pracy"
             aria-label="Nazwa"
           />
-          <span className="mono">/portfolio/{project.slug || '…'}</span>
+          <span className="ap-pe-meta">
+            <span className="mono">/portfolio/{project.slug || '…'}</span>
+            <button type="button" className={`ap-meter ${meterTone(report.score)}`} onClick={() => onSection('seo')} title="Gotowość wpisu – otwórz listę kontrolną">
+              <i style={{ '--value': `${report.score}%` }} />{report.score}%
+            </button>
+          </span>
         </div>
         <div className="ap-pe-tools">
           <button
@@ -331,6 +517,9 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
               </a>
             </>
           )}
+          <button type="button" className="ap-icon-btn" onClick={onDuplicate} title="Nowa praca na wzór tej (rodzaj, technologie, kategoria)" aria-label="Nowa praca na wzór tej">
+            <Copy size={14} />
+          </button>
           <button type="button" className="ap-icon-btn is-danger" onClick={onDelete} title="Usuń pracę" aria-label="Usuń pracę">
             <Trash2 size={14} />
           </button>
@@ -349,6 +538,7 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
           >
             <Icon size={14} /> {label}
             {id === 'links' && releaseProblem && <i className="ap-pe-alert" aria-label="Problem z wydaniem" />}
+            {report.checks.some(check => check.tab === id && !check.ok) && <i className="ap-pe-todo" aria-label="Coś do uzupełnienia" />}
           </button>
         ))}
       </nav>
@@ -409,8 +599,13 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
               <ImagePicker label="Okładka na liście" value={project.cover} onChange={cover => update({ cover })}
                 hint="Najlepiej poziomy zrzut ekranu – kadrowany do 16:10." />
             </div>
-            <Shots value={project.shots} onAdd={shot => update(current => ({ shots: [...(current.shots || []), shot] }))}
-              onChange={shots => update({ shots })} />
+            <Shots
+              value={project.shots}
+              alts={en.shotAlts || []}
+              name={project.name}
+              onAdd={shot => update(current => ({ shots: [...(current.shots || []), shot] }))}
+              onChange={(shots, shotAlts) => update(current => ({ shots, en: { ...emptyTranslation(), ...(current.en || {}), shotAlts } }))}
+            />
           </>
         )}
 
@@ -548,50 +743,93 @@ function Editor({ project, platforms, section, onSection, onChange, onSave, onDe
             )}
           </>
         )}
+
+        {section === 'seo' && (
+          <SeoSection
+            project={project}
+            lang={lang}
+            setLang={setLang}
+            value={value}
+            set={set}
+            original={original}
+            categories={categories}
+            onSection={onSection}
+          />
+        )}
       </div>
 
-      <SaveBar dirty={dirty} saving={saving} onSave={onSave} onReset={() => onChange(null)} resetLabel="Odrzuć zmiany" />
+      <SaveBar
+        dirty={dirty || Boolean(saveExtra)}
+        saving={saving}
+        onSave={dirty ? onSave : undefined}
+        saveLabel="Zapisz tę pracę"
+        onReset={dirty ? () => onChange(null) : undefined}
+        resetLabel="Odrzuć zmiany"
+        info={saveExtra?.info || 'Ta praca ma niezapisane zmiany.'}
+        extra={saveExtra?.button}
+      />
     </div>
   )
+}
+
+/** Porównanie szkicu z zapisaną wersją – bez pól, które dokłada tylko serwer. */
+const comparable = project => {
+  const { release: _release, updatedAt: _updated, ...rest } = project || {}
+  return JSON.stringify(rest)
 }
 
 export default function ProjectsManager({ notify, item = '', onItem = () => {} }) {
   const [projects, setProjects] = useState(null)
   const [platforms, setPlatforms] = useState([])
+  const [categories, setCategories] = useState([])
   const [selected, setSelected] = useState('')
-  const [draft, setDraft] = useState(null)
+  // Szkice wszystkich edytowanych prac: przejście do innej pracy nie gubi zmian,
+  // a zapisać można jedną albo wszystkie naraz.
+  const [drafts, setDrafts] = useState({})
   const [saving, setSaving] = useState(false)
   const [section, setSection] = useState('basics')
   const [query, setQuery] = useState('')
+
+  const byId = useMemo(() => new Map((projects || []).map(project => [project.id, project])), [projects])
+  const original = byId.get(selected) || null
+  const draft = drafts[selected] || original
+
+  const changed = useMemo(
+    () => Object.entries(drafts).filter(([id, value]) => byId.has(id) && comparable(value) !== comparable(byId.get(id))).map(([id]) => id),
+    [drafts, byId],
+  )
+  const dirty = changed.includes(selected)
 
   const load = async (keep = '') => {
     try {
       const payload = await api('/api/admin/projects')
       setProjects(payload.projects)
       setPlatforms(payload.platforms)
+      setCategories(payload.categories || [])
       const next = keep || selected
       const current = payload.projects.find(entry => entry.id === next)
         || (!next && item ? payload.projects.find(entry => entry.slug === item) : null)
       setSelected(current ? current.id : '')
-      setDraft(current ? structuredClone(current) : null)
       if (current) onItem(current.slug)
+      return payload.projects
     } catch (requestError) {
       toast.error(requestError.message)
+      return null
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const original = useMemo(
-    () => (projects || []).find(item => item.id === selected) || null,
-    [projects, selected],
-  )
-
-  const dirty = Boolean(draft && original) && JSON.stringify(draft) !== JSON.stringify(original)
+  // Zamknięcie karty z niezapisanymi pracami – przeglądarka zapyta.
+  useEffect(() => {
+    if (!changed.length) return undefined
+    const warn = event => { event.preventDefault(); event.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [changed.length])
 
   const choose = project => {
     setSelected(project.id)
-    setDraft(structuredClone(project))
     onItem(project.slug)
   }
 
@@ -602,37 +840,71 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
     if (target && target.id !== selected) choose(target)
   }, [item, projects]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const create = async () => {
+  const setDraft = next => setDrafts(current => {
+    if (next === null) {
+      const { [selected]: _dropped, ...rest } = current
+      return rest
+    }
+    const base = current[selected] || structuredClone(byId.get(selected))
+    return { ...current, [selected]: typeof next === 'function' ? next(base) : next }
+  })
+
+  const create = async (template = null) => {
     try {
-      const created = await api('/api/admin/projects', json('POST', emptyProject()))
+      const created = await api('/api/admin/projects', json('POST', template ? projectFromTemplate(template) : emptyProject()))
       setQuery('')
-      setSection('basics')
+      setSection(template ? 'content' : 'basics')
       await load(created.id)
-      notify('Praca dodana. Uzupełnij treść i opublikuj.')
+      notify(template
+        ? `Nowa praca na wzór „${template.name}”. Rodzaj, technologie i kategoria już są – uzupełnij treść.`
+        : 'Praca dodana. Uzupełnij treść i opublikuj.')
     } catch (requestError) {
       toast.error(requestError.message)
     }
   }
 
-  const save = async () => {
+  // Zapisuje wskazane prace po kolei; błąd jednej nie przerywa pozostałych.
+  const saveMany = useCallback(async ids => {
+    if (!ids.length) return
     setSaving(true)
-    try {
-      const saved = await api(`/api/admin/projects/${draft.id}`, json('PUT', draft))
-      await load(saved.id)
-      notify('Praca zapisana.')
-    } catch (requestError) {
-      toast.error(requestError.message)
-    } finally {
-      setSaving(false)
+    const failed = []
+    const saved = []
+    for (const id of ids) {
+      try {
+        await api(`/api/admin/projects/${id}`, json('PUT', drafts[id]))
+        saved.push(id)
+      } catch (requestError) {
+        failed.push(`${drafts[id]?.name || 'Praca'}: ${requestError.message}`)
+      }
     }
-  }
+    setDrafts(current => Object.fromEntries(Object.entries(current).filter(([id]) => !saved.includes(id))))
+    await load(selected)
+    setSaving(false)
+    if (saved.length) notify(saved.length === 1 ? 'Praca zapisana.' : `Zapisano prace: ${saved.length}.`)
+    if (failed.length) toast.error(`Nie zapisano: ${failed.join(' · ')}`)
+  }, [drafts, selected]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const save = () => saveMany([selected])
+  const saveAll = () => saveMany(changed)
+
+  // Ctrl+S / Cmd+S zapisuje wszystko, co zmienione.
+  useEffect(() => {
+    const onKey = event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        if (changed.length && !saving) saveAll()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }) // eslint-disable-line react-hooks/exhaustive-deps
 
   const remove = async () => {
-    if (!window.confirm(`Usunąć „${draft.name}” z portfolio?`)) return
+    if (!window.confirm(`Usunąć „${draft.name}” z portfolio? Tego nie da się cofnąć.`)) return
     try {
       await api(`/api/admin/projects/${draft.id}`, { method: 'DELETE' })
+      setDrafts(current => Object.fromEntries(Object.entries(current).filter(([id]) => id !== draft.id)))
       setSelected('')
-      setDraft(null)
       onItem('')
       await load()
       notify('Praca usunięta.')
@@ -644,20 +916,19 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
   // Przenosi pracę na wskazaną pozycję – krok w górę, skok na sam koniec
   // albo miejsce upuszczenia przy przeciąganiu.
   const moveTo = async (id, target) => {
-    const ids = projects.map(item => item.id)
+    const ids = projects.map(entry => entry.id)
     const index = ids.indexOf(id)
     const clamped = Math.max(0, Math.min(target, ids.length - 1))
     if (index === -1 || clamped === index) return
     ids.splice(clamped, 0, ids.splice(index, 1)[0])
-    const byId = new Map(projects.map(item => [item.id, item]))
-    setProjects(ids.map(item => byId.get(item)))
+    setProjects(ids.map(entry => byId.get(entry)))
     try {
       setProjects(await api('/api/admin/projects/reorder', json('POST', { ids })))
     } catch (requestError) {
       toast.error(requestError.message)
     }
   }
-  const move = (id, direction) => moveTo(id, projects.findIndex(item => item.id === id) + direction)
+  const move = (id, direction) => moveTo(id, projects.findIndex(entry => entry.id === id) + direction)
 
   const [dragging, setDragging] = useState(null)
   const [dropAt, setDropAt] = useState(-1)
@@ -673,10 +944,23 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
     ? projects.filter(project => [project.name, project.slug, project.label].some(text => text?.toLowerCase().includes(needle)))
     : projects
   const sortable = !needle
+  const others = changed.filter(id => id !== selected)
+  const saveExtra = changed.length > 1 || (changed.length === 1 && !dirty)
+    ? {
+      info: dirty
+        ? `Niezapisane zmiany w ${changed.length} pracach.`
+        : `Niezapisane zmiany w innych pracach: ${others.map(id => drafts[id]?.name).join(', ')}.`,
+      button: (
+        <button type="button" className={`ap-btn ${dirty ? '' : 'ap-btn-primary'}`} onClick={saveAll} disabled={saving}>
+          {saving ? <LoaderCircle className="spin" size={15} /> : <Check size={15} />} Zapisz wszystkie ({changed.length})
+        </button>
+      ),
+    }
+    : null
 
   return (
     <div className="ap-projects">
-      <GithubBar notify={notify} onRefreshed={() => (dirty ? undefined : load())} />
+      <GithubBar notify={notify} onRefreshed={() => load()} />
 
       <div className="ap-projects-layout">
         <aside className="ap-plist">
@@ -686,7 +970,7 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
               <input value={query} onChange={event => setQuery(event.target.value)} placeholder={`Szukaj w ${projects.length} pracach`} />
               {query && <button type="button" onClick={() => setQuery('')} aria-label="Wyczyść"><X size={13} /></button>}
             </label>
-            <button type="button" className="ap-btn ap-btn-primary ap-btn-sm" onClick={create} title="Dodaj pracę">
+            <button type="button" className="ap-btn ap-btn-primary ap-btn-sm" onClick={() => create()} title="Dodaj pustą pracę">
               <Plus size={14} /> Dodaj
             </button>
           </div>
@@ -695,20 +979,23 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
             {!projects.length && <Empty>Portfolio jest puste. Dodaj pierwszą pracę.</Empty>}
             {projects.length > 0 && !visible.length && <p className="ap-plist-none">Nic nie pasuje do „{query}”.</p>}
 
-            {visible.map(project => {
-              const index = projects.indexOf(project)
+            {visible.map(stored => {
+              const index = projects.indexOf(stored)
+              const project = drafts[stored.id] || stored
+              const unsaved = changed.includes(stored.id)
+              const score = readiness(project).score
               return (
                 <div
-                  key={project.id}
-                  className={`ap-prow ${project.id === selected ? 'is-active' : ''} ${dragging === project.id ? 'is-dragging' : ''} ${dropAt === index && dragging && dragging !== project.id ? 'is-drop' : ''}`}
+                  key={stored.id}
+                  className={`ap-prow ${stored.id === selected ? 'is-active' : ''} ${dragging === stored.id ? 'is-dragging' : ''} ${dropAt === index && dragging && dragging !== stored.id ? 'is-drop' : ''}`}
                   draggable={sortable}
-                  onDragStart={event => { setDragging(project.id); event.dataTransfer.effectAllowed = 'move' }}
+                  onDragStart={event => { setDragging(stored.id); event.dataTransfer.effectAllowed = 'move' }}
                   onDragOver={event => { if (!dragging) return; event.preventDefault(); setDropAt(index) }}
                   onDrop={event => { event.preventDefault(); if (dragging) moveTo(dragging, index); setDragging(null); setDropAt(-1) }}
                   onDragEnd={() => { setDragging(null); setDropAt(-1) }}
                 >
                   {sortable && <GripVertical className="ap-prow-grip" size={14} aria-hidden="true" />}
-                  <button type="button" className="ap-prow-pick" onClick={() => choose(project)}>
+                  <button type="button" className="ap-prow-pick" onClick={() => choose(stored)}>
                     <span className="ap-prow-thumb">
                       {project.icon || project.cover ? <img src={project.icon || project.cover} alt="" /> : <AppWindow size={14} />}
                     </span>
@@ -720,17 +1007,19 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
                       </small>
                     </span>
                     <span className="ap-prow-flags">
+                      {unsaved && <i className="ap-prow-unsaved" title="Niezapisane zmiany" aria-label="Niezapisane zmiany" />}
                       {project.release?.error && <CircleAlert className="is-error" size={13} aria-label="Problem z wydaniem" />}
                       {project.featured && <Star className="is-gold" size={13} aria-label="Na stronie głównej" />}
                       {project.published === false && <EyeOff size={13} aria-label="Nieopublikowana" />}
+                      <b className={`ap-prow-score ${meterTone(score)}`} title={`Gotowość wpisu: ${score}%`}>{score}</b>
                     </span>
                   </button>
                   {sortable && (
                     <div className="ap-prow-order">
-                      <button type="button" onClick={() => moveTo(project.id, 0)} disabled={index === 0} aria-label="Na samą górę" title="Na samą górę"><ChevronsUp size={13} /></button>
-                      <button type="button" onClick={() => move(project.id, -1)} disabled={index === 0} aria-label="Wyżej" title="Wyżej"><ChevronUp size={13} /></button>
-                      <button type="button" onClick={() => move(project.id, 1)} disabled={index === projects.length - 1} aria-label="Niżej" title="Niżej"><ChevronDown size={13} /></button>
-                      <button type="button" onClick={() => moveTo(project.id, projects.length - 1)} disabled={index === projects.length - 1} aria-label="Na sam dół" title="Na sam dół"><ChevronsDown size={13} /></button>
+                      <button type="button" onClick={() => moveTo(stored.id, 0)} disabled={index === 0} aria-label="Na samą górę" title="Na samą górę"><ChevronsUp size={13} /></button>
+                      <button type="button" onClick={() => move(stored.id, -1)} disabled={index === 0} aria-label="Wyżej" title="Wyżej"><ChevronUp size={13} /></button>
+                      <button type="button" onClick={() => move(stored.id, 1)} disabled={index === projects.length - 1} aria-label="Niżej" title="Niżej"><ChevronDown size={13} /></button>
+                      <button type="button" onClick={() => moveTo(stored.id, projects.length - 1)} disabled={index === projects.length - 1} aria-label="Na sam dół" title="Na sam dół"><ChevronsDown size={13} /></button>
                     </div>
                   )}
                 </div>
@@ -743,15 +1032,19 @@ export default function ProjectsManager({ notify, item = '', onItem = () => {} }
           {draft
             ? (
               <Editor
+                key={draft.id}
                 project={draft}
                 platforms={platforms}
+                categories={categories}
                 section={section}
                 onSection={setSection}
-                onChange={next => setDraft(next === null ? structuredClone(original) : next)}
+                onChange={setDraft}
                 onSave={save}
                 onDelete={remove}
+                onDuplicate={() => create(draft)}
                 saving={saving}
                 dirty={dirty}
+                saveExtra={saveExtra}
               />
             )
             : <Empty>Wybierz pracę z listy albo dodaj nową.</Empty>}

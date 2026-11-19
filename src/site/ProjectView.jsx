@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, FlaskConical, LoaderCircle, Send, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Download, ExternalLink, FlaskConical, LoaderCircle, Send, X } from 'lucide-react'
 import {
   CATALOG_PATH, PLATFORM_LABEL,
   formatBytes, formatReleaseDate, hostOf,
@@ -13,6 +13,31 @@ import PlatformIcon, { fileVariant } from '../lib/PlatformIcon'
 import { Reveal, ease } from '../lib/ui'
 import Lightbox from './Lightbox'
 import GlowEdge from '../lib/GlowEdge'
+
+/** Tytuł karty – ta sama reguła co na serwerze (server/seo.mjs → projectTitle). */
+function projectTitle(project, kindLabel) {
+  const base = project.seoTitle || `${project.name} – ${project.label || kindLabel}`
+  const full = `${base} | Adam Rędzikowski`
+  return full.length <= 70 ? full : base
+}
+
+/** Pytania pod opisem. Te same trafiają do danych FAQPage, więc muszą być widoczne. */
+function Faq({ items, title }) {
+  if (!items?.length) return null
+  return (
+    <section className="pv-faq" aria-labelledby="pv-faq-title">
+      <h2 id="pv-faq-title">{title}</h2>
+      <div className="pv-faq-list">
+        {items.map((item, index) => (
+          <details key={item.q} open={index === 0}>
+            <summary>{item.q}<ChevronDown size={16} aria-hidden="true" /></summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 function Paragraphs({ text }) {
   return String(text || '')
@@ -308,9 +333,9 @@ export default function ProjectView({ slug, onNavigate }) {
     applySeo({
       lang,
       path: `${CATALOG_PATH}/${project.slug}`,
-      title: `${project.name} – ${project.label || t(`kind.${project.kind}`)} | Adam Rędzikowski`,
-      description: describe(project.tagline || project.summary || project.body),
-      image: project.cover,
+      title: projectTitle(project, t(`kind.${project.kind}`)),
+      description: describe(project.seoDescription || project.tagline || project.summary || project.body),
+      image: project.cover || project.shots?.[0]?.src,
     })
   }, [data, status, lang, slug, t])
 
@@ -353,7 +378,7 @@ export default function ProjectView({ slug, onNavigate }) {
     )
   }
 
-  const { project, previous, next } = data
+  const { project, previous, next, related = [] } = data
   const external = project.siteUrl?.startsWith('http')
 
   return (
@@ -443,6 +468,30 @@ export default function ProjectView({ slug, onNavigate }) {
         <TestSignup key={project.slug} project={project} />
 
         <Changelog project={project} />
+
+        <Faq items={project.faq} title={t('project.faq')} />
+
+        {related.length > 0 && (
+          <section className="pv-related" aria-labelledby="pv-related-title">
+            <h2 id="pv-related-title">{t('project.related')}</h2>
+            <ul>
+              {related.map(item => (
+                <li key={item.slug}>
+                  <a
+                    href={lp(`${CATALOG_PATH}/${item.slug}`)}
+                    onClick={event => { event.preventDefault(); onNavigate(lp(`${CATALOG_PATH}/${item.slug}`)) }}
+                  >
+                    {item.icon ? <img src={item.icon} alt="" loading="lazy" /> : <span className="pv-related-blank" aria-hidden="true" />}
+                    <span>
+                      <strong>{item.name}</strong>
+                      {item.tagline && <small>{item.tagline}</small>}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {(previous || next) && (
           <nav className="pv-nav" aria-label={t('project.others')}>

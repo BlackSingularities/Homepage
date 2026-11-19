@@ -1,0 +1,1060 @@
+{
+  "arcadia": {
+    "c": "GameApplication",
+    "pl": {
+      "t": "Arcadia – 40 darmowych gier i 35 narzędzi w przeglądarce",
+      "d": "Gry przeglądarkowe i narzędzia online w jednym katalogu: bez instalacji, reklam i konta. Wszystko liczy się lokalnie, także na telefonie.",
+      "k": ["gry przeglądarkowe", "darmowe gry online", "narzędzia online", "gry bez instalacji", "gry bez reklam", "aplikacja webowa"],
+      "f": [
+        ["Czy gry w Arcadii są darmowe?", "Tak. Wszystkie gry i narzędzia działają w przeglądarce za darmo, bez konta i bez reklam."],
+        ["Czy trzeba coś instalować?", "Nie. Arcadia otwiera się jak zwykła strona i działa na komputerze, tablecie i telefonie, także na pełnym ekranie."],
+        ["Czy moje pliki są gdzieś wysyłane?", "Nie. Narzędzia liczą wszystko lokalnie w przeglądarce, więc pliki nie opuszczają urządzenia."]
+      ]
+    },
+    "en": {
+      "t": "Arcadia – 40 free browser games and 35 online tools",
+      "d": "Browser games and handy online tools in one catalogue: no install, no ads, no account. Everything runs locally, on desktop and mobile.",
+      "k": ["browser games", "free online games", "online tools", "no install games", "ad-free games", "web app"],
+      "f": [
+        ["Are the games in Arcadia free?", "Yes. Every game and tool runs in the browser for free, with no account and no ads."],
+        ["Do I need to install anything?", "No. Arcadia opens like a regular website and works on desktop, tablet and phone, including full screen."],
+        ["Are my files uploaded anywhere?", "No. The tools compute everything locally in the browser, so files never leave your device."]
+      ]
+    }
+  },
+  "openpdf": {
+    "c": "BusinessApplication",
+    "pl": {
+      "t": "OpenDocument – czytnik PDF, DjVu i EPUB oraz edytor PDF",
+      "d": "Darmowy czytnik dokumentów i edytor PDF na Androida, iOS i Windows: tryb książki, 10 formatów, adnotacje zgodne z Acrobatem. Bez konta i reklam.",
+      "k": ["edytor PDF", "czytnik PDF Android", "czytnik DjVu", "czytnik EPUB", "adnotacje PDF", "podpis PDF", "darmowy edytor PDF"],
+      "f": [
+        ["Jakie formaty otwiera OpenDocument?", "PDF, DjVu, EPUB, FB2, DOCX, ODT, RTF, Markdown i HTML – w trybie książki albo przewijania."],
+        ["Czy zmiany w PDF zobaczę w Adobe Acrobat?", "Tak. Adnotacje, formularze i podpisy są zapisywane w standardzie PDF, więc otworzy je Acrobat i inne programy."],
+        ["Na jakich urządzeniach działa?", "Na Androidzie 10 lub nowszym, iOS 16.4 lub nowszym oraz na Windows. Działa lokalnie, bez konta."]
+      ]
+    },
+    "en": {
+      "t": "OpenDocument – PDF, DjVu and EPUB reader with a PDF editor",
+      "d": "Free document reader and PDF editor for Android, iOS and Windows: real book mode, 10 formats and Acrobat-compatible annotations. No account, no ads.",
+      "k": ["PDF editor", "PDF reader Android", "DjVu reader", "EPUB reader", "PDF annotations", "sign PDF", "free PDF editor"],
+      "f": [
+        ["Which formats does OpenDocument open?", "PDF, DjVu, EPUB, FB2, DOCX, ODT, RTF, Markdown and HTML, in book or scroll mode."],
+        ["Will Adobe Acrobat see my PDF changes?", "Yes. Annotations, forms and signatures are saved to the PDF standard, so Acrobat and other readers show them."],
+        ["Which devices are supported?", "Android 10 or newer, iOS 16.4 or newer, and Windows. It works locally, without an account."]
+      ]
+    }
+  },
+  "opencalc": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "OpenCalc – kalkulator naukowy z wykresami na Androida",
+      "d": "Kalkulator naukowy na Androida: wykresy do 8 funkcji, 17 kategorii przeliczników jednostek, równania i rata kredytu. Bez reklam i konta.",
+      "k": ["kalkulator naukowy", "kalkulator z wykresami", "przelicznik jednostek", "kalkulator Android", "wykresy funkcji", "kalkulator bez reklam"],
+      "f": [
+        ["Czy OpenCalc rysuje wykresy funkcji?", "Tak. Rysuje do ośmiu funkcji naraz i znajduje miejsca zerowe, ekstrema, przecięcia oraz pochodną."],
+        ["Co oprócz kalkulatora jest w aplikacji?", "Przeliczniki jednostek w 17 kategoriach i 16 narzędzi matematycznych oraz codziennych, na przykład rata kredytu."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy. Wszystko liczy się w telefonie, bez reklam i śledzenia."]
+      ]
+    },
+    "en": {
+      "t": "OpenCalc – scientific graphing calculator for Android",
+      "d": "Scientific calculator for Android: graph up to 8 functions, 17 unit converter categories, equations and loan payments. No ads, no account.",
+      "k": ["scientific calculator", "graphing calculator", "unit converter", "Android calculator", "function graphs", "ad-free calculator"],
+      "f": [
+        ["Can OpenCalc plot functions?", "Yes. It plots up to eight functions and finds roots, extrema, intersections and the derivative."],
+        ["What else is in the app?", "Unit converters in 17 categories and 16 maths and everyday tools, such as a loan payment calculator."],
+        ["Which Android version is required?", "Android 10 or newer. Everything is calculated on the phone, without ads or tracking."]
+      ]
+    }
+  },
+  "open3dmaze": {
+    "c": "GameApplication",
+    "pl": {
+      "t": "Open3Dmaze – gra labirynt 3D sterowana pochyleniem telefonu",
+      "d": "Labirynt z kulką na Androida: ściany 3D przechylają się razem z telefonem. 60 poziomów w 5 światach, labirynt dnia, tryb bez końca i Zen.",
+      "k": ["gra labirynt", "labirynt 3D", "gra z kulką", "gra na pochylenie telefonu", "gra Android offline", "gra logiczna"],
+      "f": [
+        ["Jak się steruje w Open3Dmaze?", "Pochyleniem telefonu – kulka toczy się tam, gdzie go przechylisz, a ściany 3D przechylają się razem z ekranem."],
+        ["Ile poziomów ma gra?", "Kampania ma 5 światów i 60 poziomów po 3 gwiazdki, a obok są tryby Labirynt dnia, Bez końca, Wyścig z czasem, Mrok, Zen i własny labirynt."],
+        ["Skąd pobrać grę?", "Plik dla Androida 10 lub nowszego jest na tej stronie, a aktualizacje przychodzą z redzikowski.com."]
+      ]
+    },
+    "en": {
+      "t": "Open3Dmaze – tilt-controlled 3D maze game for Android",
+      "d": "Ball maze for Android where 3D walls lean with your phone. 60 levels across 5 worlds, daily maze, endless, time race and Zen modes.",
+      "k": ["maze game", "3D maze", "ball rolling game", "tilt game", "offline Android game", "puzzle game"],
+      "f": [
+        ["How do you control Open3Dmaze?", "By tilting the phone: the ball rolls where you lean it and the 3D walls tilt together with the screen."],
+        ["How many levels are there?", "The campaign has 5 worlds and 60 levels with 3 stars each, plus daily maze, endless, time race, darkness, Zen and custom maze modes."],
+        ["Where can I download it?", "The Android 10+ package is on this page, and updates come from redzikowski.com."]
+      ]
+    }
+  },
+  "gran-3d": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "GRAŃ – mapa szlaków górskich 3D i mapy offline",
+      "d": "Trójwymiarowy atlas gór na Windows, Androida i iOS: szlaki PTTK z OpenStreetMap, planowanie tras z czasami, profil wysokości i mapy offline.",
+      "k": ["mapa szlaków górskich", "mapa 3D gór", "mapy turystyczne offline", "szlaki PTTK", "planowanie trasy w górach", "aplikacja w góry", "Tatry 3D"],
+      "f": [
+        ["Czy GRAŃ działa bez internetu?", "Tak. Wybrany obszar pobierasz w żądanej szczegółowości, a potem mapa, teren i szlaki działają w trybie bez internetu."],
+        ["Jaki obszar obejmuje mapa?", "Teren 3D całej Europy, a dla Polski, Czech i Słowacji także LiDAR 3 m i ortofotomapę. Szlaki pochodzą z OpenStreetMap."],
+        ["Na jakich systemach działa?", "Na Windows 10 i 11, Androidzie 8 lub nowszym oraz iPhonie i iPadzie z iOS 15+ (instalacja przez AltStore lub Sideloadly)."]
+      ]
+    },
+    "en": {
+      "t": "GRAŃ – 3D mountain trail map with offline maps",
+      "d": "3D mountain atlas for Windows, Android and iOS: marked trails from OpenStreetMap, route planning with walking times, elevation profile and offline maps.",
+      "k": ["mountain trail map", "3D mountain map", "offline hiking maps", "hiking route planner", "hiking app", "Tatra mountains 3D"],
+      "f": [
+        ["Does GRAŃ work offline?", "Yes. Download an area at the detail level you need and the map, terrain and trails keep working without internet."],
+        ["Which area does the map cover?", "3D terrain for all of Europe, plus 3 m LiDAR and orthophoto for Poland, Czechia and Slovakia. Trails come from OpenStreetMap."],
+        ["Which systems are supported?", "Windows 10 and 11, Android 8 or newer, and iPhone and iPad with iOS 15+ (installed via AltStore or Sideloadly)."]
+      ]
+    }
+  },
+  "openspacecraft": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "OpenSpacecraft – atlas misji kosmicznych i Układu Słonecznego 3D",
+      "d": "Układ Słoneczny 3D w dowolnej chwili 1957–2100: 85 misji po trajektoriach JPL Horizons, satelity na orbicie i starty z każdego roku. Na Windows.",
+      "k": ["symulator Układu Słonecznego", "misje kosmiczne 3D", "satelity na orbicie", "trajektorie JPL Horizons", "astronomia na komputer", "atlas kosmosu"],
+      "f": [
+        ["Jakie misje można zobaczyć?", "85 misji od Sputnika do Artemis II, z czego 49 odtwarzanych po prawdziwych trajektoriach z JPL Horizons."],
+        ["Czy pokazuje satelity na orbicie?", "Tak. Na wybrany dzień pokazuje skatalogowane obiekty na orbicie okołoziemskiej (SATCAT, SGP4) i starty orbitalne z każdego roku."],
+        ["Na jakim systemie działa?", "Na Windows 10 i 11. Instalator sam dba o aktualizacje."]
+      ]
+    },
+    "en": {
+      "t": "OpenSpacecraft – 3D atlas of space missions and the Solar System",
+      "d": "The Solar System in 3D at any moment from 1957 to 2100: 85 missions on real JPL Horizons trajectories, satellites in orbit and every launch year. For Windows.",
+      "k": ["solar system simulator", "space missions 3D", "satellite tracker", "JPL Horizons trajectories", "astronomy software", "space atlas"],
+      "f": [
+        ["Which missions can I watch?", "85 missions from Sputnik to Artemis II, 49 of them replayed on real JPL Horizons trajectories."],
+        ["Does it show satellites in orbit?", "Yes. For any day it shows catalogued objects in Earth orbit (SATCAT, SGP4) and the orbital launches of every year."],
+        ["Which system does it run on?", "Windows 10 and 11. The installer keeps it up to date."]
+      ]
+    }
+  },
+  "polskie-studio-map": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "Polskie Studio Map – mapa Polski 3D z ortofotomapą GUGiK",
+      "d": "Trójwymiarowy atlas całej Polski na Windows: model terenu, ortofotomapa GUGiK, szlaki z OpenStreetMap, analizy widoczności, wysokości i cieni.",
+      "k": ["mapa Polski 3D", "ortofotomapa GUGiK", "model terenu Polski", "analiza widoczności", "mapa 3D na komputer", "OpenStreetMap"],
+      "f": [
+        ["Skąd pochodzą dane mapy?", "Teren i ortofotomapa pochodzą z GUGiK, a szlaki, punkty i wyszukiwarka miejsc z OpenStreetMap."],
+        ["Jakie analizy można zrobić?", "Widoczność, wysokość względną, linię wzroku, panoramę i cienie rzeźby dla wybranej daty i godziny."],
+        ["Na jakim systemie działa?", "Na Windows 10 i 11, z aktualizacjami z redzikowski.com."]
+      ]
+    },
+    "en": {
+      "t": "Polskie Studio Map – 3D map of Poland with GUGiK orthophoto",
+      "d": "3D atlas of all of Poland for Windows: terrain model, GUGiK orthophoto, OpenStreetMap trails, plus visibility, elevation and shadow analysis.",
+      "k": ["3D map of Poland", "orthophoto", "terrain model", "viewshed analysis", "3D map software", "OpenStreetMap"],
+      "f": [
+        ["Where does the map data come from?", "Terrain and orthophoto come from GUGiK, Poland's national mapping agency; trails, places and search from OpenStreetMap."],
+        ["What analyses are available?", "Visibility, relative height, line of sight, panorama and terrain shadows for any date and time."],
+        ["Which system does it run on?", "Windows 10 and 11, with updates from redzikowski.com."]
+      ]
+    }
+  },
+  "opentimer": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenTimer – budzik, stoper, minutnik i pomodoro na Androida",
+      "d": "Zegar, budzik z zadaniem przed wyłączeniem, stoper, wiele minutników, pomodoro, interwały i metronom w jednej aplikacji. Bez reklam i konta.",
+      "k": ["budzik Android", "stoper", "minutnik", "pomodoro", "timer interwałowy", "metronom", "budzik bez reklam"],
+      "f": [
+        ["Czy można ustawić kilka minutników naraz?", "Tak. OpenTimer odlicza wiele minutników jednocześnie, a obok ma stoper z okrążeniami."],
+        ["Co to jest zadanie przed wyłączeniem budzika?", "Budzik wyłącza się dopiero po wykonaniu krótkiego zadania, więc trudniej go wyłączyć przez sen."],
+        ["Czy aplikacja ma reklamy?", "Nie. Działa bez reklam, śledzenia i konta, na Androidzie 10 lub nowszym."]
+      ]
+    },
+    "en": {
+      "t": "OpenTimer – alarm, stopwatch, timers and pomodoro for Android",
+      "d": "Clock, alarm with a task to dismiss, stopwatch, multiple timers, pomodoro, intervals and metronome in one app. No ads, no account.",
+      "k": ["alarm clock Android", "stopwatch", "countdown timer", "pomodoro timer", "interval timer", "metronome", "ad-free alarm"],
+      "f": [
+        ["Can I run several timers at once?", "Yes. OpenTimer counts down many timers simultaneously, next to a stopwatch with laps."],
+        ["What is a dismiss task?", "The alarm only stops after you finish a short task, so it is harder to switch off in your sleep."],
+        ["Does the app have ads?", "No. It works without ads, tracking or an account, on Android 10 or newer."]
+      ]
+    }
+  },
+  "openpayments": {
+    "c": "FinanceApplication",
+    "pl": {
+      "t": "OpenPayments – budżet domowy ze skanowaniem paragonów",
+      "d": "Aplikacja do budżetu domowego na Androida: skan paragonu offline, automatyczne kategorie, limity, płatności cykliczne i statystyki. Bez konta.",
+      "k": ["budżet domowy", "aplikacja do wydatków", "skanowanie paragonów", "kontrola wydatków", "aplikacja finansowa Android", "budżet offline"],
+      "f": [
+        ["Czy OpenPayments odczytuje paragony?", "Tak. Robisz zdjęcie paragonu, a aplikacja rozpoznaje pozycje offline i przypisuje je do kategorii."],
+        ["Czy moje dane trafiają na serwer?", "Nie. Aplikacja działa bez konta i bez wysyłania danych; kopia zapasowa i eksport CSV zostają po Twojej stronie."],
+        ["Jaki Android jest potrzebny?", "Android 8 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenPayments – home budget app with receipt scanning",
+      "d": "Household budget app for Android: offline receipt scanning, automatic categories, budget limits, recurring payments and statistics. No account.",
+      "k": ["budget app", "expense tracker", "receipt scanner", "spending tracker", "finance app Android", "offline budget"],
+      "f": [
+        ["Can OpenPayments read receipts?", "Yes. Take a photo of a receipt and the app recognises the items offline and files them into categories."],
+        ["Is my data sent to a server?", "No. The app works without an account or uploads; backups and CSV exports stay with you."],
+        ["Which Android version is required?", "Android 8 or newer."]
+      ]
+    }
+  },
+  "opentests": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "OpenTests – generator testów i sprawdzianów z 9 przedmiotów",
+      "d": "Darmowy generator testów dla nauczycieli i uczniów: 122 tematy, rozwiązania krok po kroku, grupy A–F i wydruk PDF z kluczem. Bez AI, działa offline.",
+      "k": ["generator testów", "generator sprawdzianów", "testy z matematyki", "kartkówki do druku", "testy online dla ucznia", "grupy A B"],
+      "f": [
+        ["Czy OpenTests nadaje się dla nauczyciela?", "Tak. Generuje arkusze w grupach A–F z kluczem odpowiedzi do druku lub PDF, gotowe na sprawdzian dla klasy."],
+        ["Z jakich przedmiotów są testy?", "Matematyka, fizyka, chemia, informatyka, biologia, geografia, angielski, historia i polski – razem 122 tematy."],
+        ["Czy zadania tworzy AI?", "Nie. Każde zadanie liczą generatory tematów, więc odpowiedzi są zawsze poprawne i mają rozwiązanie krok po kroku."]
+      ]
+    },
+    "en": {
+      "t": "OpenTests – quiz and test generator for 9 school subjects",
+      "d": "Free test generator for teachers and students: 122 topics, step-by-step solutions, versions A–F and printable PDFs with answer keys. No AI, works offline.",
+      "k": ["test generator", "quiz generator", "maths worksheets", "printable tests", "practice tests", "teacher tools"],
+      "f": [
+        ["Is OpenTests useful for teachers?", "Yes. It produces versions A–F with an answer key, ready to print or save as PDF for a class test."],
+        ["Which subjects are covered?", "Maths, physics, chemistry, computer science, biology, geography, English, history and Polish – 122 topics in total."],
+        ["Are the questions written by AI?", "No. Every task is computed by topic generators, so answers are always correct and come with a step-by-step solution."]
+      ]
+    }
+  },
+  "openchemistry": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "OpenChemistry – wirtualne laboratorium chemiczne online",
+      "d": "Darmowe laboratorium chemiczne w przeglądarce: 199 doświadczeń krok po kroku, 188 odczynników i prawdziwy silnik chemiczny. Bez logowania.",
+      "k": ["wirtualne laboratorium chemiczne", "doświadczenia chemiczne online", "symulator chemii", "chemia dla ucznia", "laboratorium online", "miareczkowanie"],
+      "f": [
+        ["Czy OpenChemistry jest darmowe?", "Tak. Laboratorium działa w przeglądarce za darmo i bez zakładania konta."],
+        ["Czy wyniki doświadczeń są prawdziwe?", "Tak. pH, osady, kompleksy, gazy i ciepło wynikają z obliczeń silnika chemicznego, a nie z nagranych animacji."],
+        ["Ile jest doświadczeń?", "199 doświadczeń z przewodnikiem krok po kroku oraz tryb swobodnego eksperymentowania z 20 rodzajami sprzętu."]
+      ]
+    },
+    "en": {
+      "t": "OpenChemistry – free virtual chemistry lab online",
+      "d": "Free chemistry lab in the browser: 199 guided experiments, 188 reagents and a real chemistry engine behind every result. No sign-up.",
+      "k": ["virtual chemistry lab", "online chemistry experiments", "chemistry simulator", "chemistry for students", "online lab", "titration simulator"],
+      "f": [
+        ["Is OpenChemistry free?", "Yes. The lab runs in the browser for free, without an account."],
+        ["Are the results realistic?", "Yes. pH, precipitates, complexes, gases and heat are calculated by a chemistry engine, not played back from animations."],
+        ["How many experiments are there?", "199 guided experiments plus a free mode with 20 kinds of lab equipment."]
+      ]
+    }
+  },
+  "fsaddontoolkit": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "FS Addon Toolkit – menedżer dodatków MSFS 2024 i 2020",
+      "d": "Dodatki do Microsoft Flight Simulator włączane jednym kliknięciem, z bibliotek na dowolnych dyskach. Miniatury, mapa lotnisk, profile i plan lotu.",
+      "k": ["menedżer dodatków MSFS", "MSFS 2024 addon manager", "folder Community", "dodatki Flight Simulator", "MSFS 2020", "sceneria MSFS"],
+      "f": [
+        ["Jak FS Addon Toolkit włącza dodatki?", "Tworzy w folderze Community połączenie katalogu do biblioteki, więc niczego nie kopiuje, a wyłączony dodatek po prostu znika z symulatora."],
+        ["Czy MSFS wczyta się szybciej?", "Tak, bo symulator ładuje tylko dodatki włączone w aktywnym profilu."],
+        ["Z jakimi wersjami działa?", "Z MSFS 2024 i 2020 ze Steam i Microsoft Store, na Windows 10 i 11, bez uprawnień administratora."]
+      ]
+    },
+    "en": {
+      "t": "FS Addon Toolkit – addon manager for MSFS 2024 and 2020",
+      "d": "Turn Microsoft Flight Simulator addons on with one click, from libraries on any drive. Thumbnails, airport map, profiles and flight planning.",
+      "k": ["MSFS addon manager", "MSFS 2024 addons", "Community folder manager", "Flight Simulator addons", "MSFS 2020", "MSFS scenery"],
+      "f": [
+        ["How does FS Addon Toolkit enable addons?", "It creates a directory junction in the Community folder, so nothing is copied and a disabled addon simply disappears from the sim."],
+        ["Will MSFS load faster?", "Yes, because the simulator only loads the addons enabled in the active profile."],
+        ["Which versions are supported?", "MSFS 2024 and 2020 from Steam and the Microsoft Store, on Windows 10 and 11, without admin rights."]
+      ]
+    }
+  },
+  "openmp": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenMP – odtwarzacz muzyki i wideo na Windows z korektorem",
+      "d": "Odtwarzacz muzyki i filmów na Windows: okładka z wizualizacją, przejścia bez przerw, korektor 18-pasmowy, napisy i biblioteka także z NAS-a.",
+      "k": ["odtwarzacz muzyki Windows", "odtwarzacz wideo", "korektor 18-pasmowy", "gapless", "odtwarzacz FLAC", "muzyka z NAS"],
+      "f": [
+        ["Czy OpenMP odtwarza bez przerw między utworami?", "Tak. Obsługuje przejścia bez przerw, przenikanie i ReplayGain."],
+        ["Czy odtworzy muzykę z dysku sieciowego?", "Tak. Biblioteka muzyki i wideo może leżeć na serwerze NAS lub innym dysku sieciowym."],
+        ["Na jakim systemie działa?", "Na Windows 10 i 11."]
+      ]
+    },
+    "en": {
+      "t": "OpenMP – music and video player for Windows with an equalizer",
+      "d": "Music and video player for Windows: cover art with visualisations, gapless playback, 18-band equalizer, subtitles and a library from your NAS.",
+      "k": ["music player Windows", "video player", "18-band equalizer", "gapless player", "FLAC player", "NAS music library"],
+      "f": [
+        ["Does OpenMP play gapless?", "Yes. It supports gapless playback, crossfade and ReplayGain."],
+        ["Can it play music from a network drive?", "Yes. The music and video library can live on a NAS or any network share."],
+        ["Which system does it run on?", "Windows 10 and 11."]
+      ]
+    }
+  },
+  "opendtp": {
+    "c": "BusinessApplication",
+    "pl": {
+      "t": "OpenDTP – edytor tekstu i program do składu DTP na Windows",
+      "d": "Edytor tekstu i skład dokumentów na Windows: tekst w kształtach, opływanie, kolumny, generowanie dokumentów przez AI, eksport DOCX i PDF 1:1.",
+      "k": ["edytor tekstu Windows", "program do składu DTP", "skład dokumentów", "eksport PDF", "alternatywa dla Worda", "edytor z AI"],
+      "f": [
+        ["Czy OpenDTP zapisuje pliki Worda?", "Tak. Importuje DOCX i eksportuje dokument do DOCX oraz PDF z zachowaniem układu 1:1."],
+        ["Co potrafi skład w OpenDTP?", "Kształty tekstu z węzłów i krzywych, opływanie po konturze, kolumny, łańcuchy ramek, inicjały, siatkę bazową i polskie sierotki."],
+        ["Jak działa generowanie przez AI?", "Opisujesz dokument słowami, a wybrany model (np. przez OpenRouter) składa go z pełnym formatowaniem."]
+      ]
+    },
+    "en": {
+      "t": "OpenDTP – word processor and desktop publishing app for Windows",
+      "d": "Word processor and page layout for Windows: text inside shapes, text wrap, columns, AI document generation and 1:1 DOCX and PDF export.",
+      "k": ["word processor Windows", "desktop publishing", "page layout software", "PDF export", "Word alternative", "AI document editor"],
+      "f": [
+        ["Does OpenDTP work with Word files?", "Yes. It imports DOCX and exports to DOCX and PDF with a 1:1 layout."],
+        ["What layout features are there?", "Text shapes from nodes and curves, contour text wrap, columns, linked frames, drop caps and a baseline grid."],
+        ["How does AI generation work?", "Describe the document in words and the chosen model (for example via OpenRouter) lays it out with full formatting."]
+      ]
+    }
+  },
+  "simrail-trail": {
+    "c": "GameApplication",
+    "pl": {
+      "t": "SimRail Trail – kreator scenariuszy i misji do SimRail",
+      "d": "Menedżer scenariuszy do SimRail: własne przejazdy z posiadanych scenerii i taboru, prawdziwe pociągi z dzisiejszego rozkładu, wdrożenie jednym klikiem.",
+      "k": ["SimRail scenariusze", "kreator misji SimRail", "SimRail mod", "symulator kolei", "mission.lua", "rozkład jazdy PKP"],
+      "f": [
+        ["Jak powstaje scenariusz?", "Aplikacja czyta zainstalowaną grę i DLC, a Ty wybierasz trasę, rozkład i skład. Pliki scenariusza powstają i trafiają do gry same."],
+        ["Czy mogę jechać prawdziwym pociągiem z rozkładu?", "Tak. SimRail Trail pobiera pociągi z dzisiejszego rozkładu i składy z vagonWEB."],
+        ["Na jakim systemie działa?", "Na Windows 10 i 11, jako jeden plik exe z aktualizacjami z redzikowski.com."]
+      ]
+    },
+    "en": {
+      "t": "SimRail Trail – scenario and mission creator for SimRail",
+      "d": "Scenario manager for SimRail: build runs from the scenery and rolling stock you own, drive real trains from today's timetable, deploy in one click.",
+      "k": ["SimRail scenarios", "SimRail mission creator", "SimRail mod", "train simulator", "mission.lua", "railway timetable"],
+      "f": [
+        ["How is a scenario made?", "The app reads your installed game and DLC; you pick the route, timetable and consist, and the scenario files are generated and deployed for you."],
+        ["Can I drive a real timetabled train?", "Yes. SimRail Trail loads trains from today's real timetable and consists from vagonWEB."],
+        ["Which system does it run on?", "Windows 10 and 11, as a single exe with updates from redzikowski.com."]
+      ]
+    }
+  },
+  "opentakeoff": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenTakeoff – METAR, TAF i kokpit dla MSFS 2024 i X-Plane",
+      "d": "Darmowa aplikacja dla wirtualnych pilotów: pogoda lotniskowa, mobilny kokpit, przyrządy PFD i ND na drugim ekranie oraz analiza lądowania.",
+      "k": ["METAR TAF", "aplikacja dla pilotów", "MSFS 2024", "X-Plane 12", "drugi ekran kokpit", "analiza lądowania", "symulator lotu"],
+      "f": [
+        ["Z jakimi symulatorami działa OpenTakeoff?", "Z Microsoft Flight Simulator 2024 oraz X-Plane 11 i 12."],
+        ["Co pokazuje wersja na Windows?", "Przyrządy w stylu kabiny (PFD, ND, ECAM/EICAS), mapę nawigacyjną z radarem opadów i dziennik lotów z odtwarzaniem w 3D."],
+        ["Czy aplikacja czyta pogodę na głos?", "Tak. Pokazuje METAR, TAF, SIGMET i PIREP, a ATIS czyta na głos."]
+      ]
+    },
+    "en": {
+      "t": "OpenTakeoff – METAR, TAF and cockpit for MSFS 2024 and X-Plane",
+      "d": "Free app for virtual pilots: airport weather, a mobile cockpit, PFD and ND instruments on a second screen, and landing analysis.",
+      "k": ["METAR TAF app", "flight sim companion", "MSFS 2024", "X-Plane 12", "second screen cockpit", "landing rate analysis"],
+      "f": [
+        ["Which simulators does OpenTakeoff support?", "Microsoft Flight Simulator 2024 and X-Plane 11 and 12."],
+        ["What does the Windows version show?", "Cockpit-style instruments (PFD, ND, ECAM/EICAS), a navigation map with precipitation radar and a flight log with 3D replay."],
+        ["Does it read the weather aloud?", "Yes. It shows METAR, TAF, SIGMET and PIREP, and reads ATIS aloud."]
+      ]
+    }
+  },
+  "openshot": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenShot – aparat RAW, tryb nocny i HDR na Androida",
+      "d": "Darmowa aplikacja aparatu na Androida: zdjęcia RAW/DNG, tryb nocny, fuzja HDR, ręczny tryb Pro, wideo 4K HDR, poklatkowy do 8K i dyktafon.",
+      "k": ["aparat RAW Android", "tryb nocny", "aparat z trybem Pro", "zdjęcia DNG", "wideo 4K HDR", "dyktafon Android", "aplikacja aparatu"],
+      "f": [
+        ["Czy OpenShot robi zdjęcia w RAW?", "Tak. Zapisuje RAW (DNG) albo RAW+JPEG i sam wybiera właściwy sensor."],
+        ["Co daje ręczny tryb Pro?", "Ustawiasz ISO, czas naświetlania do 30 s, ostrość i balans bieli."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenShot – RAW camera with night mode and HDR for Android",
+      "d": "Free camera app for Android: RAW/DNG photos, night mode, HDR fusion, manual Pro mode, 4K HDR video, time-lapse up to 8K and a voice recorder.",
+      "k": ["RAW camera Android", "night mode camera", "manual camera app", "DNG photos", "4K HDR video", "voice recorder"],
+      "f": [
+        ["Does OpenShot shoot RAW?", "Yes. It saves RAW (DNG) or RAW+JPEG and picks the right sensor automatically."],
+        ["What does manual Pro mode offer?", "Control over ISO, shutter speed up to 30 s, focus and white balance."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "opensms": {
+    "c": "CommunicationApplication",
+    "pl": {
+      "t": "OpenSMS – aplikacja do SMS i MMS na Androida bez reklam",
+      "d": "Szybka aplikacja do SMS, MMS i rozmów grupowych na Androida: dwie karty SIM, filtr spamu, wiadomości zaplanowane. Bez reklam i cudzych serwerów.",
+      "k": ["aplikacja SMS", "SMS bez reklam", "MMS Android", "filtr spamu SMS", "wiadomości zaplanowane", "dwie karty SIM"],
+      "f": [
+        ["Czy OpenSMS wysyła wiadomości przez internet?", "Nie. Wiadomości idą zwykłą siecią komórkową i zostają w telefonie, bez cudzych serwerów."],
+        ["Czy można zaplanować SMS?", "Tak. Wiadomości można zaplanować na później i korzystać z szablonów."],
+        ["Czy działa z dwiema kartami SIM?", "Tak, z raportami doręczenia, na Androidzie 10 lub nowszym."]
+      ]
+    },
+    "en": {
+      "t": "OpenSMS – ad-free SMS and MMS app for Android",
+      "d": "Fast SMS, MMS and group chat app for Android: dual SIM, spam filter and scheduled messages. No ads and no third-party servers.",
+      "k": ["SMS app", "ad-free SMS", "MMS Android", "SMS spam filter", "scheduled SMS", "dual SIM messaging"],
+      "f": [
+        ["Does OpenSMS send messages over the internet?", "No. Messages travel over the regular mobile network and stay on your phone."],
+        ["Can I schedule a text?", "Yes. You can schedule messages and use templates."],
+        ["Does it support two SIM cards?", "Yes, with delivery reports, on Android 10 or newer."]
+      ]
+    }
+  },
+  "opencall": {
+    "c": "CommunicationApplication",
+    "pl": {
+      "t": "OpenDial – aplikacja telefonu i kontaktów z T9 na Androida",
+      "d": "Zamiennik systemowego telefonu na Androida: wybieranie T9 z polskimi znakami, konferencje, blokowanie numerów, scalanie kontaktów i eksport vCard.",
+      "k": ["aplikacja telefon Android", "wybieranie T9", "blokowanie numerów", "kontakty vCard", "dialer Android", "scalanie kontaktów"],
+      "f": [
+        ["Czy OpenDial zastępuje systemową aplikację telefonu?", "Tak. Obsługuje wybieranie, ekran rozmowy, konferencje i drugie połączenie."],
+        ["Czy T9 rozumie polskie znaki?", "Tak. Wyszukiwanie T9 uwzględnia polskie litery w nazwach kontaktów."],
+        ["Czy mogę wyeksportować kontakty?", "Tak – kontakty do vCard, a historię połączeń do CSV."]
+      ]
+    },
+    "en": {
+      "t": "OpenDial – phone and contacts app with T9 for Android",
+      "d": "Replacement phone app for Android: T9 dialling, conference calls, number blocking, duplicate contact merging and vCard export.",
+      "k": ["phone app Android", "T9 dialer", "call blocker", "vCard contacts", "Android dialer", "merge contacts"],
+      "f": [
+        ["Can OpenDial replace the system phone app?", "Yes. It handles dialling, the in-call screen, conference calls and call waiting."],
+        ["Does T9 search work with accents?", "Yes. T9 search handles accented letters such as Polish characters."],
+        ["Can I export my contacts?", "Yes – contacts to vCard and call history to CSV."]
+      ]
+    }
+  },
+  "openamp": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenAMP – odtwarzacz muzyki z tekstami LRC i korektorem",
+      "d": "Odtwarzacz muzyki na Androida dla własnej kolekcji: teksty zsynchronizowane LRC, korektor, wzmocnienie basów, wizualizacje i cztery widżety.",
+      "k": ["odtwarzacz muzyki Android", "teksty LRC", "korektor dźwięku", "odtwarzacz MP3", "odtwarzacz FLAC", "widżet muzyki"],
+      "f": [
+        ["Czy OpenAMP pokazuje teksty piosenek?", "Tak. Teksty LRC przewijają się w rytm utworu."],
+        ["Czy wizualizacje wymagają mikrofonu?", "Nie. Wizualizacje liczą się z dźwięku (FFT) bez dostępu do mikrofonu."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenAMP – music player with LRC lyrics and an equalizer",
+      "d": "Android music player for your own collection: synced LRC lyrics, equalizer, bass boost, visualisations and four widget types.",
+      "k": ["music player Android", "LRC lyrics", "equalizer", "MP3 player", "FLAC player", "music widget"],
+      "f": [
+        ["Does OpenAMP show lyrics?", "Yes. LRC lyrics scroll in time with the song."],
+        ["Do visualisations need the microphone?", "No. They are computed from the audio (FFT) without microphone access."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "musictagger": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenMusicTagger – automatyczne tagi MP3, okładki i teksty",
+      "d": "Program na Windows i Androida, który rozpoznaje utwory po dźwięku i uzupełnia tagi, okładki do 1400 px i teksty LRC. Ty tylko akceptujesz zmiany.",
+      "k": ["tagowanie MP3", "edytor tagów", "okładki albumów", "MusicBrainz", "AcoustID", "porządkowanie muzyki"],
+      "f": [
+        ["Jak program rozpoznaje utwory?", "Po istniejących tagach, nazwie pliku albo samym dźwięku (AcoustID i MusicBrainz)."],
+        ["Czy mogę cofnąć zmiany?", "Tak. Każda zmiana trafia do historii z możliwością cofnięcia i raportu CSV."],
+        ["Na jakich systemach działa?", "Na Windows i Androidzie."]
+      ]
+    },
+    "en": {
+      "t": "OpenMusicTagger – automatic MP3 tags, album art and lyrics",
+      "d": "Windows and Android app that recognises songs by sound and fills in tags, album art up to 1400 px and LRC lyrics. You just approve the changes.",
+      "k": ["MP3 tagger", "tag editor", "album art downloader", "MusicBrainz", "AcoustID", "organise music library"],
+      "f": [
+        ["How does it recognise songs?", "By existing tags, the file name or the audio itself (AcoustID and MusicBrainz)."],
+        ["Can I undo changes?", "Yes. Every change goes into a history you can undo, with a CSV report."],
+        ["Which systems are supported?", "Windows and Android."]
+      ]
+    }
+  },
+  "openmeter": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenMeter – decybelomierz, luksomierz i 13 innych mierników",
+      "d": "15 mierników z czujników telefonu: decybelomierz, luksomierz, poziomica, kątomierz, wykrywacz metalu, barometr i sejsmograf. Zapis do CSV.",
+      "k": ["decybelomierz", "luksomierz", "poziomica w telefonie", "wykrywacz metalu", "sejsmograf", "mierniki Android"],
+      "f": [
+        ["Jakie mierniki są w aplikacji?", "15, m.in. decybelomierz, luksomierz, poziomica, kątomierz, wykrywacz metalu, barometr i sejsmograf."],
+        ["Czy można zapisać pomiary?", "Tak. Pomiary nagrywasz do pliku CSV."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenMeter – sound meter, lux meter and 13 more phone sensors",
+      "d": "15 meters built from your phone's sensors: decibel meter, lux meter, spirit level, protractor, metal detector, barometer and seismograph. CSV logging.",
+      "k": ["decibel meter", "lux meter", "spirit level app", "metal detector app", "seismograph", "sensor app Android"],
+      "f": [
+        ["Which meters are included?", "15, including a decibel meter, lux meter, spirit level, protractor, metal detector, barometer and seismograph."],
+        ["Can I save measurements?", "Yes. Measurements can be recorded to a CSV file."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "openpfd": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenPFD – przyrządy lotnicze PFD i G1000 w telefonie",
+      "d": "Primary Flight Display z Airbusa, Boeinga lub G1000 na Androida, zasilany żyroskopem, GPS i barometrem telefonu, z QNH z najbliższego METAR-u.",
+      "k": ["PFD Android", "G1000", "sztuczny horyzont", "przyrządy lotnicze", "aplikacja lotnicza", "METAR QNH"],
+      "f": [
+        ["Skąd OpenPFD bierze dane?", "Z żyroskopu, GPS i barometru telefonu, a ciśnienie QNH z najbliższego METAR-u."],
+        ["Jakie przyrządy są dostępne?", "PFD sześciu samolotów, G1000 z widokiem SVT oraz analogowe panele Cessny, Robinsona i szybowca."],
+        ["Czy można używać go do nawigacji?", "Nie. To aplikacja do zabawy i nauki, nie do nawigacji lotniczej."]
+      ]
+    },
+    "en": {
+      "t": "OpenPFD – PFD and G1000 flight instruments on your phone",
+      "d": "Airbus, Boeing or G1000 primary flight display for Android, driven by your phone's gyroscope, GPS and barometer, with QNH from the nearest METAR.",
+      "k": ["PFD app", "G1000 app", "artificial horizon", "flight instruments", "aviation app", "METAR QNH"],
+      "f": [
+        ["Where does OpenPFD get its data?", "From the phone's gyroscope, GPS and barometer, with QNH from the nearest METAR."],
+        ["Which instruments are available?", "PFDs of six aircraft, a G1000 with SVT, and analogue panels for a Cessna, a Robinson and a glider."],
+        ["Can it be used for navigation?", "No. It is for fun and learning, not for real-world navigation."]
+      ]
+    }
+  },
+  "openroutine": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenRoutine – automatyzacja Androida bez programowania",
+      "d": "Graficzny automat dla telefonu: 16 wyzwalaczy, 14 warunków i 27 akcji, gotowe szablony, zmienne i integracje przez intencje i HTTP.",
+      "k": ["automatyzacja Android", "alternatywa dla Taskera", "makra Android", "automatyzacja telefonu", "reguły jeśli to", "HTTP webhook"],
+      "f": [
+        ["Czy trzeba umieć programować?", "Nie. Reguły układasz graficznie: zdarzenie, warunek i akcja, często z gotowego szablonu."],
+        ["Czy dane są gdzieś wysyłane?", "Nie. Automatyzacje działają w telefonie, a HTTP wywołujesz tylko wtedy, gdy sam je dodasz."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenRoutine – Android automation without coding",
+      "d": "Visual automation for your phone: 16 triggers, 14 conditions and 27 actions, ready-made templates, variables and intent and HTTP integrations.",
+      "k": ["Android automation", "Tasker alternative", "Android macros", "phone automation", "if this then that", "HTTP webhook"],
+      "f": [
+        ["Do I need to know how to code?", "No. Rules are built visually from a trigger, a condition and an action, often from a template."],
+        ["Is any data sent away?", "No. Automations run on the phone; HTTP calls happen only when you add them yourself."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "openexplorer": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenExplorer – szybka przeglądarka z blokadą reklam na Androida",
+      "d": "Przeglądarka na Androida z blokowaniem reklam i śledzenia, kontenerami kart z osobnymi ciasteczkami i menedżerem haseł z odciskiem palca.",
+      "k": ["przeglądarka Android", "blokada reklam", "menedżer haseł", "kontenery kart", "przeglądarka prywatna", "blokowanie śledzenia"],
+      "f": [
+        ["Czym są kontenery kart?", "Grupy kart z osobnymi ciasteczkami – możesz być zalogowany na dwa konta w tym samym serwisie."],
+        ["Czy hasła są bezpieczne?", "Menedżer haseł jest szyfrowany i odblokowywany odciskiem palca."],
+        ["Jaki Android jest potrzebny?", "Android 8 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenExplorer – fast ad-blocking browser for Android",
+      "d": "Android browser with ad and tracker blocking, tab containers with separate cookies and a fingerprint-protected password manager.",
+      "k": ["Android browser", "ad blocker browser", "password manager", "tab containers", "private browser", "tracker blocking"],
+      "f": [
+        ["What are tab containers?", "Groups of tabs with separate cookies, so you can be signed in to two accounts on the same site."],
+        ["Are my passwords safe?", "The password manager is encrypted and unlocked with your fingerprint."],
+        ["Which Android version is required?", "Android 8 or newer."]
+      ]
+    }
+  },
+  "powerdesk": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "PowerDesk – menedżer plików i zamiennik Eksploratora Windows",
+      "d": "Menedżer plików z kartami i dwoma panelami, pulpit z widżetami, pasek zadań i menu Start dla Windows 10 i 11. Bez uprawnień administratora.",
+      "k": ["menedżer plików Windows", "zamiennik Eksploratora", "dwa panele", "karty w Eksploratorze", "menu Start", "powłoka Windows"],
+      "f": [
+        ["Czy PowerDesk może zastąpić Eksplorator Windows?", "Tak. Może działać jako powłoka systemu z własnym pulpitem, paskiem zadań i menu Start."],
+        ["Czy potrzebne są uprawnienia administratora?", "Nie. Instalacja i działanie nie wymagają uprawnień administratora."],
+        ["Na jakim systemie działa?", "Na Windows 10 i 11."]
+      ]
+    },
+    "en": {
+      "t": "PowerDesk – file manager and Windows Explorer replacement",
+      "d": "Tabbed, dual-pane file manager plus desktop widgets, taskbar and Start menu for Windows 10 and 11. No admin rights needed.",
+      "k": ["file manager Windows", "Explorer replacement", "dual pane file manager", "tabbed Explorer", "Start menu replacement", "Windows shell"],
+      "f": [
+        ["Can PowerDesk replace Windows Explorer?", "Yes. It can run as the system shell with its own desktop, taskbar and Start menu."],
+        ["Does it need admin rights?", "No. Installing and running it does not require administrator rights."],
+        ["Which system does it run on?", "Windows 10 and 11."]
+      ]
+    }
+  },
+  "openfilepower": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenFilePower – menedżer plików z NAS (SMB) i galerią RAW",
+      "d": "Menedżer plików na Androida z kartami folderów, dostępem do NAS przez SMB 2/3, galerią RAW z histogramem i synchronizacją z NAS, SD i USB.",
+      "k": ["menedżer plików Android", "NAS SMB Android", "galeria RAW", "synchronizacja z NAS", "eksplorator plików", "pliki na dysku sieciowym"],
+      "f": [
+        ["Czy OpenFilePower połączy się z moim NAS-em?", "Tak. Łączy się przez SMB 2 i 3 i sam wykrywa serwery w sieci."],
+        ["Czy pokazuje zdjęcia RAW?", "Tak. Galeria obsługuje pliki RAW i pokazuje histogram."],
+        ["Jaki Android jest potrzebny?", "Android 8 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenFilePower – file manager with NAS (SMB) and RAW gallery",
+      "d": "Android file manager with folder tabs, NAS access over SMB 2/3, a RAW photo gallery with histogram and sync to NAS, SD and USB.",
+      "k": ["file manager Android", "SMB NAS Android", "RAW gallery", "NAS sync", "file explorer", "network drive files"],
+      "f": [
+        ["Can OpenFilePower connect to my NAS?", "Yes. It connects over SMB 2 and 3 and discovers servers on your network."],
+        ["Does it show RAW photos?", "Yes. The gallery supports RAW files and shows a histogram."],
+        ["Which Android version is required?", "Android 8 or newer."]
+      ]
+    }
+  },
+  "open360": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "Open360 – zdjęcia panoramiczne 360° telefonem na Androidzie",
+      "d": "Aplikacja do panoram 360° z aparatu telefonu: zszywanie na GPU na żywo, płótno do 16K i eksport JPEG z GPano dla Google Zdjęć i Facebooka.",
+      "k": ["panorama 360", "zdjęcia sferyczne", "aplikacja panorama Android", "zdjęcie 360 Facebook", "GPano", "photo sphere"],
+      "f": [
+        ["Jak robi się panoramę w Open360?", "Wodzisz telefonem, a sfera wypełnia się na ekranie w czasie rzeczywistym. Zapisujesz w dowolnej chwili."],
+        ["Czy zdjęcie zadziała jako 360° na Facebooku?", "Tak. Eksport zawiera metadane GPano, które rozumieją Facebook i Google Zdjęcia."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "Open360 – 360° panorama photos with your Android phone",
+      "d": "360° panorama app: live GPU stitching as you move the phone, canvas up to 16K and JPEG export with GPano metadata for Google Photos and Facebook.",
+      "k": ["360 panorama", "photo sphere", "panorama app Android", "Facebook 360 photo", "GPano", "spherical photos"],
+      "f": [
+        ["How do I shoot a panorama in Open360?", "Sweep the phone around and the sphere fills in on screen in real time. Save whenever you like."],
+        ["Will it show as 360° on Facebook?", "Yes. Exports include GPano metadata understood by Facebook and Google Photos."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "opentracetrack": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "OpenTraceTrack – rejestrator tras GPS i prędkościomierz HUD",
+      "d": "Rejestrator tras GPS na Androida z lotniczym HUD-em, wykrywaniem 14 środków transportu i eksportem do GPX, GeoJSON, KML i CSV.",
+      "k": ["rejestrator tras GPS", "prędkościomierz HUD", "eksport GPX", "ślad GPS", "licznik prędkości", "tracker podróży"],
+      "f": [
+        ["Co wyróżnia OpenTraceTrack?", "Dzieli jedno nagranie na środki transportu – rozpoznaje 14 rodzajów, od pieszo po samolot."],
+        ["Do jakich formatów eksportuje trasy?", "GPX, GeoJSON, KML i CSV, a importuje GPX z innych aplikacji."],
+        ["Czy HUD można odbić w szybie?", "Tak. Jest tryb odbicia w szybie samochodu."]
+      ]
+    },
+    "en": {
+      "t": "OpenTraceTrack – GPS route logger and HUD speedometer",
+      "d": "GPS route logger for Android with an aviation-style HUD, detection of 14 transport modes and export to GPX, GeoJSON, KML and CSV.",
+      "k": ["GPS route logger", "HUD speedometer", "GPX export", "GPS tracker", "speedometer app", "travel tracker"],
+      "f": [
+        ["What makes OpenTraceTrack different?", "It splits one recording into transport modes, recognising 14 kinds from walking to flying."],
+        ["Which formats can I export?", "GPX, GeoJSON, KML and CSV, and it imports GPX from other apps."],
+        ["Can the HUD reflect in the windscreen?", "Yes. There is a windscreen reflection mode."]
+      ]
+    }
+  },
+  "openclipflow": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenClipFlow – edytor wideo na Androida z eksportem 4K",
+      "d": "Montaż filmów na telefonie: wiele ścieżek wideo, audio i napisów, przejścia, układy kilku ujęć, lektor i eksport MP4 do 4K 60 kl/s.",
+      "k": ["edytor wideo Android", "montaż filmów na telefonie", "eksport 4K", "napisy do filmu", "edytor wielościeżkowy", "aplikacja do montażu"],
+      "f": [
+        ["Czy OpenClipFlow ma wiele ścieżek?", "Tak. Oś czasu obsługuje wiele ścieżek wideo, audio i napisów."],
+        ["W jakiej jakości eksportuje?", "Do MP4 w H.264 lub H.265, do 4K i 60 klatek na sekundę."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenClipFlow – Android video editor with 4K export",
+      "d": "Edit videos on your phone: multiple video, audio and caption tracks, transitions, split-screen layouts, voice-over and MP4 export up to 4K 60 fps.",
+      "k": ["video editor Android", "mobile video editing", "4K export", "video captions", "multitrack editor", "video editing app"],
+      "f": [
+        ["Does OpenClipFlow support multiple tracks?", "Yes. The timeline handles multiple video, audio and caption tracks."],
+        ["What export quality is available?", "MP4 in H.264 or H.265, up to 4K at 60 frames per second."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "opendesktop": {
+    "c": "LifestyleApplication",
+    "pl": {
+      "t": "OpenDesktop – launcher na Androida z kategoriami AI",
+      "d": "Rozbudowany ekran główny na Androida: siatka od 3×3 do 10×12, 12 przejść 3D, 11 motywów szuflady i kategorie aplikacji tworzone przez AI.",
+      "k": ["launcher Android", "ekran główny", "launcher z AI", "personalizacja Androida", "szuflada aplikacji", "widżety"],
+      "f": [
+        ["Jak duża może być siatka ikon?", "Od 3×3 do 10×12."],
+        ["Co robi AI w launcherze?", "Układa aplikacje w kategorie i pomaga je wyszukiwać."],
+        ["Jaki Android jest potrzebny?", "Android 8 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenDesktop – Android launcher with AI app categories",
+      "d": "Feature-rich Android home screen: grid from 3×3 to 10×12, 12 3D transitions, 11 app drawer themes and app categories created by AI.",
+      "k": ["Android launcher", "home screen", "AI launcher", "Android customisation", "app drawer", "widgets"],
+      "f": [
+        ["How large can the icon grid be?", "Anything from 3×3 to 10×12."],
+        ["What does AI do in the launcher?", "It sorts apps into categories and helps you find them."],
+        ["Which Android version is required?", "Android 8 or newer."]
+      ]
+    }
+  },
+  "openkeyboard": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenKeyboard – klawiatura z autokorektą w 30 językach naraz",
+      "d": "Klawiatura na Androida z podpowiedziami z kilku języków jednocześnie, pisaniem gestem, schowkiem i 18 motywami. Uczy się tylko w telefonie.",
+      "k": ["klawiatura Android", "autokorekta", "pisanie gestem", "klawiatura wielojęzyczna", "klawiatura prywatna", "polska klawiatura"],
+      "f": [
+        ["Czy trzeba przełączać języki?", "Nie. Podpowiedzi i autokorekta działają w 30 językach jednocześnie."],
+        ["Czy klawiatura wysyła to, co piszę?", "Nie. Wszystko, czego się uczy, zostaje w telefonie."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenKeyboard – keyboard with autocorrect in 30 languages at once",
+      "d": "Android keyboard with suggestions from several languages at once, gesture typing, clipboard and 18 themes. Learns only on your phone.",
+      "k": ["Android keyboard", "autocorrect", "gesture typing", "multilingual keyboard", "private keyboard", "swipe keyboard"],
+      "f": [
+        ["Do I need to switch languages?", "No. Suggestions and autocorrect work in 30 languages simultaneously."],
+        ["Does the keyboard send what I type?", "No. Everything it learns stays on the phone."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "openmail": {
+    "c": "CommunicationApplication",
+    "pl": {
+      "t": "OpenMail – klient poczty na Androida: Gmail, Outlook, WP, Onet",
+      "d": "Wszystkie skrzynki w jednej aplikacji: Gmail, Outlook, iCloud, WP, Onet, Interia i każdy IMAP. Wspólna skrzynka, OAuth i praca offline.",
+      "k": ["klient poczty Android", "aplikacja email", "poczta WP", "poczta Onet", "Interia poczta", "IMAP", "Gmail i Outlook"],
+      "f": [
+        ["Jakie skrzynki obsługuje OpenMail?", "Gmail, Outlook, iCloud, WP, Onet, Interia i każdy serwer IMAP/SMTP, w dowolnej liczbie kont."],
+        ["Czy można cofnąć wysłanie maila?", "Tak. Jest cofanie wysyłki i kolejka wiadomości do wysłania offline."],
+        ["Jaki Android jest potrzebny?", "Android 10 lub nowszy."]
+      ]
+    },
+    "en": {
+      "t": "OpenMail – Android email client for Gmail, Outlook and any IMAP",
+      "d": "All your inboxes in one app: Gmail, Outlook, iCloud and any IMAP server. Unified inbox, OAuth sign-in, safe HTML and offline mode.",
+      "k": ["email client Android", "email app", "IMAP client", "unified inbox", "Gmail and Outlook", "offline email"],
+      "f": [
+        ["Which mailboxes does OpenMail support?", "Gmail, Outlook, iCloud and any IMAP/SMTP server, with unlimited accounts."],
+        ["Can I undo sending?", "Yes. There is undo send and an offline outbox."],
+        ["Which Android version is required?", "Android 10 or newer."]
+      ]
+    }
+  },
+  "opensync": {
+    "c": "SecurityApplication",
+    "pl": {
+      "t": "OpenSync – szyfrowana kopia zapasowa telefonu na NAS",
+      "d": "Kopie zapasowe Androida na NAS, serwer lub dysk USB przez SMB, SFTP i WebDAV. Szyfrowanie AES-256 w telefonie, deduplikacja i harmonogram.",
+      "k": ["kopia zapasowa Android", "backup na NAS", "szyfrowana kopia", "SFTP backup", "WebDAV", "kopia telefonu"],
+      "f": [
+        ["Czy serwer widzi moje pliki?", "Nie. Szyfrowanie AES-256-GCM odbywa się w telefonie, więc serwer nie zna nawet nazw plików."],
+        ["Dokąd można robić kopie?", "Na NAS albo serwer przez SMB, SFTP lub WebDAV i na dysk USB."],
+        ["Czy kopie robią się same?", "Tak. Harmonogram z warunkami uruchamia kopię, a Wake-on-LAN może obudzić NAS."]
+      ]
+    },
+    "en": {
+      "t": "OpenSync – encrypted phone backup to your NAS",
+      "d": "Android backups to a NAS, server or USB drive over SMB, SFTP and WebDAV. AES-256 encryption on the phone, deduplication and scheduling.",
+      "k": ["Android backup", "NAS backup", "encrypted backup", "SFTP backup", "WebDAV backup", "phone backup"],
+      "f": [
+        ["Can the server see my files?", "No. AES-256-GCM encryption happens on the phone, so the server cannot even see file names."],
+        ["Where can I back up to?", "A NAS or server over SMB, SFTP or WebDAV, or a USB drive."],
+        ["Do backups run automatically?", "Yes. A schedule with conditions starts them, and Wake-on-LAN can wake the NAS."]
+      ]
+    }
+  },
+  "openpano": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenPano – łączenie zdjęć w panoramy z RAW do DNG",
+      "d": "Program do łączenia zdjęć w panoramy na Windows, Androida i iOS: RAW, 11 projekcji, szwy bez duchów i eksport do liniowego DNG, TIFF lub JPEG.",
+      "k": ["łączenie panoram", "program do panoram", "panorama z RAW", "stitching zdjęć", "panorama 360 GPano", "eksport DNG"],
+      "f": [
+        ["Czy OpenPano łączy zdjęcia RAW?", "Tak. Obsługuje RAW z kilkunastu aparatów, a wynik zapisuje w liniowym DNG."],
+        ["Jakie projekcje są dostępne?", "11 projekcji, m.in. sferyczna i cylindryczna, oraz projekcja dobierana automatycznie."],
+        ["Na jakich systemach działa?", "Na Windows, Androidzie i iOS."]
+      ]
+    },
+    "en": {
+      "t": "OpenPano – panorama stitching from RAW to DNG",
+      "d": "Panorama stitching for Windows, Android and iOS: RAW input, 11 projections, ghost-free seams and export to linear DNG, TIFF or JPEG.",
+      "k": ["panorama stitching", "panorama software", "RAW panorama", "photo stitching", "360 panorama GPano", "DNG export"],
+      "f": [
+        ["Does OpenPano stitch RAW files?", "Yes. It supports RAW from over a dozen cameras and saves the result as linear DNG."],
+        ["Which projections are available?", "11 projections, including spherical and cylindrical, plus automatic projection."],
+        ["Which systems are supported?", "Windows, Android and iOS."]
+      ]
+    }
+  },
+  "openaudiopower": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenAudioPower – studio audio i rozdzielanie wokalu od muzyki",
+      "d": "Wielościeżkowe studio na Windows: nagrywanie, montaż, efekty na żywo i rozbicie piosenki na wokal, perkusję, bas, gitarę i pianino na GPU.",
+      "k": ["usuwanie wokalu", "separacja ścieżek", "studio nagraniowe Windows", "Demucs", "program do montażu audio", "karaoke z piosenki"],
+      "f": [
+        ["Czy OpenAudioPower oddzieli wokal od muzyki?", "Tak. Rozdziela MP3 lub FLAC na 6 ścieżek: wokal, perkusję, bas, gitarę, pianino i resztę."],
+        ["Czy separacja działa bez internetu?", "Tak. Działa lokalnie, na karcie graficznej kilkanaście razy szybciej, niż trwa utwór."],
+        ["Na jakim systemie działa?", "Na 64-bitowym Windows 10 i 11."]
+      ]
+    },
+    "en": {
+      "t": "OpenAudioPower – audio studio and vocal remover for Windows",
+      "d": "Multitrack studio for Windows: record, edit, apply real-time effects and split any song into vocals, drums, bass, guitar and piano on the GPU.",
+      "k": ["vocal remover", "stem separation", "audio studio Windows", "Demucs", "audio editor", "karaoke maker"],
+      "f": [
+        ["Can OpenAudioPower separate vocals from music?", "Yes. It splits MP3 or FLAC into 6 stems: vocals, drums, bass, guitar, piano and other."],
+        ["Does separation work offline?", "Yes. It runs locally on the graphics card, many times faster than the song plays."],
+        ["Which system does it run on?", "64-bit Windows 10 and 11."]
+      ]
+    }
+  },
+  "openfps": {
+    "c": "UtilitiesApplication",
+    "pl": {
+      "t": "OpenFPS – licznik FPS i nakładka z obciążeniem CPU i GPU",
+      "d": "Lekka nakładka FPS na Windows: czas klatki, 1% i 0.1% low, temperatury i obciążenie CPU/GPU na wielu monitorach. Bezpieczna dla anty-cheatów.",
+      "k": ["licznik FPS", "nakładka FPS", "monitor temperatury GPU", "frame time", "1% low", "alternatywa MSI Afterburner"],
+      "f": [
+        ["Czy OpenFPS może spowodować bana w grze?", "Pomiar idzie przez ETW, bez wstrzykiwania kodu do gier, więc jest bezpieczny dla systemów anty-cheat."],
+        ["Czy działa na kilku monitorach?", "Tak. Każdy monitor może mieć własną nakładkę z wartościami aplikacji, która jest na nim."],
+        ["Czy wymaga instalacji?", "Nie. To jeden przenośny plik dla Windows 10 i 11."]
+      ]
+    },
+    "en": {
+      "t": "OpenFPS – FPS counter and CPU/GPU overlay for Windows",
+      "d": "Lightweight FPS overlay for Windows: frame time, 1% and 0.1% lows, temperatures and CPU/GPU load on multiple monitors. Anti-cheat safe.",
+      "k": ["FPS counter", "FPS overlay", "GPU temperature monitor", "frame time", "1% low", "MSI Afterburner alternative"],
+      "f": [
+        ["Can OpenFPS get me banned?", "It measures through ETW without injecting code into games, so it is safe with anti-cheat systems."],
+        ["Does it work on several monitors?", "Yes. Each monitor can have its own overlay showing the app on that screen."],
+        ["Does it need installing?", "No. It is a single portable file for Windows 10 and 11."]
+      ]
+    }
+  },
+  "muszejechac": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "MuszęJechać – rozkłady jazdy i pojazdy na żywo w całej Polsce",
+      "d": "Cała polska komunikacja publiczna na jednej mapie: 107 miast i 148 przewoźników, pojazdy z GPS na żywo, wyszukiwarka połączeń z cenami biletów.",
+      "k": ["rozkład jazdy", "wyszukiwarka połączeń", "komunikacja miejska na żywo", "gdzie jest autobus", "mapa pojazdów", "GTFS Polska"],
+      "f": [
+        ["Jakie miasta obejmuje MuszęJechać?", "107 miast i 148 przewoźników z oficjalnych rozkładów GTFS."],
+        ["Czy widać, gdzie jest autobus lub tramwaj?", "Tak. Pozycje pojazdów z GPS są na mapie na żywo, razem z opóźnieniami."],
+        ["Czy jest aplikacja na telefon?", "Tak. Ten sam interfejs działa w przeglądarce i w aplikacji na Androida."]
+      ]
+    },
+    "en": {
+      "t": "MuszęJechać – live public transport map for Poland",
+      "d": "All Polish public transport on one map: 107 cities and 148 operators, live GPS vehicle positions and a journey planner with ticket prices.",
+      "k": ["Poland public transport", "journey planner", "live bus tracker", "transit map", "GTFS Poland", "timetables"],
+      "f": [
+        ["Which cities are covered?", "107 cities and 148 operators from official GTFS timetables."],
+        ["Can I see where my bus or tram is?", "Yes. Live GPS vehicle positions and delays are shown on the map."],
+        ["Is there a mobile app?", "Yes. The same interface works in the browser and in an Android app."]
+      ]
+    }
+  },
+  "kompendium-podrozy": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "Kompendium Podróży – informacje o każdym kraju przed wyjazdem",
+      "d": "Encyklopedia podróżnika: każdy kraj z mapą, walutą, dniami wolnymi, prawem, obyczajami, przyrodą i znanymi postaciami na jednej stronie.",
+      "k": ["informacje o krajach", "przed podróżą", "obyczaje w krajach", "waluta i kurs", "encyklopedia podróży", "przewodnik po krajach"],
+      "f": [
+        ["Co znajdę na stronie kraju?", "Mapę, spis treści, walutę z bieżącym kursem, dni wolne, prawo i obyczaje, przyrodę oraz znane osoby."],
+        ["Czy są informacje o lokalnych zasadach?", "Tak – na przykład o alkoholu, używkach, stroju, gestach i napiwkach."],
+        ["Gdzie działa serwis?", "Pod adresem kompendium-podrozy.pl, w zwykłej przeglądarce."]
+      ]
+    },
+    "en": {
+      "t": "Kompendium Podróży – everything about a country before you travel",
+      "d": "A traveller's encyclopedia: every country with a map, currency, public holidays, laws, customs, nature and famous people on one page.",
+      "k": ["country information", "travel preparation", "local customs", "currency exchange rate", "travel encyclopedia", "country guide"],
+      "f": [
+        ["What is on a country page?", "A map, contents, currency with the current rate, holidays, laws and customs, nature and famous people."],
+        ["Does it cover local rules?", "Yes – for example alcohol, substances, dress code, gestures and tipping."],
+        ["Where can I use it?", "At kompendium-podrozy.pl, in any browser."]
+      ]
+    }
+  },
+  "podrozownik": {
+    "c": "TravelApplication",
+    "pl": {
+      "t": "Podróżownik – planer i dziennik podróży z mapą i GPX",
+      "d": "Cała podróż w jednym miejscu: plan dnia, mapa świata ze wszystkimi trasami, transport, noclegi, ślady GPX, wydatki i zdjęcia. Jest tryb demo.",
+      "k": ["planer podróży", "dziennik podróży", "mapa odwiedzonych miejsc", "ślady GPX", "budżet podróży", "plan wyjazdu"],
+      "f": [
+        ["Co można zapisać w Podróżowniku?", "Oś podróży dzień po dniu, transport, noclegi, ślady GPX, wydatki w kategoriach i zdjęcia."],
+        ["Czy trzeba zakładać konto, żeby zobaczyć aplikację?", "Nie. Jest tryb demo bez zakładania konta."],
+        ["Czy aplikacja pomaga w planowaniu?", "Tak. Edytor AI proponuje zmiany planu i pokazuje je do przejrzenia przed zapisem."]
+      ]
+    },
+    "en": {
+      "t": "Podróżownik – travel planner and journal with maps and GPX",
+      "d": "Your whole trip in one place: day plans, a world map of every route, transport, stays, GPX tracks, expenses and photos. Demo mode included.",
+      "k": ["travel planner", "travel journal", "visited places map", "GPX tracks", "travel budget", "trip itinerary"],
+      "f": [
+        ["What can I record in Podróżownik?", "A day-by-day timeline, transport, stays, GPX tracks, categorised expenses and photos."],
+        ["Do I need an account to try it?", "No. There is a demo mode without signing up."],
+        ["Does it help with planning?", "Yes. An AI editor suggests plan changes and shows them for review before saving."]
+      ]
+    }
+  },
+  "strefamilczenia": {
+    "c": "NewsApplication",
+    "pl": {
+      "t": "Strefa Milczenia – katastrofy, wywiad i tajne operacje",
+      "d": "Ponad 200 długich artykułów o katastrofach przemysłowych, szpiegostwie, zimnej wojnie i skandalach – z kategoriami, krajami i osią czasu.",
+      "k": ["katastrofy", "historia wywiadu", "zimna wojna", "szpiegostwo", "tajne operacje", "artykuły historyczne"],
+      "f": [
+        ["O czym pisze Strefa Milczenia?", "O katastrofach przemysłowych, operacjach wywiadu, zimnej wojnie i sprawach, o których świat wolał nie mówić."],
+        ["Ile jest artykułów?", "Ponad 200, w kategoriach, według krajów i na osi czasu."],
+        ["Czy jest aplikacja mobilna?", "Tak, na Androida i iOS – dla subskrybentów."]
+      ]
+    },
+    "en": {
+      "t": "Strefa Milczenia – disasters, intelligence and covert operations",
+      "d": "Over 200 long-form articles on industrial disasters, espionage, the Cold War and scandals – organised by category, country and timeline.",
+      "k": ["disasters", "intelligence history", "Cold War", "espionage", "covert operations", "long-form history"],
+      "f": [
+        ["What does Strefa Milczenia cover?", "Industrial disasters, intelligence operations, the Cold War and stories the world preferred to keep quiet."],
+        ["How many articles are there?", "Over 200, by category, by country and on a timeline."],
+        ["Is there a mobile app?", "Yes, for Android and iOS – for subscribers."]
+      ]
+    }
+  },
+  "openlyrics": {
+    "c": "MultimediaApplication",
+    "pl": {
+      "t": "OpenLyrics – tekst piosenki na ekranie w rytm muzyki",
+      "d": "Program na Windows i Androida, który pokazuje tekst granego utworu w przezroczystej nakładce, wiersz po wierszu. Z pliku albo z bazy LRCLIB.",
+      "k": ["tekst piosenki na ekranie", "napisy do muzyki", "teksty LRC", "karaoke na komputerze", "LRCLIB", "nakładka z tekstem"],
+      "f": [
+        ["Z jakim odtwarzaczem działa OpenLyrics?", "Z każdym odtwarzaczem, który zgłasza odtwarzany utwór do systemu – Spotify, przeglądarką czy lokalnym programem."],
+        ["Skąd bierze teksty?", "Z samego pliku MP3, FLAC, OGG, M4A lub .lrc, a gdy go tam nie ma – z otwartej bazy LRCLIB."],
+        ["Na jakich systemach działa?", "Na Windows 10 i 11 oraz Androidzie 10 lub nowszym."]
+      ]
+    },
+    "en": {
+      "t": "OpenLyrics – song lyrics on screen, in sync with the music",
+      "d": "Windows and Android app that shows the lyrics of whatever is playing in a transparent overlay, line by line. From the file or the LRCLIB database.",
+      "k": ["lyrics on screen", "synced lyrics", "LRC lyrics", "desktop karaoke", "LRCLIB", "lyrics overlay"],
+      "f": [
+        ["Which players does OpenLyrics support?", "Any player that reports what is playing to the system – Spotify, a browser or a local player."],
+        ["Where do the lyrics come from?", "From the MP3, FLAC, OGG, M4A or .lrc file itself, or from the open LRCLIB database when the file has none."],
+        ["Which systems are supported?", "Windows 10 and 11, and Android 10 or newer."]
+      ]
+    }
+  },
+  "projecttravel": {
+    "c": "BusinessApplication",
+    "pl": {
+      "t": "ProjectTravel – strona i system dla biura podróży",
+      "d": "Realizacja dla biura podróży: katalog wyjazdów z terminami i cenami, blog, galeria oraz panel z generatorem umów PDF, mailingiem i statystykami.",
+      "k": ["strona dla biura podróży", "system dla biura podróży", "katalog wycieczek", "wyjazdy szkolne", "generator umów", "strona internetowa na zamówienie"],
+      "f": [
+        ["Co obejmuje realizacja ProjectTravel?", "Stronę z katalogiem wyjazdów, kalendarzem, blogiem i galerią oraz panel do prowadzenia ofert, dokumentów i korespondencji."],
+        ["Czy biuro samo zarządza treścią?", "Tak. W panelu prowadzi oferty, terminy i treści, generuje umowy w PDF i wysyła mailing."],
+        ["Czy mogę zamówić podobny system?", "Tak. Napisz przez formularz kontaktowy – projektuję i buduję strony oraz systemy dla firm."]
+      ]
+    },
+    "en": {
+      "t": "ProjectTravel – website and booking system for a travel agency",
+      "d": "Client project for a travel agency: trip catalogue with dates and prices, blog and gallery, plus an admin panel with PDF contracts, mailing and analytics.",
+      "k": ["travel agency website", "travel agency software", "tour catalogue", "school trips", "contract generator", "custom website"],
+      "f": [
+        ["What does the ProjectTravel project include?", "A website with a trip catalogue, calendar, blog and gallery, plus a panel for offers, documents and client correspondence."],
+        ["Can the agency manage content itself?", "Yes. It manages offers, dates and content, generates PDF contracts and sends mailings from the panel."],
+        ["Can I order a similar system?", "Yes. Get in touch through the contact form – I design and build websites and systems for businesses."]
+      ]
+    }
+  },
+  "pianomaster": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "PianoMaster – nauka gry na pianinie online z MIDI",
+      "d": "Darmowa nauka gry na pianinie w przeglądarce: wodospad nut, nuty, ocena gry na żywo i ponad 40 utworów. Pianino MIDI, klawiatura komputera lub mysz.",
+      "k": ["nauka gry na pianinie", "pianino online", "nauka nut", "MIDI pianino", "lekcje pianina", "synthesia alternatywa"],
+      "f": [
+        ["Czy potrzebuję pianina?", "Nie. Możesz grać na pianinie MIDI, klawiaturze komputera albo myszą."],
+        ["Jak wygląda nauka?", "Nuty spływają na klawiaturę, a w trybie Ćwicz aplikacja czeka, aż zagrasz właściwy dźwięk. Jest też tryb Występ z punktacją."],
+        ["Czy mogę dodać własne utwory?", "Tak. Własne pliki MIDI zapiszesz na koncie, obok ponad 40 wbudowanych utworów i ćwiczeń."]
+      ]
+    },
+    "en": {
+      "t": "PianoMaster – learn piano online with MIDI",
+      "d": "Free piano learning in the browser: falling notes, sheet music, live scoring and 40+ songs. Play a MIDI keyboard, your computer keyboard or the mouse.",
+      "k": ["learn piano online", "online piano", "learn to read music", "MIDI piano", "piano lessons", "Synthesia alternative"],
+      "f": [
+        ["Do I need a piano?", "No. You can play a MIDI keyboard, your computer keyboard or use the mouse."],
+        ["How does learning work?", "Notes fall onto the keyboard and in Practice mode the app waits until you hit the right key. Performance mode scores your playing."],
+        ["Can I add my own songs?", "Yes. Upload your own MIDI files to your account, next to more than 40 built-in songs and exercises."]
+      ]
+    }
+  },
+  "aeroflow": {
+    "c": "EducationalApplication",
+    "pl": {
+      "t": "AeroFlow – tunel aerodynamiczny 2D i symulacja opływu CFD",
+      "d": "Symulator przepływu metodą Lattice-Boltzmann na GPU: rysujesz profil NACA, walec lub auto i widzisz opływ, siły w niutonach, Cd i Cl na żywo.",
+      "k": ["tunel aerodynamiczny", "symulacja CFD", "Lattice Boltzmann", "profil NACA", "współczynnik oporu", "aerodynamika program"],
+      "f": [
+        ["Co można symulować w AeroFlow?", "Profile NACA, walce, dowolne kształty i ściany rysowane pędzlem – w jednostkach fizycznych i w czasie rzeczywistym."],
+        ["Czy wyniki są wiarygodne?", "Każdy wynik ma ocenę wiarygodności, która mówi wprost, czy jest ilościowy, czy tylko jakościowy."],
+        ["Na jakich systemach działa?", "Na Windows i Linuksie, z obliczeniami na GPU i automatycznym przejściem na procesor."]
+      ]
+    },
+    "en": {
+      "t": "AeroFlow – 2D wind tunnel and CFD flow simulator",
+      "d": "Lattice-Boltzmann flow simulator on the GPU: draw a NACA airfoil, cylinder or car and see the flow, forces in newtons, Cd and Cl live.",
+      "k": ["virtual wind tunnel", "CFD simulation", "Lattice Boltzmann", "NACA airfoil", "drag coefficient", "aerodynamics software"],
+      "f": [
+        ["What can I simulate in AeroFlow?", "NACA airfoils, cylinders, any shape and walls painted with a brush – in physical units and in real time."],
+        ["Are the results reliable?", "Every result carries a reliability rating that says plainly whether it is quantitative or only qualitative."],
+        ["Which systems are supported?", "Windows and Linux, computing on the GPU with automatic CPU fallback."]
+      ]
+    }
+  },
+  "gothic-save-explorer": {
+    "c": "GameApplication",
+    "pl": {
+      "t": "Gothic Remake Save Explorer – edytor zapisów Gothic 1 Remake",
+      "d": "Przeglądarka i edytor zapisów Gothic 1 Remake: postać, ekwipunek, zadania, NPC i reputacja. Zmiany zawsze w nowym slocie, oryginał zostaje.",
+      "k": ["Gothic 1 Remake", "edytor zapisów Gothic", "save editor", "Gothic Remake ekwipunek", "zapis gry Gothic", "narzędzie dla graczy"],
+      "f": [
+        ["Czy program nadpisze mój zapis?", "Nie. Zmiany trafiają zawsze do nowego slotu zapisu, a oryginał zostaje nietknięty."],
+        ["Co pokazuje Save Explorer?", "Postać, ekwipunek, zadania, NPC, handlarzy, reputację i statystyki, a także porównanie dwóch zapisów."],
+        ["Czy to oficjalne narzędzie?", "Nie. To nieoficjalny, lokalny program dla graczy, z interfejsem po polsku i angielsku."]
+      ]
+    },
+    "en": {
+      "t": "Gothic Remake Save Explorer – save editor for Gothic 1 Remake",
+      "d": "Viewer and editor for Gothic 1 Remake saves: character, inventory, quests, NPCs and reputation. Edits always go to a new slot.",
+      "k": ["Gothic 1 Remake", "Gothic save editor", "save editor", "Gothic Remake inventory", "Gothic save game", "gamer tools"],
+      "f": [
+        ["Will it overwrite my save?", "No. Changes always go to a new save slot and the original stays untouched."],
+        ["What does Save Explorer show?", "Character, inventory, quests, NPCs, traders, reputation and statistics, plus a comparison of two saves."],
+        ["Is it an official tool?", "No. It is an unofficial, local tool for players, with a Polish and English interface."]
+      ]
+    }
+  }
+}

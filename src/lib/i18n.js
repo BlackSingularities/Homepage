@@ -128,6 +128,8 @@ export const STRINGS = {
     'project.shots': name => `Zrzuty ekranu: ${name}`,
     'project.shot': (name, n) => `${name} – ekran ${n}`,
     'project.others': 'Inne prace',
+    'project.faq': 'Najczęstsze pytania',
+    'project.related': 'Podobne prace',
     'project.previous': 'Poprzednia',
     'project.next': 'Następna',
 
@@ -312,6 +314,8 @@ export const STRINGS = {
     'project.shots': name => `Screenshots: ${name}`,
     'project.shot': (name, n) => `${name} – screen ${n}`,
     'project.others': 'Other projects',
+    'project.faq': 'Frequently asked questions',
+    'project.related': 'Related projects',
     'project.previous': 'Previous',
     'project.next': 'Next',
 

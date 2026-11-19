@@ -13,13 +13,13 @@ import sharp from 'sharp'
 import { cleanLink, cleanMedia, cleanRepo, cleanText, isEmail, slugify, uniqueSlug } from './sanitize.mjs'
 import { createMail } from './mail.mjs'
 import * as tpl from './email.mjs'
-import { PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
+import { APP_CATEGORIES, PLATFORMS, STORES, TEST_PLATFORMS, downloadsFor, storesFor, projectSummary, publicProject, sanitizeProject, totalDownloads } from './projects.mjs'
 import { createReleaseService } from './github.mjs'
 import { createPosterService, withPosters } from './posters.mjs'
 import { writeZip } from './zip.mjs'
 import { createAnalytics } from './analytics.mjs'
 import { langOf, localizePage, localizeProject } from './i18n.mjs'
-import { renderDocument, renderSitemap } from './seo.mjs'
+import { relatedProjects, renderDocument, renderSitemap } from './seo.mjs'
 
 const app = express()
 const PORT = Number(process.env.PORT || 3001)
@@ -701,7 +701,10 @@ app.get('/api/projects/:slug', async (req, res) => {
   }
   res.set('Cache-Control', 'no-cache')
   const lang = langOf(req.query.lang)
-  res.json({ project: publicProject(localizeProject(project, lang), release, counts, { changelog }), previous: neighbour(-1), next: neighbour(1) })
+  // Podobne prace pod opisem – te same co w HTML dla robotów, żeby linki wewnętrzne były widoczne.
+  const related = relatedProjects(project, entries.map(entry => localizeProject(entry.project, lang)))
+    .map(item => ({ slug: item.slug, name: item.name, kind: item.kind, label: item.label, tagline: item.tagline, icon: item.icon || '' }))
+  res.json({ project: publicProject(localizeProject(project, lang), release, counts, { changelog }), previous: neighbour(-1), next: neighbour(1), related })
 })
 
 /** Plik z dowolnego wydania trzymanego w historii, po identyfikatorze. */
@@ -1560,7 +1563,7 @@ app.get('/api/admin/downloads/:slug/:fileId/:name', async (req, res, next) => {
 })
 
 app.get('/api/admin/projects', async (_req, res) => {
-  res.json({ projects: await adminProjectList(), platforms: PLATFORMS, stores: STORES.map(([id, name]) => ({ id, name })) })
+  res.json({ projects: await adminProjectList(), platforms: PLATFORMS, categories: APP_CATEGORIES, stores: STORES.map(([id, name]) => ({ id, name })) })
 })
 
 app.post('/api/admin/projects', enforceSameOrigin, async (req, res) => {

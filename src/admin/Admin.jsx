@@ -1,9 +1,9 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 import {
-  AppWindow, ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, FileStack, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
-  LockKeyhole, LogOut, Mail, MapPin, MessageSquareText, RefreshCw, Save, Settings, ShieldCheck, Trash2,
+  AppWindow, ArrowLeft, ArrowUpRight, BarChart3, Bell, Boxes, Bug, Lightbulb, Camera, Download, Files, FlaskConical, LayoutDashboard, Link2, LoaderCircle,
+  LockKeyhole, LogOut, Mail, MapPin, MessageSquareText, Package, RefreshCw, Save, Settings, ShieldCheck, Trash2, Type,
 } from 'lucide-react'
+import { meterTone, readiness } from './readiness'
 import { api, formatDate, json } from '../lib/api'
 import { Card, Empty, Notice, Text, Toaster, Toggle, toast } from './parts'
 import PagesManager from './PagesManager'
@@ -20,25 +20,42 @@ import MailPanel from './MailPanel'
 import MailComposer, { quoteBlock } from './MailComposer'
 import '../styles/admin.css'
 
-/** Zakładka, jej adres pod /admin, nazwa, ikona i grupa w menu. */
+/**
+ * Zakładka, jej adres pod /admin, nazwa, ikona, grupa w menu i jedno zdanie
+ * pod tytułem. Kolejność: to, co przychodzi codziennie (zapytania, poczta),
+ * potem treści strony, potem aplikacje. Ustawienia poczty są w stopce menu.
+ */
 const TABS = [
-  ['dashboard', '', 'Pulpit', LayoutDashboard, ''],
-  ['analytics', 'analityka', 'Analityka', BarChart3, ''],
-  ['submissions', 'zgloszenia', 'Zgłoszenia', MessageSquareText, ''],
-  ['apps', 'aplikacje', 'Zarządzanie aplikacjami', AppWindow, 'Aplikacje'],
-  ['bugReports', 'raporty-bledow', 'Raporty błędów', Bug, 'Aplikacje'],
-  ['appFeedback', 'sugestie', 'Sugestie i zgłoszenia', Lightbulb, 'Aplikacje'],
-  ['testers', 'testerzy', 'Testerzy', FlaskConical, 'Aplikacje'],
-  ['downloads', 'pobieranie', 'Pobieranie', Download, 'Aplikacje'],
-  ['content', 'tresci', 'Treści strony', FileStack, 'Strona'],
-  ['pages', 'podstrony', 'Podstrony', Files, 'Strona'],
-  ['gallery', 'galeria', 'Galeria', Camera, 'Strona'],
-  ['projects', 'portfolio', 'Portfolio', Boxes, 'Strona'],
-  ['resources', 'do-pobrania', 'Do pobrania', FileStack, 'Strona'],
-  ['links', 'przydatne-linki', 'Przydatne linki', Link2, 'Strona'],
-  ['mail', 'poczta', 'Poczta', Mail, 'Poczta'],
-  ['settings', 'ustawienia-poczty', 'Ustawienia poczty', Settings, 'Poczta'],
+  ['dashboard', '', 'Pulpit', LayoutDashboard, '', 'Co wymaga uwagi i w jakim stanie jest portfolio.'],
+  ['submissions', 'zgloszenia', 'Zapytania', MessageSquareText, '', 'Wiadomości z formularza kontaktowego na stronie.'],
+  ['mail', 'poczta', 'Poczta', Mail, '', 'Skrzynka odbiorcza i wysłane wiadomości.'],
+  ['analytics', 'analityka', 'Analityka', BarChart3, '', 'Ruch na stronie, źródła wejść i pobrania aplikacji.'],
+  ['projects', 'portfolio', 'Portfolio', Boxes, 'Strona', 'Prace: treść, zdjęcia, pliki do pobrania i SEO.'],
+  ['pages', 'podstrony', 'Podstrony', Files, 'Strona', 'Strony oferty pod adresem /p/…'],
+  ['content', 'tresci', 'Treści strony', Type, 'Strona', 'Teksty strony głównej i katalogu, po polsku i angielsku.'],
+  ['links', 'przydatne-linki', 'Przydatne linki', Link2, 'Strona', 'Polecane strony pokazywane w /przydatne-linki.'],
+  ['resources', 'do-pobrania', 'Do pobrania', Package, 'Strona', 'Materiały i presety pod /do-pobrania.'],
+  ['gallery', 'galeria', 'Galeria', Camera, 'Strona', ''],
+  ['apps', 'aplikacje', 'Przegląd aplikacji', AppWindow, 'Aplikacje', 'Konta użytkowników i dane wysyłane z aplikacji.'],
+  ['bugReports', 'raporty-bledow', 'Raporty błędów', Bug, 'Aplikacje', 'Awarie zgłoszone automatycznie przez aplikacje.'],
+  ['appFeedback', 'sugestie', 'Sugestie z aplikacji', Lightbulb, 'Aplikacje', 'Pomysły i uwagi wysłane z wnętrza aplikacji.'],
+  ['testers', 'testerzy', 'Testerzy', FlaskConical, 'Aplikacje', 'Zapisy do testów wersji przedpremierowych.'],
+  ['downloads', 'pobieranie', 'Pobrania', Download, 'Aplikacje', 'Ile razy pobrano każdy plik.'],
+  ['settings', 'ustawienia-poczty', 'Ustawienia poczty', Settings, 'Ustawienia', 'Serwery IMAP i SMTP oraz dane nadawcy.'],
 ]
+
+/** Zakładki, które przycisk „Odśwież” umie przeładować. */
+const REFRESHABLE = new Set(['dashboard', 'submissions', 'mail', 'analytics', 'apps', 'bugReports', 'appFeedback', 'testers', 'downloads', 'settings'])
+
+/** Publiczny adres tego, co jest otwarte w panelu – „Zobacz na stronie”. */
+function publicPathFor(tab, item) {
+  if (tab === 'projects') return item ? `/portfolio/${item}` : '/portfolio'
+  if (tab === 'pages') return item ? `/p/${item}` : '/'
+  if (tab === 'links') return '/przydatne-linki'
+  if (tab === 'resources') return '/do-pobrania'
+  if (tab === 'content' && item === 'en') return '/en'
+  return '/'
+}
 
 /** Podsekcje „Zarządzania aplikacjami” w menu (adres /admin/aplikacje/<slug>). */
 const APP_LINKS = [['gran', 'Grań', MapPin]]
@@ -165,28 +182,50 @@ function Submissions({ items, loading, onStatus, onDelete, onReply }) {
 
 /* ── dashboard ──────────────────────────────────────────────────── */
 
-function Dashboard({ submissions, pages, onTab }) {
-  // onTab(tab, item) – pulpit linkuje prosto do edytora konkretnej podstrony.
-  const stats = [
-    ['Zgłoszenia', submissions.length, 'submissions'],
-    ['Nowe zgłoszenia', submissions.filter(item => item.status === 'new').length, 'submissions'],
-    ['Podstrony', pages.length, 'pages'],
-    ['Opublikowane', pages.filter(page => page.published).length, 'pages'],
+function Dashboard({ submissions, pages, projects, unread, onTab }) {
+  // onTab(tab, item) – pulpit linkuje prosto do edytora konkretnej pracy albo podstrony.
+  const fresh = submissions.filter(item => item.status === 'new').length
+  const scored = projects.map(project => ({ project, ...readiness(project) }))
+  const average = scored.length ? Math.round(scored.reduce((sum, item) => sum + item.score, 0) / scored.length) : 0
+  const weak = scored.filter(item => item.score < 85).sort((a, b) => a.score - b.score)
+  const drafts = projects.filter(project => project.published === false).length
+
+  const kpis = [
+    ['Nowe zapytania', fresh, fresh > 0, fresh ? 'czekają na odpowiedź' : 'wszystko obsłużone', () => onTab('submissions')],
+    ['Powiadomienia', unread, unread > 0, unread ? 'raporty, sugestie, testerzy' : 'nic nowego', () => onTab(unread ? 'bugReports' : 'dashboard')],
+    ['Prace w portfolio', projects.length - drafts, false, drafts ? `i ${drafts} w szkicu` : 'wszystkie opublikowane', () => onTab('projects')],
+    ['Gotowość SEO', `${average}%`, false, weak.length ? `${weak.length} do dopracowania` : 'wszystkie gotowe', () => onTab('projects')],
   ]
 
   return (
-    <div className="ap-stack">
-      <div className="ap-stats">
-        {stats.map(([label, value, tab]) => (
-          <button key={label} onClick={() => onTab(tab)}>
-            <span>{label}</span>
-            <b>{value}</b>
+    <div className="ap-dash">
+      <div className="ap-dash-kpis">
+        {kpis.map(([label, value, alert, note, open]) => (
+          <button key={label} type="button" onClick={open}>
+            {label}
+            <b className={alert ? 'is-alert' : ''}>{value}</b>
+            <small>{note}</small>
           </button>
         ))}
       </div>
 
-      <div className="ap-two">
-        <Card title="Ostatnie zgłoszenia" description="Pięć najnowszych wiadomości z formularza.">
+      <div className="ap-dash-grid">
+        <Card title="Prace do dopracowania" description="Najsłabiej przygotowane wpisy. Kliknij, żeby otworzyć edytor.">
+          {weak.slice(0, 8).map(({ project, score, checks }) => (
+            <button key={project.id} type="button" className="ap-readiness-row" onClick={() => onTab('projects', project.slug)}>
+              {project.icon ? <img src={project.icon} alt="" /> : <i className="ap-readiness-blank" />}
+              <span>
+                <strong>{project.name}</strong>
+                <small>Brakuje: {checks.filter(check => !check.ok).map(check => check.label.toLowerCase()).join(', ')}</small>
+              </span>
+              <span className={`ap-meter ${meterTone(score)}`} aria-label={`Gotowość ${score}%`}><i style={{ '--value': `${score}%` }} />{score}%</span>
+            </button>
+          ))}
+          {!weak.length && <Empty>Wszystkie prace mają komplet treści i SEO.</Empty>}
+        </Card>
+
+        <div className="ap-dash-col">
+        <Card title="Ostatnie zapytania" description="Pięć najnowszych wiadomości z formularza.">
           {submissions.slice(0, 5).map(item => (
             <button key={item.id} className="ap-row" onClick={() => onTab('submissions')}>
               <Status value={item.status} />
@@ -197,7 +236,7 @@ function Dashboard({ submissions, pages, onTab }) {
           {!submissions.length && <Empty>Pierwsze zapytanie pojawi się tutaj.</Empty>}
         </Card>
 
-        <Card title="Twoje podstrony" description="Strony oferty tworzone w panelu.">
+        <Card title="Podstrony" description="Strony oferty tworzone w panelu.">
           {pages.slice(0, 6).map(page => (
             <button key={page.id} className="ap-row" onClick={() => onTab('pages', page.slug)}>
               <span className={`ap-dot ${page.published ? 'is-live' : ''}`} />
@@ -207,6 +246,7 @@ function Dashboard({ submissions, pages, onTab }) {
           ))}
           {!pages.length && <Empty>Nie masz jeszcze podstron. Dodaj pierwszą w zakładce „Podstrony”.</Empty>}
         </Card>
+        </div>
       </div>
     </div>
   )
@@ -388,7 +428,7 @@ function GalleryManager() {
 /* ── powiadomienia ──────────────────────────────────────────────── */
 
 const NOTIFICATION_LABEL = {
-  submissions: 'Zgłoszenia', bugReports: 'Raporty błędów', appFeedback: 'Sugestie i zgłoszenia', apps: 'Punkty na mapie (GRAŃ)', testers: 'Testerzy', mail: 'Poczta',
+  submissions: 'Zapytania', bugReports: 'Raporty błędów', appFeedback: 'Sugestie z aplikacji', apps: 'Punkty na mapie (GRAŃ)', testers: 'Testerzy', mail: 'Poczta',
 }
 
 function NotificationBell({ data, onOpen }) {
@@ -414,7 +454,7 @@ function NotificationBell({ data, onOpen }) {
   return (
     <div className="ap-bell" ref={root}>
       <button
-        className="ap-btn ap-btn-ghost"
+        className="ap-btn ap-btn-sm"
         onClick={() => setOpen(value => !value)}
         aria-expanded={open}
         aria-label={total ? `Powiadomienia: ${total}` : 'Powiadomienia'}
@@ -452,6 +492,7 @@ function AdminPanel({ admin, onLogout }) {
   const { tab, item } = location
   const [submissions, setSubmissions] = useState([])
   const [pages, setPages] = useState([])
+  const [projects, setProjects] = useState([])
   const [compose, setCompose] = useState(null)
   const [identity, setIdentity] = useState(null)
   const [mailChange, setMailChange] = useState(0)
@@ -490,12 +531,14 @@ function AdminPanel({ admin, onLogout }) {
   }, [notify])
 
   const loadOverview = useCallback(() => run(async () => {
-    const [submissionList, pageList] = await Promise.all([
+    const [submissionList, pageList, projectList] = await Promise.all([
       api('/api/admin/submissions'),
       api('/api/admin/pages'),
+      api('/api/admin/projects'),
     ])
     setSubmissions(submissionList)
     setPages(pageList)
+    setProjects(projectList.projects)
   }), [run])
 
   useEffect(() => { loadOverview() }, [loadOverview])
@@ -599,21 +642,21 @@ function AdminPanel({ admin, onLogout }) {
   const unread = Object.values(notifications.counts).reduce((sum, value) => sum + value, 0)
 
   useEffect(() => {
-    document.title = `${unread ? `(${unread}) ` : ''}${active?.[2] || 'Panel'}${item ? ` · ${item}` : ''} – Panel administracyjny`
+    document.title = `${unread ? `(${unread}) ` : ''}${active?.[2] || 'Panel'}${item ? `: ${item}` : ''} – panel`
   }, [active, item, unread])
 
   return (
     <div className="ap-shell">
       <aside className="ap-sidebar">
-        <a className="ap-brand" href="/">
-          <b>AR</b>
-          <span>Studio<i>Control</i></span>
+        <a className="ap-brand" href="/admin" onClick={event => { event.preventDefault(); chooseTab('dashboard') }}>
+          <img src="/assets/brand/favicon-r-180.png" alt="" />
+          <span>Panel<i>redzikowski.com</i></span>
         </a>
 
-        <nav>
-          {TABS.map(([id, , label, Icon, group], index) => (
+        <nav aria-label="Sekcje panelu">
+          {TABS.filter(([id]) => id !== 'settings').map(([id, , label, Icon, group], index, list) => (
             <Fragment key={id}>
-              {group && group !== TABS[index - 1]?.[4] && <span className="ap-nav-group">{group}</span>}
+              {group && group !== list[index - 1]?.[4] && <span className="ap-nav-group">{group}</span>}
               <a
                 href={adminPath(id)}
                 className={tab === id && !(id === 'apps' && item) ? 'is-active' : ''}
@@ -624,7 +667,7 @@ function AdminPanel({ admin, onLogout }) {
                   chooseTab(id)
                 }}
               >
-                <Icon size={17} /><span>{label}</span>
+                <Icon size={16} /><span>{label}</span>
                 {notifications.counts[id] > 0 && <b className="ap-count">{notifications.counts[id]}</b>}
               </a>
               {id === 'apps' && APP_LINKS.map(([slug, name, AppIcon]) => (
@@ -645,30 +688,44 @@ function AdminPanel({ admin, onLogout }) {
           ))}
         </nav>
 
-        <a className="ap-back" href="/"><ArrowLeft size={15} /> <span>Wróć na stronę</span></a>
+        <div className="ap-side-foot">
+          <a
+            href={adminPath('settings')}
+            className={tab === 'settings' ? 'is-active' : ''}
+            title="Ustawienia poczty"
+            onClick={event => { if (event.metaKey || event.ctrlKey) return; event.preventDefault(); chooseTab('settings') }}
+          >
+            <Settings size={15} /><span>Ustawienia poczty</span>
+          </a>
+          <a href="/" title="Wróć na stronę"><ArrowLeft size={15} /><span>Wróć na stronę</span></a>
+          <p className="ap-side-user" title={admin?.username ? `Zalogowano jako ${admin.username}` : undefined}>
+            <b>{(admin?.username || 'A').slice(0, 1).toUpperCase()}</b><span>{admin?.username || 'Administrator'}</span>
+          </p>
+          <button type="button" onClick={onLogout} title="Wyloguj"><LogOut size={15} /><span>Wyloguj</span></button>
+        </div>
       </aside>
 
       <main className={`ap-main ${tab === 'gallery' ? 'is-gallery' : ''}`}>
         {tab !== 'gallery' && <header className="ap-header">
           <div>
             <h1>{active?.[2]}</h1>
+            {active?.[5] && <p>{active[5]}</p>}
           </div>
           <div className="ap-header-actions">
-            <NotificationBell data={notifications} onOpen={chooseTab} />
-            <a className="ap-btn ap-btn-ghost" href="/" target="_blank" rel="noreferrer">
-              Zobacz stronę <ArrowUpRight size={14} />
+            {REFRESHABLE.has(tab) && (
+              <button className="ap-btn ap-btn-sm" onClick={refresh} disabled={loading} title="Pobierz dane jeszcze raz">
+                <RefreshCw className={loading ? 'spin' : ''} size={14} /> Odśwież
+              </button>
+            )}
+            <a className="ap-btn ap-btn-sm" href={publicPathFor(tab, item)} target="_blank" rel="noreferrer">
+              Zobacz na stronie <ArrowUpRight size={14} />
             </a>
-            <button className="ap-btn ap-btn-ghost" onClick={refresh} disabled={loading}>
-              <RefreshCw className={loading ? 'spin' : ''} size={14} /> Odśwież
-            </button>
-            <button className="ap-btn ap-btn-ghost" onClick={onLogout}>
-              <LogOut size={14} /> Wyloguj
-            </button>
+            <NotificationBell data={notifications} onOpen={chooseTab} />
           </div>
         </header>}
 
-        <motion.div className={`ap-body ${tab === 'gallery' ? 'is-gallery' : ''}`} key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
-          {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} onTab={chooseTab} />}
+        <div className={`ap-body ${tab === 'gallery' ? 'is-gallery' : ''}`}>
+          {tab === 'dashboard' && <Dashboard submissions={submissions} pages={pages} projects={projects} unread={unread} onTab={chooseTab} />}
 
           {tab === 'submissions' && (
             <Submissions items={submissions} loading={loading} onStatus={changeStatus} onDelete={deleteSubmission} onReply={replyToSubmission} />
@@ -704,7 +761,7 @@ function AdminPanel({ admin, onLogout }) {
           {tab === 'settings' && (
             <MailSettings settings={settings} setSettings={setSettings} onSave={saveSettings} loading={loading} />
           )}
-        </motion.div>
+        </div>
 
         {loading && (
           <div className="ap-loading"><LoaderCircle className="spin" size={15} /> Pracuję…</div>

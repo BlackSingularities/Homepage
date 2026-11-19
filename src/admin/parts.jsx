@@ -425,7 +425,7 @@ export function ImagePicker({ label, value, onChange, hint }) {
   )
 }
 
-export function SaveBar({ dirty, saving, onSave, onReset, resetLabel = 'Przywróć domyślne', info }) {
+export function SaveBar({ dirty, saving, onSave, onReset, resetLabel = 'Przywróć domyślne', info, saveLabel = 'Zapisz', extra }) {
   return (
     <AnimatePresence>
       {(dirty || saving) && (
@@ -439,9 +439,12 @@ export function SaveBar({ dirty, saving, onSave, onReset, resetLabel = 'Przywró
           <span>{info || 'Masz niezapisane zmiany.'}</span>
           <div>
             {onReset && <button type="button" className="ap-btn ap-btn-ghost" onClick={onReset}>{resetLabel}</button>}
-            <button type="button" className="ap-btn ap-btn-primary" onClick={onSave} disabled={saving}>
-              {saving ? <LoaderCircle className="spin" size={15} /> : <Check size={15} />} Zapisz
-            </button>
+            {extra}
+            {onSave && (
+              <button type="button" className="ap-btn ap-btn-primary" onClick={onSave} disabled={saving}>
+                {saving ? <LoaderCircle className="spin" size={15} /> : <Check size={15} />} {saveLabel}
+              </button>
+            )}
           </div>
         </motion.div>
       )}
