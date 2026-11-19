@@ -15,8 +15,8 @@ import { cors } from './app-accounts.mjs'
  * Gdy jej jeszcze nie ma – serwer dopisuje zapytanie do kolejki (202), a aplikacja pyta publiczny
  * Overpass jak dotąd. Poza obszarem – 404, aplikacja pyta publiczny Overpass.
  *
- * Kolejka pracuje po jednym zapytaniu naraz, z przerwami (uczciwe korzystanie z publicznych
- * serwerów). Raz na godzinę dopisuje do niej brakujące i przeterminowane (> 30 dni) zapytania
+ * Kolejka pracuje w kilku miejscach naraz na różnych publicznych serwerach Overpass (na każdym
+ * najwyżej tyle zapytań, ile dopuszcza z jednego adresu), z przerwami między zapytaniami. Raz na godzinę dopisuje do niej brakujące i przeterminowane (> 30 dni) zapytania
  * wszystkich sektorów obszaru – na podstawie tych samych szablonów co w aplikacji
  * (`gran-queries.json`, wyciągnięte z `osm.rs` i `landcover.rs`; po zmianie zapytań w GRANI
  * zaktualizuj plik – bez tego serwer i tak uczy się nowych zapytań od aplikacji).
@@ -39,7 +39,11 @@ const OVERPASS = [
   'https://overpass.kumi.systems/api/interpreter',
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ]
+/** Równoległe miejsca na serwerach Overpass: overpass-api.de daje dwa naraz z jednego adresu, reszta po jednym. */
+const SLOTS = [OVERPASS[0], OVERPASS[0], OVERPASS[1], OVERPASS[2], OVERPASS[3]]
 const PAUSE = 4000
+/** Przerwa miejsca po błędzie jego serwera (przeciążenie, limit) – zapytanie przejmuje inny. */
+const BACKOFF = 60_000
 const RETRY = 10 * 60 * 1000
 const LIMIT_WINDOW = 15 * 60 * 1000
 const LIMIT = 600
@@ -186,9 +190,10 @@ export function registerGranSectors(app, deps) {
     stats.queued = urgent.size + queue.size
   }
 
-  async function upstream(query) {
+  /** Zapytanie: najpierw serwer miejsca, potem pozostałe. */
+  async function upstream(query, preferred) {
     let last = ''
-    for (const url of OVERPASS) {
+    for (const url of [preferred, ...OVERPASS.filter(u => u !== preferred)]) {
       try {
         const response = await fetch(url, {
           method: 'POST',
@@ -201,13 +206,16 @@ export function registerGranSectors(app, deps) {
           continue
         }
         const text = await response.text()
-        const v = JSON.parse(text)
-        // przekroczony czas lub limit to kod 200 z uwagą i uciętymi danymi – nie wolno ich zapisać
-        if (typeof v.remark === 'string' && v.remark.includes('error')) {
-          last = `${url}: ${v.remark.slice(0, 200)}`
+        // przekroczony czas lub limit to kod 200 z uwagą i uciętymi danymi – nie wolno ich zapisać.
+        // Uwaga stoi na końcu odpowiedzi: wystarczy jej ogon, bez wczytywania całego (do kilkudziesięciu
+        // MB) JSON-a – kilka miejsc naraz nie zajmuje wtedy pamięci serwera
+        const tail = text.slice(-4000)
+        const remark = /"remark"\s*:\s*"([^"]*)"/.exec(tail)?.[1] || ''
+        if (!text.trimStart().startsWith('{') || !text.trimEnd().endsWith('}') || remark.includes('error')) {
+          last = `${url}: ${(remark || 'niepełna odpowiedź').slice(0, 200)}`
           continue
         }
-        return text
+        return { text, url }
       } catch (error) {
         last = `${url}: ${error.message}`
       }
@@ -215,21 +223,36 @@ export function registerGranSectors(app, deps) {
     throw new Error(last || 'Overpass nie odpowiada')
   }
 
-  /** Kolejka: po jednym zapytaniu, z przerwą. */
-  async function work() {
-    await fs.mkdir(DIR, { recursive: true })
-    if (!(await fs.stat(INDEX).catch(() => null))) await fs.writeFile(INDEX, '{}')
+  /** Zapytania właśnie pobierane (każde przez jedno miejsce). */
+  const inflight = new Set()
+
+  /** Następne zapytanie do pobrania: najpierw pilne (od aplikacji), potem z planu. */
+  function take() {
+    for (const list of [urgent, queue]) {
+      for (const [hash, entry] of list) {
+        if (!inflight.has(hash)) {
+          inflight.add(hash)
+          return [hash, entry]
+        }
+      }
+    }
+    return null
+  }
+
+  /** Jedno miejsce kolejki: zapytania po kolei do swojego serwera, z przerwą. */
+  async function slot(url) {
     for (;;) {
-      const next = urgent.entries().next().value || queue.entries().next().value
+      const next = take()
       if (!next) {
-        stats.busy = false
         await new Promise(resolve => setTimeout(resolve, 5000))
         continue
       }
       const [hash, entry] = next
       stats.busy = true
+      let wait = PAUSE
       try {
-        const text = await upstream(entry.query)
+        const { text, url: used } = await upstream(entry.query, url)
+        if (used !== url) wait = BACKOFF
         const packed = await gzip(Buffer.from(text))
         await fs.writeFile(path.join(DIR, `${hash}.json.gz`), packed)
         await updateJson(INDEX, {}, current => ({
@@ -244,12 +267,22 @@ export function registerGranSectors(app, deps) {
         stats.failed += 1
         stats.lastError = String(error.message).slice(0, 300)
         console.warn('gran-overpass:', stats.lastError)
+        wait = BACKOFF
       }
+      inflight.delete(hash)
       urgent.delete(hash)
       queue.delete(hash)
       stats.queued = urgent.size + queue.size
-      await new Promise(resolve => setTimeout(resolve, PAUSE))
+      stats.busy = inflight.size > 0
+      await new Promise(resolve => setTimeout(resolve, wait))
     }
+  }
+
+  /** Kolejka: kilka miejsc naraz na różnych serwerach Overpass. */
+  async function work() {
+    await fs.mkdir(DIR, { recursive: true })
+    if (!(await fs.stat(INDEX).catch(() => null))) await fs.writeFile(INDEX, '{}')
+    await Promise.all(SLOTS.map(url => slot(url)))
   }
 
   /** Brakujące i przeterminowane zapytania wszystkich sektorów obszaru. */
