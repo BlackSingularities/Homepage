@@ -178,7 +178,7 @@ prywatne – ich pliki idą wtedy przez `/api/projects/:slug/asset/:id`, bo adre
 `browser_download_url` wymagają autoryzacji. Token jest szyfrowany AES-256-GCM tym
 samym kluczem co hasło poczty i nigdy nie opuszcza serwera.
 
-Odpowiedzi GitHuba lądują w `releases.json` z czasem życia 30 minut, więc strona nie
+Odpowiedzi GitHuba lądują w `releases.json` z czasem życia 5 minut, więc strona nie
 odpytuje API przy każdym wejściu. Gdy odświeżenie się nie powiedzie, serwer podaje
 ostatni udany wynik, a panel pokazuje powód błędu przy pracy.
 
