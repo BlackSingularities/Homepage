@@ -22,6 +22,11 @@ services:
       # Deploys wipe the app directory, so production points this at a path
       # outside it (set in .env). Locally it stays ./data.
       - ${HOMEPAGE_DATA_DIR:-./data}:/app/data
+      # Pamięć podręczna danych okolicy GRANI (odpowiedzi Overpass): wolumen Dockera, nie katalog
+      # danych – przetrwa wdrożenia, ale nie trafia do kopii zapasowych (da się pobrać od nowa).
+      - gran_cache:/app/cache
+    environment:
+      GRAN_CACHE_DIR: /app/cache
     networks:
       - homepage_internal
       # Tylko ruch wychodzący (GitHub z wydaniami aplikacji, poczta).
@@ -55,6 +60,9 @@ services:
     networks:
       - webproxy
       - homepage_internal
+
+volumes:
+  gran_cache:
 
 networks:
   webproxy:
