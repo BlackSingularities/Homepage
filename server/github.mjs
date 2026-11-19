@@ -10,7 +10,7 @@ import { detectPlatform, isSupportFile } from './projects.mjs'
  * padnie, zwracamy ostatni udany wynik razem z informacją o błędzie.
  */
 
-const TTL_MS = 30 * 60 * 1000
+const TTL_MS = 5 * 60 * 1000
 // Podbijane, gdy zmienia się kształt wpisu – stare wpisy odświeżają się od razu.
 const CACHE_VERSION = 4
 // Ile wydań wstecz trzymamy – starczy na historię zmian i na aplikacje, które
