@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  ArrowUpRight, Ban, Check, ImageIcon, Mail, MapPin, MessageSquareText, RotateCcw, Save, Send, ShieldCheck, Trash2, UserRound, Users,
+  ArrowUpRight, Ban, Check, Database, ImageIcon, Mail, MapPin, MessageSquareText, RotateCcw, Save, Send, ShieldCheck, Trash2, UserRound, Users,
 } from 'lucide-react'
 import { api, formatDate, formatDay, json } from '../lib/api'
 import { Card, Empty, Text, Toggle, Segmented, toast } from './parts'
@@ -59,6 +59,32 @@ function AppList({ apps, onOpen }) {
 
 /* ── przegląd ─────────────────────────────────────────────────────── */
 
+/** Dane okolicy GRANI trzymane na serwerze (Polska, Czechy, Słowacja): postęp zapełniania. */
+function ServerData() {
+  const [data, setData] = useState(null)
+  useEffect(() => {
+    let alive = true
+    const load = () => api('/api/admin/gran-sectors').then(value => alive && setData(value)).catch(() => undefined)
+    load()
+    const timer = setInterval(load, 30000)
+    return () => { alive = false; clearInterval(timer) }
+  }, [])
+  if (!data) return null
+  const pct = data.planned ? Math.min(100, Math.round((data.fresh / data.planned) * 100)) : 0
+  return (
+    <>
+      <h3 className="ax-h"><Database size={15} /> Dane okolicy na serwerze ({data.regions.join(', ')})</h3>
+      <div className="ax-stats">
+        <Stat label="Gotowe zapytania" value={`${pct}%`} hint={`${data.fresh} z ${data.planned} · ${data.sectors} sektorów`} />
+        <Stat label="Zajęte miejsce" value={mb(data.bytes)} hint={`zapisane odpowiedzi: ${data.stored}`} />
+        <Stat label="W kolejce" value={data.queued} hint={data.busy ? 'pobieranie trwa' : 'bezczynna'} />
+        <Stat label="Wydane aplikacji" value={data.served} hint={`od uruchomienia · pobrane: ${data.fetched}, błędy: ${data.failed}`} />
+      </div>
+      {data.lastError && <p className="ap-muted">Ostatni błąd Overpass: {data.lastError}</p>}
+    </>
+  )
+}
+
 function Overview({ summary, onSection }) {
   const { users, content, mail } = summary
   const todo = (content.pointsPending || 0) + (content.commentsPending || 0) + (content.photosPending || 0)
@@ -88,6 +114,7 @@ function Overview({ summary, onSection }) {
         <Stat label="Zdjęcia" value={content.photos || 0} hint={mb(content.photosBytes || 0)} />
         <Stat label="Zgłoszone punkty" value={content.reported || 0} onClick={() => onSection('punkty')} />
       </div>
+      {summary.id === 'gran-3d' && <ServerData />}
       <h3 className="ax-h"><ShieldCheck size={15} /> Strony dla użytkowników</h3>
       <div className="ax-links">
         <a className="ap-btn ap-btn-ghost" href={`/aplikacje/${summary.slug}/prywatnosc`} target="_blank" rel="noreferrer">Polityka prywatności <ArrowUpRight size={14} /></a>
