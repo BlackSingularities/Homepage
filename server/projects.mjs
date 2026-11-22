@@ -181,13 +181,19 @@ export function sanitizeProject(input, existing = {}) {
  */
 export function thumbFor(src) {
   if (!src || !src.startsWith('/uploads/') || src.startsWith('/uploads/thumbs/') || /\.gif$/i.test(src)) return src || ''
+  // Trasa miniatur obsługuje tylko pliki z głównego katalogu uploadów –
+  // podkatalogi (np. plakaty) mają własne, gotowe kopie.
+  if (src.slice('/uploads/'.length).includes('/')) return src
   return `/uploads/thumbs/${src.slice('/uploads/'.length)}.webp`
 }
 
 /** Wiersz listy na stronie głównej i w portfolio – bez pełnego opisu i galerii. */
 export function projectSummary(project, release, counts = {}) {
-  // Bez okładki lista dostaje pierwszy zrzut ekranu – kafelek nie stoi pusty.
-  const cover = project.cover || project.shots[0]?.src || ''
+  // Bez okładki lista dostaje pierwszy zwykły zrzut ekranu (plakaty z repozytorium
+  // stoją na początku galerii), a gdy jest tylko plakat – jego mniejszą kopię.
+  const fallback = project.shots.find(shot => !shot.poster) || project.shots[0]
+  const cover = project.cover || fallback?.src || ''
+  const thumb = !project.cover && fallback?.poster ? (fallback.thumb || fallback.src) : thumbFor(cover)
   return {
     id: project.id,
     slug: project.slug,
@@ -198,7 +204,7 @@ export function projectSummary(project, release, counts = {}) {
     category: project.category || '',
     icon: project.icon || '',
     cover,
-    thumb: thumbFor(cover),
+    thumb,
     featured: project.featured,
     site: project.siteHidden ? '' : project.siteUrl,
     platforms: [...new Set((storesFor(project).length ? storesFor(project) : downloadsFor(project, release)).map(item => item.platform))]
