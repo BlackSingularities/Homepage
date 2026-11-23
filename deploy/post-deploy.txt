@@ -55,3 +55,4 @@ homepage_api node server/migrate-seo-v62.mjs
 homepage_api node server/migrate-fsopendatascenery-v63.mjs
 homepage_api node server/migrate-portfolio-icons-v64.mjs
 homepage_api node server/migrate-repo-shots-v65.mjs
+homepage_api node server/migrate-old-shots-v66.mjs
