@@ -233,7 +233,7 @@ export const STRINGS = {
     'form.invalid': 'Uzupełnij zaznaczone pola, żeby wysłać wiadomość.',
 
     'seo.homeTitle': 'Adam Rędzikowski – strony, aplikacje i programy na zamówienie',
-    'seo.homeDescription': 'Strony internetowe, aplikacje webowe i programy na komputer oraz telefon projektowane i budowane od zera. Analiza, interfejs, wykonanie, wdrożenie i dalszy rozwój u jednej osoby. Łódź i zdalnie.',
+    'seo.homeDescription': 'Strony internetowe, aplikacje webowe i programy na komputer oraz telefon projektowane i budowane od zera. Analiza, interfejs, kod, wdrożenie i dalszy rozwój u jednej osoby. Łódź i zdalnie.',
     'seo.catalogTitle': 'Portfolio – strony, aplikacje i programy | Adam Rędzikowski',
     'seo.catalogDescription': 'Portfolio Adama Rędzikowskiego: działające serwisy internetowe do otwarcia w przeglądarce oraz aplikacje na Androida, iOS i Windows do pobrania z najnowszych wydań.',
     'seo.notFound': 'Nie znaleziono strony | Adam Rędzikowski',
@@ -429,7 +429,7 @@ export const STRINGS = {
     'form.invalid': 'Please fill in the highlighted fields to send your message.',
 
     'seo.homeTitle': 'Adam Rędzikowski – Custom Websites & Apps',
-    'seo.homeDescription': 'Freelance designer creating custom websites, web applications and desktop & mobile apps from scratch. Analysis, UX, build, launch and long-term care from one person. Based in Poland, working remotely worldwide.',
+    'seo.homeDescription': 'Freelance designer creating custom websites, web applications and desktop & mobile apps from scratch. Analysis, UX, code, launch and long-term care from one person. Based in Poland, working remotely worldwide.',
     'seo.catalogTitle': 'Portfolio – Websites, Web Apps & Mobile Apps | Adam Rędzikowski',
     'seo.catalogDescription': 'Portfolio of Adam Rędzikowski: live websites you can open in the browser and Android, iOS and Windows apps you can download straight from their latest releases.',
     'seo.notFound': 'Page not found | Adam Rędzikowski',

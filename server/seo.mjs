@@ -16,7 +16,7 @@ const T = {
   pl: {
     locale: 'pl_PL',
     homeTitle: 'Adam Rędzikowski – strony, aplikacje i programy na zamówienie',
-    homeDescription: 'Strony internetowe, aplikacje webowe i programy na komputer oraz telefon projektowane i budowane od zera. Analiza, interfejs, wykonanie, wdrożenie i dalszy rozwój u jednej osoby. Łódź i zdalnie.',
+    homeDescription: 'Strony internetowe, aplikacje webowe i programy na komputer oraz telefon projektowane i budowane od zera. Analiza, interfejs, kod, wdrożenie i dalszy rozwój u jednej osoby. Łódź i zdalnie.',
     catalogTitle: 'Portfolio – strony, aplikacje i programy | Adam Rędzikowski',
     catalogDescription: 'Portfolio Adama Rędzikowskiego: działające serwisy internetowe do otwarcia w przeglądarce oraz aplikacje na Androida, iOS i Windows do pobrania z najnowszych wydań.',
     suffix: 'Adam Rędzikowski',
@@ -44,7 +44,7 @@ const T = {
   en: {
     locale: 'en_US',
     homeTitle: 'Adam Rędzikowski – Custom Websites & Apps',
-    homeDescription: 'Freelance designer creating custom websites, web applications and desktop & mobile apps from scratch. Analysis, UX, build, launch and long-term care from one person. Based in Poland, working remotely worldwide.',
+    homeDescription: 'Freelance designer creating custom websites, web applications and desktop & mobile apps from scratch. Analysis, UX, code, launch and long-term care from one person. Based in Poland, working remotely worldwide.',
     catalogTitle: 'Portfolio – Websites, Web Apps & Mobile Apps | Adam Rędzikowski',
     catalogDescription: 'Portfolio of Adam Rędzikowski: live websites you can open in the browser and Android, iOS and Windows apps you can download straight from their latest releases.',
     suffix: 'Adam Rędzikowski',

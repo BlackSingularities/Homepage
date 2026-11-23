@@ -3,7 +3,7 @@
     "initials": "AR",
     "name": "Adam Rędzikowski",
     "role": "Custom websites and applications",
-    "tagline": "Analysis, design, build and deployment – all from one person.",
+    "tagline": "Analysis, design, code and deployment – all from one person.",
     "location": "Łódź, Poland · working remotely worldwide",
     "email": "kontakt@redzikowski.com",
     "phone": ""
@@ -11,7 +11,7 @@
   "hero": {
     "titleTop": "One person,",
     "titleAccent": "from analysis to launch.",
-    "lead": "I design and build custom websites and applications. I start with the problem and the way you work, then take care of the interface, the build, the launch and everything that comes after. Below are some of my projects – each one can be opened in the browser or downloaded.",
+    "lead": "I design and build custom websites and applications. I start with the problem and the way you work, then take care of the interface, the code, the launch and everything that comes after. Below are some of my projects – each one can be opened in the browser or downloaded.",
     "primaryCta": "Tell me what you need",
     "secondaryCta": "See the portfolio"
   },
